@@ -4,7 +4,7 @@ or any later version. It is developed and maintained by [Étienne Payet](mailto:
 
 Usage: `java -jar nti.jar <file> [action] [options]`
 
-This program tries to prove (non)termination of the program in the provided file.
+NTI tries to prove (non)termination of the program in the provided file.
 - For logic programs, the implemented technique is described in
 [[Payet & Mesnard, TOPLAS'06]](http://lim.univ-reunion.fr/staff/epayet/Research/Resources/toplas06.pdf).
 - For TRSs, the implemented technique uses the dependency pair (DP) framework:
