@@ -8,7 +8,7 @@ sound DP processors, then it tries to prove that the unsolved subproblems
 are infinite using the approach of [Payet, LOPSTR'18].
 
 `file` has to conform to the TPDB syntax specification
-(see http://termination-portal.org/wiki/TPDB).
+(see http://termination-portal.org/wiki/TPDB).   
 It has one of the following suffixes:
 - `.pl` for a pure logic program
 - `.xml` for a TRS or an SRS in XML format
