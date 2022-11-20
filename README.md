@@ -7,10 +7,11 @@ first, it decomposes the initial set of DP problems into subproblems using
 sound DP processors, then it tries to prove that the unsolved subproblems
 are infinite using the approach of [Payet, LOPSTR'18].
 
-`file` has one of the following suffixes:
+`file` has to conform to the TPDB syntax specification
+(see http://termination-portal.org/wiki/TPDB).
+It has one of the following suffixes:
 - `.pl` for a pure logic program
 - `.xml` for a TRS or an SRS in XML format
-`file` has to conform to the TPDB syntax specification (see http://termination-portal.org/wiki/TPDB)
 
 `action` (optional) can be:
 - `-h|--help`: print this help
