@@ -6,7 +6,7 @@ This program tries to prove (non)termination of the program in the provided file
 - For TRSs, the implemented technique uses the dependency pair (DP) framework:
 first, it decomposes the initial set of DP problems into subproblems using
 sound DP processors, then it tries to prove that the unsolved subproblems
-are infinite using the approach of [[Payet, TCS'08]](http://lim.univ-reunion.fr/staff/epayet/Research/Resources/tcs08.pdf)
+are infinite using the approaches of [[Payet, TCS'08]](http://lim.univ-reunion.fr/staff/epayet/Research/Resources/tcs08.pdf)
 and [[Payet, LOPSTR'18]](http://arxiv.org/abs/1808.05065).
 
 `file` has to conform to the [TPDB syntax specification](http://termination-portal.org/wiki/TPDB).   
