@@ -1,16 +1,29 @@
-NTI (October 2022)
+Usage: `java -jar nti.jar <file> [action] [options]`
 
-NTI is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program tries to prove (non)termination of the program in the provided file.
+- For logic programs, the implemented technique is described in [Payet & Mesnard, TOPLAS'06].
+- For TRSs, the implemented technique uses the dependency pair (DP) framework:
+  first, it decomposes the initial set of DP problems into subproblems using
+  sound DP processors, then it tries to prove that the unsolved subproblems
+  are infinite using the approach of [Payet, LOPSTR'18].
 
-NTI is distributed in the hope that it will be useful
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
+`file` has one of the following suffixes:
+   `.pl` for a pure logic program
+   `.xml` for a TRS or an SRS in XML format
+`file` has to conform to the TPDB syntax specification (see http://termination-portal.org/wiki/TPDB)
 
-You should have received a copy of the GNU Lesser General Public License
-along with NTI. If not, see <http://www.gnu.org/licenses/>.
+`action` (optional) can be:
+   `-h|--help`: print this help
+   `--version`: print the version of NTI
+   `-print`: print the program in the given file
+   `-stat`: print some statistics about the program in the given file
+   `-prove`: run a (non)termination proof of the program in the given file
+    THIS IS THE DEFAULT ACTION
 
-Type `java -jar nti.jar -h` for usage
+`options` (optional) can be:
+   `-v`: verbose mode (for printing proof details in the final output)
+   `-t=n`: set a time bound on the nontermination proofs
+    `n` is the time bound in seconds
+   `-cTI=path`: set the path to cTI (for proving termination of logic programs)
+    if no path to cTI is set then only nontermination proofs are run for
+    logic programs
