@@ -1,8 +1,6 @@
-Copyright 2022 [Étienne Payet](etienne.payet@univ-reunion.fr)
-
 NTI is a **free software** distributed under the terms of the
 [GNU Lesser General Public License version 3](https://www.gnu.org/licenses/lgpl-3.0.html)
-or any later version
+or any later version. It is developed and maintained by [Étienne Payet](mailto:etienne.payet@univ-reunion.fr)
 
 Usage: `java -jar nti.jar <file> [action] [options]`
 
