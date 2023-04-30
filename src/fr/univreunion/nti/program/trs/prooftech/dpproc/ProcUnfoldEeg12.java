@@ -225,7 +225,7 @@ public class ProcUnfoldEeg12 extends Processor {
 	 */
 	@Override
 	public String toString() {
-		return "## DP Processor: the technique of [Emmes, Enger, Giesl, IJCAR'12] + unfolding (" +
+		return "## DP Processor: [Emmes, Enger, Giesl, IJCAR'12] (" +
 				this.parameters + "). ";
 	}
 }

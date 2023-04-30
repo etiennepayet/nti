@@ -385,7 +385,9 @@ public class ProcUnfoldPayet extends Processor {
 	 */
 	@Override
 	public String toString() {
-		return "## DP Processor: unfold [Payet, LOPSTR'18] and search for a loop or a lasso (" +
+		return
+				"## DP Processor: [Payet, LOPSTR'18] + " +
+				"[Payet, Non-termination in TRS and LP] (" +
 				this.parameters + "). ";
 	}
 }

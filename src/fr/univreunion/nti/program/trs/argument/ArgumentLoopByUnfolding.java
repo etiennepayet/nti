@@ -161,7 +161,7 @@ public class ArgumentLoopByUnfolding implements Argument {
 	 */
 	@Override
 	public String getWitnessKind() {
-		return "loop";
+		return "single loop";
 	}
 	
 	/**
@@ -177,23 +177,28 @@ public class ArgumentLoopByUnfolding implements Argument {
 		// from the rule that provides this argument.
 		Term left = this.U.getLeft(); //.toFunction();
 		Term right = this.U.getRight(); //.toFunction();
+		String certificate = this.looping.toFunction().toString(variables, false);
 
 		return
-				"The following rule was generated while unfolding\n" +
+				"* Certificate: " + certificate + " from a " + this.getWitnessKind() +
+				"\n* Description:\n" + 
+				"The following rule R was generated while unfolding\n" +
 				"the dependency pairs of the analyzed TRS:\n" +
 				"[iteration = " + this.U.getIteration() + "] " +
 				left.toString(variables, this.shallow) +
 				" -> " +
 				right.toString(variables, this.shallow) +
-				"\nLet l be the left-hand side and r be the right-hand side of this rule." +
+				"\nLet l be the left-hand side and r be the right-hand side of R." +
 				"\nLet p = " + p +
 				", theta1 = " + this.theta1.toString(variables) +
 				" and theta2 = " + this.theta2.toString(variables) + "." +
 				"\nWe have r|p = " +
 				right.get(p, this.shallow).toString(variables, this.shallow) +
-				" and theta2(theta1(l)) = theta1(r|p)." +
-				"\nHence, the term theta1(l) = " +
-				this.looping.toFunction().toString(variables, false) +
-				" starts a looping chain.";
+				"\nand theta2(theta1(l)) = theta1(r|p), " +
+				"i.e., l semi-unifies with r|p." +
+				"\nHence, theta1(R) forms a single loop (Def. 3.5 of " +
+				"\n[Payet, Non-termination in TRS and LP])." + 
+				"\nSo, the term theta1(l) = " + certificate +
+				"\nstarts an infinite rewrite sequence w.r.t. the analyzed TRS.";
 	}
 }

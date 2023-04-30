@@ -118,7 +118,7 @@ public class ArgumentRecurrentPairTrs implements Argument {
 	 */
 	@Override
 	public String getWitnessKind() {
-		return "lasso";
+		return "recurrent pair";
 	}
 	
 	/**
@@ -129,36 +129,19 @@ public class ArgumentRecurrentPairTrs implements Argument {
 	@Override
 	public String toString() {
 		Map<Variable,String> variables = new HashMap<Variable,String>();
-		
+		String certificate = this.lassoLooping.toFunction().toString(variables, false);
+			
 		return
+				"* Certificate: " + certificate + " from a " + this.getWitnessKind() +
+				"\n* Description:\n" + 
 				"The following two rules were generated while unfolding\n" +
 				"the dependency pairs of the analyzed TRS [iteration = " +
 				this.DPP.getIteration() + "]:\n" +
 				"r  = " + this.DPP.getFirst().toString(variables, false) +
 				"\nr' = " + this.DPP.getSecond().toString(variables, false) +
-				"\nThey satisfy the syntactic constraints of Def. 5.6 of\n" +
-				"[Payet, Non-termination in TRS and LP]. So, by Corollary 5.14 of\n" +
-				"[Payet, Non-termination in TRS and LP], the term\n" +
-				this.lassoLooping.toFunction().toString(variables, false) +
-				" starts a lasso-chain.";
+				"\nThey form a recurrent pair (Def. 3.12 of\n" +
+				"[Payet, Non-termination in TRS and LP]).\nSo, the term " +
+				certificate +
+				"\nstarts an infinite rewrite sequence w.r.t. the analyzed TRS.";
 	}
-	/*
-	public String toString() {
-		Map<Variable,String> variables = new HashMap<Variable,String>();
-		
-		return
-				"The following double path program (DPP) was generated while " +
-				"unfolding the analyzed TRS:\n" +
-				"[iteration = " + this.DPP.getIteration() + "] " +
-				this.DPP.toString(variables, false) +
-				"\nThis DPP admits the recurrent pair defined by:\n" +
-				this.recPair.toString() +
-				"\nHence, the term " +
-				this.lassoLooping.toFunction().toString(variables, false) +
-				" is lasso-looping w.r.t. the analyzed TRS.\n" +
-				"The stem of the lasso-loop is " + this.DPP.getPathFirst() +
-				" and the lasso is " + this.DPP.getPathSecond() + ". \n" +
-				"NB: the rules are numbered in the order they occur in the file, starting from 1.";
-	}
-	*/
 }

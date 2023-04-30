@@ -78,7 +78,7 @@ public class ArgumentGeneralized implements Argument {
 	 */
 	@Override
 	public String getWitnessKind() {
-		return "generalized rewrite rule";
+		return "generalized rule";
 	}
 	
 	/**
@@ -89,13 +89,15 @@ public class ArgumentGeneralized implements Argument {
 	@Override
 	public String toString() {
 		Map<Variable,String> variables = new HashMap<Variable,String>();
-
+		String certificate = this.R.getLeft().toString(variables, false);
+		
 		return
-				"The following generalized rewrite rule was generated " +
-				"while unfolding the analyzed TRS:\n" +
+				"* Certificate: " + certificate + " from a " + this.getWitnessKind() +
+				"\n* Description:\n" + 
+				"The following generalized rule was detected\n" +
+				"in the analyzed TRS:\n" +
 				this.R.toString(variables, false) +
-				"\nHence, the term " +
-				this.R.getLeft().toString(variables, false) +
-				" starts an infinite rewrite sequence w.r.t. the analyzed TRS.";
+				"\nHence, the term " + certificate +
+				"\nstarts an infinite rewrite sequence w.r.t. the analyzed TRS.";
 	}
 }
