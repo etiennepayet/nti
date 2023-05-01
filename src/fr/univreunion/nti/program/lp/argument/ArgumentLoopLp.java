@@ -104,7 +104,7 @@ public class ArgumentLoopLp implements Argument {
 		result.append(this.m);
 		result.append(": ");
 		result.append(this.Q);
-		result.append(" is ");
+		result.append(" starts a ");
 		result.append(this.witness.getLoopKind());
 		result.append(" ");
 		result.append(this.witness.getShortDescription());

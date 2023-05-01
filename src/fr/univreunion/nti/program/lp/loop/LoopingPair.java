@@ -34,7 +34,7 @@ import fr.univreunion.nti.term.FunctionSymbol;
  * where binseq is a sequence of binary logic program
  * rules and tau is a DN set of positions for binseq.
  * 
- * Looping pairs are used for inferring path-loopingness.
+ * Looping pairs are used for inferring single loops.
  *   
  * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
@@ -99,18 +99,19 @@ public class LoopingPair implements LoopWitness {
 	}
 
 	/**
-	 * Checks whether this pair is a witness of
-	 * path-loopingness of the given mode, ie if
-	 * the positions that are distinguished by
+	 * Checks whether this pair is a witness of the
+	 * existence of a single loop for the given mode,
+	 * ie if the positions that are distinguished by
 	 * the set of positions of this pair include
 	 * the given mode.
 	 * 
-	 * @param m a mode whose path-loopingness is to
-	 * be proved
-	 * @return a (non-<code>null</code>) path-looping
-	 * query corresponding to <code>m</code> or
-	 * <code>null</code>, if this pair is not a witness
-	 * of path-loopingness of <code>m</code>
+	 * @param m a mode for which a single loop is to
+	 * be found
+	 * @return a (non-<code>null</code>) query
+	 * starting a single loop and corresponding to
+	 * <code>m</code> or <code>null</code>, if this
+	 * pair is not a witness of the existence of a
+	 * single loop for <code>m</code>
 	 */
 	@Override
 	public Function provesLoopingnessOf(Mode m) {
@@ -139,7 +140,7 @@ public class LoopingPair implements LoopWitness {
 	 */
 	@Override
 	public String getLoopKind() {
-		return "path-looping";
+		return "single loop";
 	}
 
 	/**
@@ -154,7 +155,7 @@ public class LoopingPair implements LoopWitness {
 			path.addAll(R.getPath());
 		
 		return "(extracted from a looping pair)\n" +
-				"  The path-loop is " + path;
+				"  The single loop is " + path;
 	}
 
 	/**

@@ -31,13 +31,14 @@ import fr.univreunion.nti.term.Term;
 import fr.univreunion.nti.term.Variable;
 
 /**
- * A recurrent pair (Omega1, Omega2) for proving non-looping
- * nontermination of a double path program (DPP). The following
- * template is assumed:
+ * A recurrent pair (Omega1, Omega2) for proving the
+ * existence of a binary loop. The following template
+ * is assumed:
  * Omega1 = { C1[D^i u] | i in IN }
  * Omega2 = { C2[D^j u](D^k u) | j,k in IN }
- * where the contexts C1 and D contain the square hole only and
- * the context C2 contains the square hole as well as the circle hole.
+ * where the contexts C1 and D contain the square hole
+ * only and the context C2 contains the square hole as
+ * well as the circle hole.
  * 
  * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */

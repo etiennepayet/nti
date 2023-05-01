@@ -27,14 +27,13 @@ import fr.univreunion.nti.term.Position;
 import fr.univreunion.nti.term.Term;
 
 /**
- * A double-path program (DPP) in LP.
- * 
- * DPPs are used for inferring lasso-loopingness.
+ * A recurrent pair in LP for proving the
+ * existence of a binary loop.
  * 
  * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
 
-public class DppLp implements LoopWitness {
+public class RecurrentPairLp implements LoopWitness {
 
 	/**
 	 * The rule pi1 of this DPP.
@@ -52,10 +51,10 @@ public class DppLp implements LoopWitness {
 	private final RecurrentPair recPair;
 
 	/**
-	 * A lasso-looping atomic query provided by this DPP
+	 * A binary-looping atomic query provided by this DPP
 	 * and extracted from <code>recPair</code>.
 	 */
-	private final Function lassoLooping;
+	private final Function binaryLooping;
 
 	/**
 	 * Builds an incomplete DPP containing only
@@ -68,7 +67,7 @@ public class DppLp implements LoopWitness {
 	 * @throws IllegalArgumentException if <code>pi2</code>
 	 * is <code>null</code>
 	 */
-	public DppLp(BinaryRuleLp pi2) {
+	public RecurrentPairLp(BinaryRuleLp pi2) {
 		if (pi2 == null)
 			throw new IllegalArgumentException(
 					"construction of a DPP with a null rule");
@@ -76,7 +75,7 @@ public class DppLp implements LoopWitness {
 		this.pi1 = null;
 		this.pi2 = pi2;
 		this.recPair = null;
-		this.lassoLooping = null;
+		this.binaryLooping = null;
 	}
 
 	/**
@@ -93,9 +92,9 @@ public class DppLp implements LoopWitness {
 	 * @throws NullPointerException if <code>pi1</code>
 	 * or <code>pi2</code> is <code>null</code>
 	 */
-	private DppLp(BinaryRuleLp pi1, BinaryRuleLp pi2) {
+	private RecurrentPairLp(BinaryRuleLp pi1, BinaryRuleLp pi2) {
 
-		Function lassoLooping = null;
+		Function binaryLooping = null;
 		RecurrentPair recPair = null;
 
 		// We try to build a recurrent pair from this DPP.
@@ -116,12 +115,12 @@ public class DppLp implements LoopWitness {
 
 		if (recPair != null)
 			// Here, a recurrent pair could be built. We
-			// get a lasso-looping atomic query from it.
-			lassoLooping = recPair.getNonTerminatingGoal();
+			// get a binary-looping atomic query from it.
+			binaryLooping = recPair.getNonTerminatingGoal();
 
 		this.pi1 = pi1;
 		this.pi2 = pi2;
-		this.lassoLooping = lassoLooping;
+		this.binaryLooping = binaryLooping;
 		this.recPair = recPair;
 	}
 
@@ -138,7 +137,7 @@ public class DppLp implements LoopWitness {
 	 * is <code>null</code>
 	 */
 	@Override
-	public DppLp add(BinaryRuleLp pi1) {
+	public RecurrentPairLp add(BinaryRuleLp pi1) {
 
 		if (pi1 == null)
 			throw new IllegalArgumentException(
@@ -148,7 +147,7 @@ public class DppLp implements LoopWitness {
 		// (see public constructor above).
 
 		if (this.pi1 == null) {
-			DppLp dpp = new DppLp(pi1, this.pi2);
+			RecurrentPairLp dpp = new RecurrentPairLp(pi1, this.pi2);
 			if (dpp.recPair != null) return dpp;
 		}
 
@@ -156,25 +155,27 @@ public class DppLp implements LoopWitness {
 	}
 
 	/**
-	 * Checks whether this pair is a witness of
-	 * lasso-loopingness of the given mode, using
-	 * recurrent pairs.
+	 * Checks whether this pair is a witness for
+	 * the existence of a binary loop for the
+	 * given mode.
 	 * 
-	 * @param m a mode whose lasso-loopingness is to be
-	 * proved
-	 * @return a (non-<code>null</code>) lasso-looping
-	 * query corresponding to <code>m</code> or
-	 * <code>null</code>, if this pair is not a witness
-	 * of lasso-loopingness of <code>m</code>
+	 * @param m a mode for which a binary loop is
+	 * to be found
+	 * @return a (non-<code>null</code>) query 
+	 * starting a binary loop and corresponding
+	 * to <code>m</code> or <code>null</code>,
+	 * if this pair is not a witness of the
+	 * existence of a binary loop for
+	 * <code>m</code>
 	 */
 	@Override
 	public Function provesLoopingnessOf(Mode m) {
-		if (this.lassoLooping != null) {
-			if (this.lassoLooping.getRootSymbol() == m.getPredSymbol()) {
+		if (this.binaryLooping != null) {
+			if (this.binaryLooping.getRootSymbol() == m.getPredSymbol()) {
 				for (Integer i: m)
-					if (!this.lassoLooping.get(new Position(i)).isGround())
+					if (!this.binaryLooping.get(new Position(i)).isGround())
 						return null;
-				return this.lassoLooping;
+				return this.binaryLooping;
 			}
 		}
 		return null;
@@ -189,7 +190,7 @@ public class DppLp implements LoopWitness {
 	 */
 	@Override
 	public String getLoopKind() {
-		return "lasso-looping";
+		return "binary loop";
 	}
 
 	/**
@@ -200,9 +201,9 @@ public class DppLp implements LoopWitness {
 	@Override
 	public String getShortDescription() {
 		return "(extracted from a recurrent pair)\n" +
-				"  The stem of the lasso-loop is " + 
+				"  The stem to the loop is " + 
 				this.pi1.getPath() +
-				" and the lasso is " + this.pi2.getPath();
+				" and the loop is " + this.pi2.getPath();
 	}
 
 	/**

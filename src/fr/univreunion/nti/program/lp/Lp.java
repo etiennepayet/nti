@@ -42,7 +42,7 @@ import fr.univreunion.nti.program.Program;
 import fr.univreunion.nti.program.Proof;
 import fr.univreunion.nti.program.lp.argument.ArgumentLoopLp;
 import fr.univreunion.nti.program.lp.argument.ArgumentLp;
-import fr.univreunion.nti.program.lp.loop.DppLp;
+import fr.univreunion.nti.program.lp.loop.RecurrentPairLp;
 import fr.univreunion.nti.program.lp.loop.LoopWitness;
 import fr.univreunion.nti.program.lp.loop.LoopingPair;
 import fr.univreunion.nti.term.Function;
@@ -132,7 +132,7 @@ public class Lp extends Program implements Iterable<RuleLp> {
 			if (U instanceof BinaryRuleLp) {
 				BinaryRuleLp R = (BinaryRuleLp) U;
 
-				// We keep R for inferring path-loopingness
+				// We keep R for inferring single loops
 				// from looping pairs.
 				LinkedList<BinaryRuleLp> binseq = new LinkedList<BinaryRuleLp>();
 				binseq.add(R);
@@ -140,9 +140,9 @@ public class Lp extends Program implements Iterable<RuleLp> {
 				if (R.isUnitLoop(tau))
 					newDict.add(new LoopingPair(binseq, tau));
 
-				// We also keep R for inferring lasso-loopingness
-				// from DPPs and recurrent pairs.
-				newDict.add(new DppLp(R));
+				// We also keep R for inferring binary loops
+				// from recurrent pairs.
+				newDict.add(new RecurrentPairLp(R));
 			}
 		}
 
@@ -482,7 +482,7 @@ public class Lp extends Program implements Iterable<RuleLp> {
 						Function looping = L.provesLoopingnessOf(m);
 						if (looping != null) {
 							A.add(new ArgumentLoopLp(m, looping, L));
-							proof.printlnIfVerbose("The mode " + m + " is " + L.getLoopKind() +
+							proof.printlnIfVerbose("The mode " + m + " starts a " + L.getLoopKind() +
 									" because of the generated witness:\n  " + L);
 							remainingModes[k] = false;
 							nbRemainingModes--;
