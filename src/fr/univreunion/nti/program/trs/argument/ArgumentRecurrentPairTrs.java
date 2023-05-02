@@ -118,7 +118,7 @@ public class ArgumentRecurrentPairTrs implements Argument {
 	 */
 	@Override
 	public String getWitnessKind() {
-		return "recurrent pair";
+		return "binary loop";
 	}
 	
 	/**
