@@ -25,7 +25,6 @@ import java.util.List;
 
 import fr.univreunion.nti.term.Function;
 import fr.univreunion.nti.term.FunctionSymbol;
-import fr.univreunion.nti.term.Position;
 import fr.univreunion.nti.term.Term;
 
 /**
@@ -77,7 +76,7 @@ public class Mode implements Iterable<Integer> {
 
 		int n = this.predSymbol.getArity();
 		for (int p = 0; p < n; p++) {
-			Term t_p = A.get(new Position(p));
+			Term t_p = A.getChild(p);
 			if (t_p instanceof Function) {
 				FunctionSymbol f = ((Function)t_p).getRootSymbol();
 				String name = f.getName();

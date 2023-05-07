@@ -500,64 +500,54 @@ public abstract class Term implements Iterable<Position> {
 	protected abstract Term deepCopyAux(
 			Collection<Variable> varsToBeCopied,
 			Map<Term, Term> copies);
-
-	/**
-	 * Returns the number of occurrences of the
-	 * provided term in this term.
-	 * 
-	 * @return the number of occurrences of the
-	 * provided term in this term
-	 */
-	public int nbOccurrences(Term t) {
-		Term s = this.findSchema();
-		
-		if (s == t) return 1;
-		
-		return s.nbOccurrencesAux(t);
-	}
-
-	/**
-	 * An auxiliary, internal, method which is used
-	 * to return the number of occurrences of the
-	 * provided term in this term.
-	 * 
-	 * This term is supposed to be the schema of its
-	 * class representative. Moreover, it is supposed
-	 * that <code>this != t</code>.
-	 * 
-	 * @return the number of occurrences of the
-	 * provided term in this term
-	 */
-	protected abstract int nbOccurrencesAux(Term t);
 	
 	/**
 	 * Checks whether this term contains the given
-	 * variable.
+	 * term.
 	 * 
-	 * @param v a variable whose presence in this
+	 * @param t a term whose presence in this
 	 * term is to be tested
 	 * @return <code>true</code> iff this term
-	 * contains <code>v</code>
+	 * contains <code>t</code>
 	 */
-	public boolean contains(Variable v) {
+	public boolean contains(Term t) {
 		Term.incCurrentTime();
-		return this.findSchema().containsAux(v);
+		return this.containsAux1(t);
+	}
+	
+	/**
+	 * An auxiliary, internal, method which is used
+	 * to check whether this term contains the given
+	 * term.
+	 * 
+	 * @param t a term whose presence in this term
+	 * is to be tested
+	 * @return <code>true</code> iff this term
+	 * contains <code>t</code>
+	 */
+	protected boolean containsAux1(Term t) {
+		Term s = this.findSchema();
+
+		if (s == t) return true;
+		
+		return s.containsAux(t);
 	}
 
 	/**
 	 * An auxiliary, internal, method which is used
 	 * to check whether this term contains the given
-	 * variable.
+	 * term.
 	 * 
 	 * This term is supposed to be the schema of its
-	 * class representative.
+	 * class representative. Moreover, it is supposed
+	 * that <code>this != t</code>.
 	 * 
-	 * @param v a variable whose presence in this
-	 * term is to be tested
+	 * @param t a term whose presence in this term
+	 * is to be tested
 	 * @return <code>true</code> iff this term
-	 * contains <code>v</code>
+	 * contains <code>t</code>
 	 */
-	protected abstract boolean containsAux(Variable v);
+	protected abstract boolean containsAux(Term t);
 
 	/**
 	 * Checks whether this term points to a variable.
@@ -686,6 +676,36 @@ public abstract class Term implements Iterable<Position> {
 
 	/**
 	 * Returns the subterm of this term at the given
+	 * single position.
+	 * 
+	 * @param i a single position
+	 * @return the subterm of this term at the given
+	 * position
+	 * @throws IndexOutOfBoundsException if <code>i</code>
+	 * is not a valid position in this term
+	 */
+	public Term get(int i) {
+		return this.findSchema().getAux(i);
+	}
+	
+	/**
+	 * An auxiliary, internal, method which returns
+	 * the subterm of this term at the given single
+	 * position.
+	 * 
+	 * This term is supposed to be the schema of its
+	 * class representative. 
+	 * 
+	 * @param i a single position
+	 * @return the subterm of this term at the given
+	 * position
+	 * @throws IndexOutOfBoundsException if <code>i</code>
+	 * is not a valid position in this term
+	 */
+	protected abstract Term getAux(int i);
+	
+	/**
+	 * Returns the subterm of this term at the given
 	 * position.
 	 * 
 	 * This is a convenience method: the call
@@ -697,7 +717,7 @@ public abstract class Term implements Iterable<Position> {
 	 * @param p a position
 	 * @return the subterm of this term at the given
 	 * position
-	 * @throws IndexOutOfBoundsException when <code>p</code>
+	 * @throws IndexOutOfBoundsException if <code>p</code>
 	 * is not a valid position in this term
 	 */
 	public Term get(Position p) {
@@ -722,7 +742,7 @@ public abstract class Term implements Iterable<Position> {
 	 * search has to be processed through this term
 	 * @return the subterm of this term at the given
 	 * position
-	 * @throws IndexOutOfBoundsException when <code>p</code>
+	 * @throws IndexOutOfBoundsException if <code>p</code>
 	 * is not a valid position in this term
 	 */
 	public Term get(Position p, boolean shallow) {
@@ -747,7 +767,7 @@ public abstract class Term implements Iterable<Position> {
 	 * @param shallow a boolean indicating whether a shallow
 	 * search has to be processed through this term
 	 * @return the subterm of this term at the given position
-	 * @throws IndexOutOfBoundsException when the provided
+	 * @throws IndexOutOfBoundsException if the provided
 	 * iterator does not correspond to a valid position in
 	 * this term
 	 */

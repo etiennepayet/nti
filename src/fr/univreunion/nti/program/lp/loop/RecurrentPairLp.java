@@ -23,7 +23,6 @@ import fr.univreunion.nti.program.RecurrentPair;
 import fr.univreunion.nti.program.lp.BinaryRuleLp;
 import fr.univreunion.nti.program.lp.Mode;
 import fr.univreunion.nti.term.Function;
-import fr.univreunion.nti.term.Position;
 import fr.univreunion.nti.term.Term;
 
 /**
@@ -36,119 +35,94 @@ import fr.univreunion.nti.term.Term;
 public class RecurrentPairLp implements LoopWitness {
 
 	/**
-	 * The rule pi1 of this DPP.
+	 * The rule R1 of this recurrent pair.
 	 */
-	private final BinaryRuleLp pi1;
+	private final BinaryRuleLp R1;
 
 	/**
-	 * The rule pi2 of this DPP.
+	 * The rule R2 of this recurrent pair.
 	 */
-	private final BinaryRuleLp pi2;
+	private final BinaryRuleLp R2;
 
 	/**
-	 * A recurrent pair constructed from this DPP.
+	 * A recurrent pair constructed from R1 and R2.
 	 */
 	private final RecurrentPair recPair;
 
 	/**
-	 * A binary-looping atomic query provided by this DPP
-	 * and extracted from <code>recPair</code>.
-	 */
-	private final Function binaryLooping;
-
-	/**
-	 * Builds an incomplete DPP containing only
-	 * the rule pi2.
+	 * Builds an incomplete recurrent pair containing
+	 * only the rule R2.
 	 * 
-	 * This DPP will have to be completed later
-	 * using method <code>add</code>.
+	 * This recurrent pair will have to be completed
+	 * later using method <code>add</code>.
 	 * 
-	 * @param pi2 the rule pi2 of this DPP
-	 * @throws IllegalArgumentException if <code>pi2</code>
+	 * @param R2 the rule R2 of this recurrent pair
+	 * @throws IllegalArgumentException if <code>R2</code>
 	 * is <code>null</code>
 	 */
-	public RecurrentPairLp(BinaryRuleLp pi2) {
-		if (pi2 == null)
+	public RecurrentPairLp(BinaryRuleLp R2) {
+		if (R2 == null)
 			throw new IllegalArgumentException(
-					"construction of a DPP with a null rule");
+					"construction of a recurrent pair with a null rule");
 
-		this.pi1 = null;
-		this.pi2 = pi2;
+		this.R1 = null;
+		this.R2 = R2;
 		this.recPair = null;
-		this.binaryLooping = null;
 	}
 
 	/**
-	 * Constructs a DPP whose binary rules are the
-	 * provided ones.
+	 * Constructs a recurrent pair whose binary rules
+	 * are the provided ones.
 	 * 
 	 * The provided rules are supposed to be
 	 * non-<code>null</code>.
 	 * 
-	 * @param pi1 (non-<code>null</code>)
-	 * the first rule of this DPP
-	 * @param pi2 (non-<code>null</code>)
-	 * the second rule of this DPP
-	 * @throws NullPointerException if <code>pi1</code>
-	 * or <code>pi2</code> is <code>null</code>
+	 * @param R1 (non-<code>null</code>)
+	 * the first rule of this recurrent pair
+	 * @param R2 (non-<code>null</code>)
+	 * the second rule of this recurrent pair
+	 * @throws NullPointerException if <code>R1</code>
+	 * or <code>R2</code> is <code>null</code>
 	 */
-	private RecurrentPairLp(BinaryRuleLp pi1, BinaryRuleLp pi2) {
+	private RecurrentPairLp(BinaryRuleLp R1, BinaryRuleLp R2) {
 
-		Function binaryLooping = null;
-		RecurrentPair recPair = null;
+		this.R1 = R1;
+		this.R2 = R2;
 
-		// We try to build a recurrent pair from this DPP.
-		Function H1 = pi1.getHead();
-		Term B1 = pi1.getBody(0);
-		Function H2 = pi2.getHead();
-		Term B2 = pi2.getBody(0);
-		// First, we try with the DPP ['pi1', 'pi2'].
-		recPair = RecurrentPair.getInstance(H1, B1, H2, B2);
-		// If the DPP ['pi1', 'pi2'] provided nothing,
-		// we try with the DPP ['pi2', 'pi1'].
-		if (recPair == null) {
-			BinaryRuleLp pi = pi1;
-			pi1 = pi2;
-			pi2 = pi;
-			recPair = RecurrentPair.getInstance(H2, B2, H1, B1);
-		}
-
-		if (recPair != null)
-			// Here, a recurrent pair could be built. We
-			// get a binary-looping atomic query from it.
-			binaryLooping = recPair.getNonTerminatingGoal();
-
-		this.pi1 = pi1;
-		this.pi2 = pi2;
-		this.binaryLooping = binaryLooping;
-		this.recPair = recPair;
+		// We try to build a recurrent pair from R1 and R2.
+		Function H1 = R1.getHead();
+		Term B1 = R1.getBody(0);
+		Function H2 = R2.getHead();
+		Term B2 = R2.getBody(0);
+		this.recPair = RecurrentPair.getInstance(H1, B1, H2, B2);
 	}
 
 	/**
-	 * Builds a complete DPP from this one and
-	 * the provided binary rule.
+	 * Builds a complete recurrent pair from this
+	 * one and the provided binary rule.
 	 * 
-	 * If this DPP is already complete then just
-	 * returns this DPP.
+	 * If this recurrent pair is already complete
+	 * then just returns this recurrent pair.
 	 * 
-	 * @param pi1 a binary logic program rule
-	 * @result a new DPP or this DPP
-	 * @throws IllegalArgumentException if <code>pi1</code>
+	 * @param R1 a binary logic program rule
+	 * @result a new recurrent pair or this
+	 * recurrent pair
+	 * @throws IllegalArgumentException if <code>R1</code>
 	 * is <code>null</code>
 	 */
 	@Override
-	public RecurrentPairLp add(BinaryRuleLp pi1) {
+	public RecurrentPairLp add(BinaryRuleLp R1) {
 
-		if (pi1 == null)
+		if (R1 == null)
 			throw new IllegalArgumentException(
-					"construction of a DPP with a null rule");
+					"construction of a recurrent pair with a null rule");
 
-		// Here, necessarily pi2 != null
+		// Here, necessarily R2 != null
 		// (see public constructor above).
 
-		if (this.pi1 == null) {
-			RecurrentPairLp dpp = new RecurrentPairLp(pi1, this.pi2);
-			if (dpp.recPair != null) return dpp;
+		if (this.R1 == null) {
+			RecurrentPairLp pair = new RecurrentPairLp(R1, this.R2);
+			if (pair.recPair != null) return pair;
 		}
 
 		return this;
@@ -170,14 +144,18 @@ public class RecurrentPairLp implements LoopWitness {
 	 */
 	@Override
 	public Function provesLoopingnessOf(Mode m) {
-		if (this.binaryLooping != null) {
-			if (this.binaryLooping.getRootSymbol() == m.getPredSymbol()) {
-				for (Integer i: m)
-					if (!this.binaryLooping.get(new Position(i)).isGround())
-						return null;
-				return this.binaryLooping;
+		if (this.recPair != null) {
+			Function nonterminating = this.recPair.getNonTerminatingTerm();
+			if (nonterminating != null) {
+				if (nonterminating.getRootSymbol() == m.getPredSymbol()) {
+					for (int i: m)
+						if (!nonterminating.get(i).isGround())
+							return null;
+					return nonterminating;
+				}
 			}
 		}
+
 		return null;
 	}
 
@@ -202,27 +180,21 @@ public class RecurrentPairLp implements LoopWitness {
 	public String getShortDescription() {
 		return "(extracted from a recurrent pair)\n" +
 				"  The stem to the loop is " + 
-				this.pi1.getPath() +
-				" and the loop is " + this.pi2.getPath();
+				this.R1.getPath() +
+				" and the loop is " + this.R2.getPath();
 	}
 
 	/**
-	 * Returns a string representation of this DPP.
+	 * Returns a string representation of this
+	 * recurrent pair.
 	 * 
-	 * @return a string representation of this DPP
+	 * @return a string representation of this
+	 * recurrent pair
 	 */
 	@Override
 	public String toString() {
-		StringBuffer s = new StringBuffer();
-
-		s.append("Recurrent pair: ");
-		s.append(this.recPair);
-		s.append(" for the DPP: <");
-		s.append(this.pi1.toSimpleString());
-		s.append(", ");
-		s.append(this.pi2.toSimpleString());
-		s.append(">");
-
-		return s.toString();
+		if (this.recPair != null)
+			return this.recPair.toString();
+		return super.toString();
 	}
 }

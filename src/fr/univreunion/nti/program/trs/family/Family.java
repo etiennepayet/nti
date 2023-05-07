@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import fr.univreunion.nti.term.FunctionSymbol;
-import fr.univreunion.nti.term.Position;
 import fr.univreunion.nti.term.Term;
 import fr.univreunion.nti.term.Variable;
 
@@ -154,9 +153,7 @@ public class Family {
 
 		for (int i = 0; i < this.arguments.length; i++) {
 			Family this_i = this.arguments[i];
-			Position p = new Position(i);
-
-			if (this_i != null && !this_i.contains(t.get(p))) return false;
+			if (this_i != null && !this_i.contains(t.get(i))) return false;
 		}
 
 		return true;

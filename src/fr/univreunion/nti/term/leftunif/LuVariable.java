@@ -127,24 +127,29 @@ public class LuVariable extends Variable {
 	/**
 	 * An auxiliary, internal, method which is used
 	 * to check whether this term contains the given
-	 * variable.
+	 * term.
 	 * 
 	 * This term is supposed to be the schema of its
-	 * class representative.
+	 * class representative. Moreover, it is supposed
+	 * that <code>this != t</code>.
 	 * 
-	 * @param V a variable
+	 * @param t a term whose presence in this term
+	 * is to be tested
 	 * @return <code>true</code> iff this term
-	 * contains <code>V</code>
+	 * contains <code>t</code>
 	 */
 	@Override
-	protected boolean containsAux(Variable V) {
-		if (V instanceof LuVariable) {
-			LuVariable X = (LuVariable) V;
+	protected boolean containsAux(Term t) {
+		if (t instanceof LuVariable) {
+			LuVariable X = (LuVariable) t;
 			return (X.getRho() <= this.rho) && (X.getVariable() == this.X);
 		}
 
-		// Here, V is a standard variable.
-		return V == this.X;
+		if (t instanceof Variable)
+			// Here, t is a standard variable.
+			return t == this.X;
+		
+		return false;
 	}
 
 	/**

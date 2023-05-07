@@ -128,7 +128,7 @@ public class Function extends Term {
 	 * @param i the index of the child to be returned
 	 * @return the <code>i</code>-th child of this
 	 * function
-	 * @throws IndexOutOfBoundsException when
+	 * @throws IndexOutOfBoundsException if
 	 * <code>i</code> is not a valid child index in
 	 * this function
 	 */
@@ -288,41 +288,20 @@ public class Function extends Term {
 
 	/**
 	 * An auxiliary, internal, method which is used
-	 * to return the number of occurrences of the
-	 * provided term in this term.
+	 * to check whether this term contains the given
+	 * term.
 	 * 
 	 * This term is supposed to be the schema of its
 	 * class representative. Moreover, it is supposed
 	 * that <code>this != t</code>.
 	 * 
-	 * @return the number of occurrences of the
-	 * provided term in this term
-	 */
-	@Override
-	protected int nbOccurrencesAux(Term t) {		
-		int n = 0;
-
-		for (Term s : this.arguments)
-			n += s.nbOccurrences(t);
-
-		return n;
-	}
-
-	/**
-	 * An auxiliary, internal, method which is used
-	 * to check whether this term contains the given
-	 * variable.
-	 * 
-	 * This term is supposed to be the schema of its
-	 * class representative.
-	 * 
-	 * @param v a variable whose presence in this
-	 * term is to be tested
+	 * @param t a term whose presence in this term
+	 * is to be tested
 	 * @return <code>true</code> iff this term
-	 * contains <code>v</code>
+	 * contains <code>t</code>
 	 */
 	@Override
-	protected boolean containsAux(Variable v) {
+	protected boolean containsAux(Term t) {
 		// If this term's mark is not set to the current time,
 		// then this term has not been visited yet. Otherwise,
 		// it has already been visited and then we have to
@@ -331,8 +310,8 @@ public class Function extends Term {
 		long time = Term.getCurrentTime();
 		if (this.mark < time) {
 			this.mark = time;
-			for (Term t : this.arguments)
-				if (t.findSchema().containsAux(v)) return true;
+			for (Term s : this.arguments)
+				if (s.containsAux1(t)) return true;
 		}
 
 		return false;
@@ -533,6 +512,25 @@ public class Function extends Term {
 
 		return symbols;
 	}
+	
+	/**
+	 * An auxiliary, internal, method which returns
+	 * the subterm of this term at the given single
+	 * position.
+	 * 
+	 * This term is supposed to be the schema of its
+	 * class representative. 
+	 * 
+	 * @param i a single position
+	 * @return the subterm of this term at the given
+	 * position
+	 * @throws IndexOutOfBoundsException if <code>i</code>
+	 * is not a valid position in this term
+	 */
+	@Override
+	protected Term getAux(int i) {
+		return this.getChild(i);
+	}
 
 	/**
 	 * An auxiliary, internal, method which is used to
@@ -558,7 +556,7 @@ public class Function extends Term {
 	 * @param shallow a boolean indicating whether a shallow
 	 * search has to be processed through this term
 	 * @return the subterm of this term at the given position
-	 * @throws IndexOutOfBoundsException when the provided
+	 * @throws IndexOutOfBoundsException if the provided
 	 * iterator does not correspond to a valid position in
 	 * this term
 	 */

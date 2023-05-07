@@ -27,7 +27,7 @@ import fr.univreunion.nti.program.trs.polynomial.PolynomialConst;
 
 public class Main {
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		PolynomialConst.resetIDs();
 		
 		PolynomialConst c1 = new PolynomialConst();

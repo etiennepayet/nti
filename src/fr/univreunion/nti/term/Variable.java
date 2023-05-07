@@ -219,48 +219,30 @@ public class Variable extends Term {
 
 		return s;
 	}
-
+	
 	/**
 	 * An auxiliary, internal, method which is used
-	 * to return the number of occurrences of the
-	 * provided term in this term.
+	 * to check whether this term contains the given
+	 * term.
 	 * 
 	 * This term is supposed to be the schema of its
 	 * class representative. Moreover, it is supposed
 	 * that <code>this != t</code>.
 	 * 
-	 * @return the number of occurrences of the
-	 * provided term in this term
-	 */
-	@Override
-	protected int nbOccurrencesAux(Term t) {
-		// As this != t, the term t cannot occur
-		// in this variable.
-		return 0;
-	}
-	
-	/**
-	 * An auxiliary, internal, method which is used
-	 * to check whether this term contains the given
-	 * variable.
-	 * 
-	 * This term is supposed to be the schema of its
-	 * class representative.
-	 * 
-	 * @param v a variable whose presence in this
-	 * term is to be tested
+	 * @param t a term whose presence in this term
+	 * is to be tested
 	 * @return <code>true</code> iff this term
-	 * contains <code>v</code>
+	 * contains <code>t</code>
 	 */
 	@Override
-	protected boolean containsAux(Variable v) {
-		if (v instanceof LuVariable) {
-			LuVariable X = (LuVariable) v;
+	protected boolean containsAux(Term t) {
+		if (t instanceof LuVariable) {
+			LuVariable X = (LuVariable) t;
 			return (X.getRho() == 0) && (X.getVariable() == this);
 		}
 
-		// Here, v is a standard variable.
-		return v == this;
+		// Here, as this != t, we return false.
+		return false;
 	}
 
 	/**
@@ -356,7 +338,24 @@ public class Variable extends Term {
 		return new HashSet<FunctionSymbol>();
 	}
 	
-
+	/**
+	 * An auxiliary, internal, method which returns
+	 * the subterm of this term at the given single
+	 * position.
+	 * 
+	 * This term is supposed to be the schema of its
+	 * class representative. 
+	 * 
+	 * @param i a single position
+	 * @return the subterm of this term at the given
+	 * position
+	 * @throws IndexOutOfBoundsException
+	 */
+	@Override
+	protected Term getAux(int i) {
+		throw new IndexOutOfBoundsException(i + " -- " + this);
+	}
+	
 	/**
 	 * An auxiliary, internal, method which is used to
 	 * return the subterm of this term at the position

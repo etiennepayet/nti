@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import fr.univreunion.nti.program.Path;
 import fr.univreunion.nti.term.Function;
 import fr.univreunion.nti.term.FunctionSymbol;
-import fr.univreunion.nti.term.Position;
 import fr.univreunion.nti.term.Substitution;
 import fr.univreunion.nti.term.Term;
 import fr.univreunion.nti.term.Variable;
@@ -100,8 +99,7 @@ public class BinaryRuleLp extends UnfoldedRuleLp {
 	 * and <code>false</code> otherwise
 	 */
 	public boolean isGroundHeadArgument(int i) {
-		Position p = new Position(i);
-		return this.head.get(p).isGround();
+		return this.head.getChild(i).isGround();
 	}
 
 	/**
@@ -148,8 +146,8 @@ public class BinaryRuleLp extends UnfoldedRuleLp {
 		int n = this.head.getRootSymbol().getArity();
 		for (int i = 0; i < n; i++)
 			for (int j = 0; j < n; j++) {
-				s_i = this.head.get(new Position(i));
-				s_j = this.head.get(new Position(j));
+				s_i = this.head.getChild(i);
+				s_j = this.head.getChild(j);
 				if (j != i && !s_i.isVariableDisjointWith(s_j))
 					Result.add(i);
 			}
@@ -179,7 +177,7 @@ public class BinaryRuleLp extends UnfoldedRuleLp {
 		for (int i = 0; i < DN2.length; i++) {
 			tau_i = tau.get(p, i);
 			if (tau_i != null) {
-				s_i = this.head.get(new Position(i));
+				s_i = this.head.getChild(i);
 				if (s_i.isMoreGeneralThan(tau_i))
 					DN2[i] = tau_i;
 				else if (tau_i.isMoreGeneralThan(s_i))
@@ -211,7 +209,7 @@ public class BinaryRuleLp extends UnfoldedRuleLp {
 		int m = q.getArity();
 		for (int j = 0; j < m; j++) {
 			tau_j = tau.get(q, j);
-			t_j = this.body[0].get(new Position(j));
+			t_j = this.body[0].getChild(j);
 			if (tau_j != null &&
 					!tau_j.isMoreGeneralThan(t_j))
 				Result.add(j);
@@ -240,10 +238,10 @@ public class BinaryRuleLp extends UnfoldedRuleLp {
 		int m = q.getArity();
 		for (int i = 0; i < n; i++)
 			if (tau.inDomain(p, i)) {
-				s_i = this.head.get(new Position(i));
+				s_i = this.head.getChild(i);
 				for (int j = 0; j < m; j++)
 					if (!tau.inDomain(q, j)) {
-						t_j = this.body[0].get(new Position(j));
+						t_j = this.body[0].getChild(j);
 						if (!s_i.isVariableDisjointWith(t_j))
 							Result.add(i);
 					}

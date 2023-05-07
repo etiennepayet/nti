@@ -186,7 +186,7 @@ public class UnfoldedRuleTrsLoopComp extends UnfoldedRuleTrs {
 		this.second = second;
 		this.pathSecond.addAll(pathSecond);
 	}
-	
+
 	/**
 	 * Returns the first rule (i.e., N) of this composed triple.
 	 *  
@@ -195,7 +195,7 @@ public class UnfoldedRuleTrsLoopComp extends UnfoldedRuleTrs {
 	public RuleTrs getFirst() {
 		return new RuleTrs(this.left, this.right);
 	}
-	
+
 	/**
 	 * Returns the second rule (i.e., N') of this composed triple.
 	 *  
@@ -204,7 +204,7 @@ public class UnfoldedRuleTrsLoopComp extends UnfoldedRuleTrs {
 	public RuleTrs getSecond() {
 		return this.second;
 	}
-	
+
 	/**
 	 * Returns the path (in the unfolded program) corresponding
 	 * to the first rule of this triple.
@@ -306,21 +306,15 @@ public class UnfoldedRuleTrsLoopComp extends UnfoldedRuleTrs {
 		Function l2 = this.second.getLeft();
 		Term r2 = this.second.getRight();
 
-		// First, we try with the DPP ['this', 'this.second'].
 		RecurrentPair recPair = 
 				RecurrentPair.getInstance(l1, r1, l2, r2);
 
-		// If the DPP ['this', 'this.second'] provided nothing,
-		// we try with the DPP ['this.second', 'this'].
-		if (recPair == null)
-			recPair = RecurrentPair.getInstance(l2, r2, l1, r1);
-
 		if (recPair != null) {
 			// Here, a recurrent pair could be built.
-			// We get a lasso-looping term from it.
-			Function lassoLooping = recPair.getNonTerminatingGoal();
-			if (lassoLooping != null)
-				A = new ArgumentRecurrentPairTrs(lassoLooping, this, recPair);
+			// We get a non-terminating term from it.
+			Function nonterminating = recPair.getNonTerminatingTerm();
+			if (nonterminating != null)
+				A = new ArgumentRecurrentPairTrs(nonterminating, this);
 		}
 
 		return A;

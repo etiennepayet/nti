@@ -294,42 +294,23 @@ public class PrologList extends Term {
 
 	/**
 	 * An auxiliary, internal, method which is used
-	 * to return the number of occurrences of the
-	 * provided term in this term.
+	 * to check whether this term contains the given
+	 * term.
 	 * 
 	 * This term is supposed to be the schema of its
 	 * class representative. Moreover, it is supposed
 	 * that <code>this != t</code>.
 	 * 
-	 * @return the number of occurrences of the
-	 * provided term in this term
-	 */
-	@Override
-	protected int nbOccurrencesAux(Term t) {
-		if (this == EMPTY_PROLOG_LIST) return 0;
-
-		return this.first.nbOccurrences(t)
-				+ this.tail.nbOccurrences(t);		
-	}
-
-	/**
-	 * An auxiliary, internal, method which is used
-	 * to check whether this term contains the given
-	 * variable.
-	 * 
-	 * This term is supposed to be the schema of its
-	 * class representative.
-	 * 
-	 * @param v a variable whose presence in this
-	 * term is to be tested
+	 * @param t a term whose presence in this term
+	 * is to be tested
 	 * @return <code>true</code> iff this term
-	 * contains <code>v</code>
+	 * contains <code>t</code>
 	 */
 	@Override
-	protected boolean containsAux(Variable v) {
+	protected boolean containsAux(Term t) {
 		// If this list is the empty list, then we return false.
 		// Otherwise, we check whether the first element or the
-		// tail of this list contain the provided variable.
+		// tail of this list contain the provided term.
 		if (this != EMPTY_PROLOG_LIST) {
 			// If this term's mark is not set to the current time,
 			// then this term has not been visited yet. Otherwise,
@@ -338,8 +319,8 @@ public class PrologList extends Term {
 			long time = Term.getCurrentTime();
 			if (this.mark < time) {
 				this.mark = time;
-				return this.first.findSchema().containsAux(v) ||
-						this.tail.findSchema().containsAux(v);
+				return this.first.containsAux1(t) ||
+						this.tail.containsAux1(t);
 			}
 		}
 
@@ -502,6 +483,16 @@ public class PrologList extends Term {
 		}
 
 		return symbols;
+	}
+	
+	/**
+	 * Unsupported operation.
+	 * 
+	 * @throws UnsupportedOperationException
+	 */
+	@Override
+	protected Term getAux(int i) {
+		throw new UnsupportedOperationException();
 	}
 
 	/**

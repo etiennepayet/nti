@@ -269,41 +269,20 @@ public class PrologTuple extends Term {
 
 	/**
 	 * An auxiliary, internal, method which is used
-	 * to return the number of occurrences of the
-	 * provided term in this term.
+	 * to check whether this term contains the given
+	 * term.
 	 * 
 	 * This term is supposed to be the schema of its
 	 * class representative. Moreover, it is supposed
 	 * that <code>this != t</code>.
 	 * 
-	 * @return the number of occurrences of the
-	 * provided term in this term
-	 */
-	@Override
-	protected int nbOccurrencesAux(Term t) {
-		int n = 0;
-		
-		for (Term s : this.elements)
-			n += s.nbOccurrences(t);
-		
-		return n;
-	}
-	
-	/**
-	 * An auxiliary, internal, method which is used
-	 * to check whether this term contains the given
-	 * variable.
-	 * 
-	 * This term is supposed to be the schema of its
-	 * class representative.
-	 * 
-	 * @param v a variable whose presence in this
-	 * term is to be tested
+	 * @param t a term whose presence in this term
+	 * is to be tested
 	 * @return <code>true</code> iff this term
-	 * contains <code>v</code>
+	 * contains <code>t</code>
 	 */
 	@Override
-	protected boolean containsAux(Variable v) {
+	protected boolean containsAux(Term t) {
 		// If this term's mark is not set to the current time,
 		// then this term has not been visited yet. Otherwise,
 		// it has already been visited and then we have to
@@ -312,8 +291,8 @@ public class PrologTuple extends Term {
 		long time = Term.getCurrentTime();
 		if (this.mark < time) {
 			this.mark = time;
-			for (Term t : this.elements)
-				if (t.findSchema().containsAux(v)) return true;
+			for (Term s : this.elements)
+				if (s.containsAux1(t)) return true;
 		}
 
 		return false;
@@ -428,7 +407,7 @@ public class PrologTuple extends Term {
 		for (Term t : this.elements)
 			t.getVariableOccurrences(occurrences);
 	}
-	
+
 	/**
 	 * An auxiliary, internal, method which is used to
 	 * build the set of function symbols of this term.
@@ -448,7 +427,7 @@ public class PrologTuple extends Term {
 		// it has already been visited and then we have to
 		// return an empty set because the set of function
 		// symbols of this term has already been considered.
-		
+
 		long time = Term.getCurrentTime();
 		if (this.mark < time) {
 			this.mark = time;
@@ -458,6 +437,29 @@ public class PrologTuple extends Term {
 		}
 
 		return symbols;
+	}
+
+	/**
+	 * An auxiliary, internal, method which returns
+	 * the subterm of this term at the given single
+	 * position.
+	 * 
+	 * This term is supposed to be the schema of its
+	 * class representative. 
+	 * 
+	 * @param i a single position
+	 * @return the subterm of this term at the given
+	 * position
+	 * @throws IndexOutOfBoundsException if <code>i</code>
+	 * is not a valid position in this term
+	 */
+	@Override
+	protected Term getAux(int i) {
+		// Check whether i is out of bounds.
+		if (i < 0 || i >= this.elements.size())
+			throw new IndexOutOfBoundsException(i + " -- " + this);
+
+		return this.elements.get(i);
 	}
 
 	/**
@@ -484,7 +486,7 @@ public class PrologTuple extends Term {
 	 * @param shallow a boolean indicating whether a shallow
 	 * search has to be processed through this term
 	 * @return the subterm of this term at the given position
-	 * @throws IndexOutOfBoundsException when the provided
+	 * @throws IndexOutOfBoundsException if the provided
 	 * iterator does not correspond to a valid position in
 	 * this term
 	 */
@@ -885,7 +887,7 @@ public class PrologTuple extends Term {
 	protected int depthAux() {
 		throw new UnsupportedOperationException();
 	}
-	
+
 	/**
 	 * Unsupported operation.
 	 * 

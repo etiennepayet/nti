@@ -151,9 +151,8 @@ public class Lp extends Program implements Iterable<RuleLp> {
 
 	/**
 	 * This method tries to add each binary unfolded rule
-	 * in the given list to the looping pairs and DPPs of
-	 * the given dictionary. The resulting loop dictionary
-	 * is returned.
+	 * in the given list to the loop witnesses of the given
+	 * dictionary. The resulting loop dictionary is returned.
 	 * 
 	 * @param unfolded a list of rules resulting from unfolding
 	 * a logic program

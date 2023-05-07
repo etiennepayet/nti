@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.univreunion.nti.program.Argument;
-import fr.univreunion.nti.program.RecurrentPair;
 import fr.univreunion.nti.program.trs.ParentTrs;
 import fr.univreunion.nti.program.trs.loop.comp.UnfoldedRuleTrsLoopComp;
 import fr.univreunion.nti.term.Function;
@@ -31,11 +30,8 @@ import fr.univreunion.nti.term.Variable;
 
 /**
  * A nontermination proof argument in term rewriting.
- * It is produced when searching for a lasso-looping
- * term using recurrent pairs. It embeds a lasso-looping
- * term, together with the double path program (DPP) that
- * provides this argument and the recurrent pair that was
- * computed for the DPP.
+ * It is produced when searching for a binary loop
+ * using recurrent pairs.
  *
  * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
@@ -43,35 +39,27 @@ import fr.univreunion.nti.term.Variable;
 public class ArgumentRecurrentPairTrs implements Argument {
 
 	/**
-	 * The lasso-looping term of this argument.
+	 * The term that starts a binary loop.
 	 */
-	private final Function lassoLooping;
+	private final Function binaryLooping;
 
 	/**
-	 * The double path program that provides this argument.
+	 * The recurrent pair that provides this argument.
 	 */
-	private final UnfoldedRuleTrsLoopComp DPP;
-	
-	/**
-	 * The recurrent pair that was computed for the DPP
-	 * of this argument.
-	 */
-	// private final RecurrentPair recPair;
-	
+	private final UnfoldedRuleTrsLoopComp recPair;
+		
 	/**
 	 * Builds a nontermination argument.
 	 * 
-	 * @param lassoLooping the lasso-looping term of this argument
-	 * @param DPP the double path program that provides this argument
-	 * @param recPair the recurrent pair that was computed for the DPP
+	 * @param binaryLooping the term that starts a binary loop
+	 * @param recPair the recurrent pair from which the
+	 * binary-looping term was generated
 	 */
-	public ArgumentRecurrentPairTrs(Function lassoLooping, 
-			UnfoldedRuleTrsLoopComp DPP,
-			RecurrentPair recPair) {
+	public ArgumentRecurrentPairTrs(Function binaryLooping, 
+			UnfoldedRuleTrsLoopComp recPair) {
 		
-		this.lassoLooping = lassoLooping;
-		this.DPP = DPP;
-		// this.recPair = recPair;
+		this.binaryLooping = binaryLooping;
+		this.recPair = recPair;
 	}
 	
 	/**
@@ -92,17 +80,17 @@ public class ArgumentRecurrentPairTrs implements Argument {
 		for (int i = 0; i < indentation; i++) s.append(" ");
 		s.append("Here is the successful unfolding. Let IR be the TRS under analysis.\n");
 		
-		int n = this.DPP.getIteration();
+		int n = this.recPair.getIteration();
 		
 		ParentTrs parent;
-		if ((parent = this.DPP.getParent()) != null) {
+		if ((parent = this.recPair.getParent()) != null) {
 			s.append(parent.toString(indentation) + "\n");
 			for (int i = 0; i < indentation; i++) s.append(" ");
-			s.append("==> L" + n + " = " + this.DPP);
+			s.append("==> L" + n + " = " + this.recPair);
 		}
 		else {
 			for (int i = 0; i < indentation; i++) s.append(" ");
-			s.append("L" + n + " = " + this.DPP);
+			s.append("L" + n + " = " + this.recPair);
 		}
 		s.append(" is in U_IR^" + n + ".");
 		
@@ -129,16 +117,16 @@ public class ArgumentRecurrentPairTrs implements Argument {
 	@Override
 	public String toString() {
 		Map<Variable,String> variables = new HashMap<Variable,String>();
-		String certificate = this.lassoLooping.toFunction().toString(variables, false);
+		String certificate = this.binaryLooping.toFunction().toString(variables, false);
 			
 		return
 				"* Certificate: " + certificate + " from a " + this.getWitnessKind() +
 				"\n* Description:\n" + 
 				"The following two rules were generated while unfolding\n" +
 				"the dependency pairs of the analyzed TRS [iteration = " +
-				this.DPP.getIteration() + "]:\n" +
-				"r  = " + this.DPP.getFirst().toString(variables, false) +
-				"\nr' = " + this.DPP.getSecond().toString(variables, false) +
+				this.recPair.getIteration() + "]:\n" +
+				"r  = " + this.recPair.getFirst().toString(variables, false) +
+				"\nr' = " + this.recPair.getSecond().toString(variables, false) +
 				"\nThey form a recurrent pair (Def. 3.12 of\n" +
 				"[Payet, Non-termination in TRS and LP]).\nSo, the term " +
 				certificate +

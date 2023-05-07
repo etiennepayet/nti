@@ -98,6 +98,6 @@ public class ArgumentGeneralized implements Argument {
 				"in the analyzed TRS:\n" +
 				this.R.toString(variables, false) +
 				"\nHence, the term " + certificate +
-				"\nstarts an infinite rewrite sequence w.r.t. the analyzed TRS.";
+				"\nstarts an infinite rewrite sequence w.r.t.\nthe analyzed TRS.";
 	}
 }

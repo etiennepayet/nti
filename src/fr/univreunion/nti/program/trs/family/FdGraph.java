@@ -26,7 +26,6 @@ import java.util.Set;
 
 import fr.univreunion.nti.program.trs.Trs;
 import fr.univreunion.nti.term.FunctionSymbol;
-import fr.univreunion.nti.term.Position;
 import fr.univreunion.nti.term.Term;
 import fr.univreunion.nti.term.Variable;
 
@@ -42,7 +41,7 @@ public class FdGraph {
 	 * The term rewrite system to which this graph refers.
 	 */
 	private final Trs IR;
-	
+
 	/**
 	 * The set of edges of the graph. It is a mapping from hash codes
 	 * of terms to sets of function symbols. A mapping h(t) -> F
@@ -68,7 +67,7 @@ public class FdGraph {
 	public FdGraph(Trs IR) {
 		this.IR = IR;
 	}
-	
+
 	/**
 	 * Adds an edge from <code>start</code> to <code>end</code>
 	 * to this graph if it is not already present.
@@ -115,10 +114,8 @@ public class FdGraph {
 
 		// Then, compute the family sets of the arguments of t.
 		int n = t.getRootSymbol().getArity();
-		for (int i = 0; i < n; i++) {
-			Position p = new Position(i);
-			family.add(i, this.getFamily(t.get(p)));
-		}
+		for (int i = 0; i < n; i++) 
+			family.add(i, this.getFamily(t.get(i)));
 
 		return family;
 	}
