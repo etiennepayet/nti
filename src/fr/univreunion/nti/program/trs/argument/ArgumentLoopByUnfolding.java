@@ -161,7 +161,8 @@ public class ArgumentLoopByUnfolding implements Argument {
 	 */
 	@Override
 	public String getWitnessKind() {
-		return "single loop";
+		// return "single loop";
+		return "loop";
 	}
 	
 	/**
@@ -180,8 +181,10 @@ public class ArgumentLoopByUnfolding implements Argument {
 		String certificate = this.looping.toFunction().toString(variables, false);
 
 		return
-				"* Certificate: " + certificate + " from a " + this.getWitnessKind() +
-				"\n* Description:\n" + 
+				// "* Certificate: " + certificate + " from a " + this.getWitnessKind() +
+				// "\n* Description:\n" + 
+				"* Certificate: " + certificate + " is non-terminating\n" +
+				"* Description:\n" + 
 				"The following rule R was generated while unfolding\n" +
 				"the dependency pairs of the analyzed TRS:\n" +
 				"[iteration = " + this.U.getIteration() + "] " +
@@ -196,8 +199,8 @@ public class ArgumentLoopByUnfolding implements Argument {
 				right.get(p, this.shallow).toString(variables, this.shallow) +
 				"\nand theta2(theta1(l)) = theta1(r|p), " +
 				"i.e., l semi-unifies with r|p." +
-				"\nHence, theta1(R) forms a single loop (Def. 3.5 of " +
-				"\n[Payet, Non-termination in TRS and LP])." + 
+				// "\nHence, theta1(R) forms a single loop (Def. 3.5 of " +
+				// "\n[Payet, Non-termination in TRS and LP])." + 
 				"\nSo, the term theta1(l) = " + certificate +
 				"\nstarts an infinite rewrite sequence w.r.t. the analyzed TRS.";
 	}

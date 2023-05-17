@@ -26,7 +26,9 @@ import java.util.Map;
 import fr.univreunion.nti.term.Function;
 import fr.univreunion.nti.term.FunctionSymbol;
 import fr.univreunion.nti.term.Hole;
+import fr.univreunion.nti.term.Substitution;
 import fr.univreunion.nti.term.Term;
+import fr.univreunion.nti.term.Variable;
 
 /**
  * A recurrent pair for proving the existence of a binary loop
@@ -63,14 +65,25 @@ public class RecurrentPair {
 	private final Function r2;
 
 	/**
-	 * The ground context C of this recurrent pair.
+	 * The ground context c of this recurrent pair.
 	 */
-	private final Term C;
+	private final Term c;
 
 	/**
-	 * The ground term t of this recurrent pair.
+	 * The ground term s of this recurrent pair.
+	 */
+	private final Term s;
+
+	/**
+	 * The term t of this recurrent pair
+	 * (either equal to s or to a variable).
 	 */
 	private final Term t;
+
+	/**
+	 * The integers n1, n2, n3 of this recurrent pair.
+	 */
+	private final int n1, n2, n3;
 
 	/**
 	 * The position of the increasing argument
@@ -157,7 +170,7 @@ public class RecurrentPair {
 	 */
 	private synchronized static RecurrentPair buildRecPair(
 			Function l1, Function r1, Function l2, Function r2) {
-		
+
 		// We flatten l1 and r1 (i.e., make each subterm the
 		// only element of its class and be its own schema).
 		Map<Term, Term> copies = new HashMap<Term, Term>();
@@ -183,7 +196,7 @@ public class RecurrentPair {
 			// First, we check whether l1 = f(...,x1,...) and
 			// l2 = f(...,x2,...) where x1 and x2 are variables
 			// located at position i and occur only at that
-			// position in l1, rr1 and l2.
+			// position in l1, r1 and l2.
 			Term x1 = l1.getChild(i), x2 = l2.getChild(i);
 			if (x1.isVariable() && x2.isVariable() &&
 					occursOnlyAt(x1, l1,  i, -1, n) &&
@@ -194,75 +207,76 @@ public class RecurrentPair {
 				for (int j = 0; j < n; j++)
 					if (j != i) {
 						Term y1 = r1.getChild(j);
-						Term t = l2.getChild(j);
+						Term s = l2.getChild(j);
 
 						if (x1 != y1 && y1.isVariable() &&
 								occursOnlyAt(y1, l1,  -1, j, n) &&
 								occursOnlyAt(y1, r1, -1, j, n) &&
 								occursOnlyAt(x2, r2, i, j, n)  && 
-								t.isGround()) {
+								s.isGround()) {
 
-							Term s = r1.getChild(i);
-							Term t1 = r2.getChild(i), t2 = r2.getChild(j);
-
-							Term C = null;
 							// 0x25A1 is the UFT-16 encoding of
 							// the white square character.
 							Hole square = new Hole("" + '\u25A1');
+							Term c = groundContextFrom(l1.getChild(j), y1, square);
 
-							boolean cond3;
-							if (cond3 = (t2 == x2))
-								// Condition (3) of Def. 3.12 of
-								// [Payet, JAR'23].
-								C = contextFrom(
-										new Term[] {l1.getChild(j), s, t1},
-										new Term[] {y1, x1, t},
-										square);
-							
-							else if (s == x1 && t1.deepEquals(t2))
-								// Condition (4) of Def. 3.12 of
-								// [Payet, JAR'23].
-								C = contextFrom(
-										new Term[] {l1.getChild(j), t2},
-										new Term[] {y1, x2},
-										square);
+							if (c != null) {
+								int n1 = towerOfContexts(r1.getChild(i), c, x1);
+								// If c does not contain any hole then n1 < 0.
+								if (0 <= n1) {
+									Term t2 = r2.getChild(j);
+									int n3 = towerOfContexts(t2, c, x2);
+									if (0 <= n3) {
+										Term t1 = r2.getChild(i);
+										int n2 = towerOfContexts(t1, c, s);
+										Term t = null;
+										if (0 <= n2) t = s;
+										else {
+											n2 = towerOfContexts(t1, c, x2);
+											if (0 <= n2) t = x2;
+										}
+										if (t != null) {
+											// We build the non-terminating term.
 
-							if (C != null && C != square && C.getVariables().size() == 1) {
-								// Here, C is a ground context (i.e., its only
-								// variable is the hole) and is not the hole.
+											// The arguments of the non-terminating term:
+											LinkedList<Term> arguments = new LinkedList<Term>();
+											for (int k = 0; k < n; k++) {
+												if (k == i) {
+													if (t == s) arguments.add(t1);
+													else {
+														// Here, t = x.
+														Substitution sigma = new Substitution();
+														sigma.add((Variable) x2, s);
+														arguments.add(t1.apply(sigma));
+													}
+												}
+												else if (k == j) {
+													Substitution sigma = new Substitution();
+													sigma.add((Variable) x2, s);
+													arguments.add(t2.apply(sigma));
+												}
+												else {
+													Term l1_k = l1.getChild(k);
+													if (!(l1_k.unifyWith(r1.getChild(k)) &&
+															l1_k.unifyWith(l2.getChild(k)) &&
+															l1_k.unifyWith(r2.getChild(k))))
+														// If a non-terminating term cannot be built
+														// then we stop because another i or another j
+														// will not work. Indeed, at that point, we have
+														// l1_j = c[y] and r1_j = y, i.e., l1_j does not
+														// unify with r1_j. We have something similar for i.
+														return null;
+													arguments.add(l1_k);
+												}
+											}
 
-								// We build a non-terminating term generated
-								// by the recurrent pair.
-								// The arguments of the non-terminating term:
-								LinkedList<Term> arguments = new LinkedList<Term>();
-
-								for (int k = 0; k < n; k++)
-									if (k == i) {
-										// If cond. 3 holds then t1 = c[t].
-										if (cond3) arguments.add(t1);
-										else arguments.add(t);
+											return new RecurrentPair(l1, r1, l2, r2,
+													c, s, t, n1, n2, n3,
+													i, j, new Function(f, arguments));
+										}
 									}
-									else if (k == j) arguments.add(t);
-									else {
-										Term l1_k = l1.getChild(k);
-										if (!(l1_k.unifyWith(r1.getChild(k)) &&
-												l1_k.unifyWith(l2.getChild(k)) &&
-												l1_k.unifyWith(r2.getChild(k))))
-											// If a non-terminating term cannot be built
-											// then we stop because another i or another j
-											// will not work. Indeed, at that point, we have
-											// l1_j = c[y] and r1_j = y, i.e., l1_j does not
-											// unify with r1_j. We have something similar for i.
-											return null;
-										arguments.add(l1_k);
-									}
-
-								// Finally, if a non-terminating term could be built
-								// then we stop and return a recurrent pair. 
-								return new RecurrentPair(l1, r1, l2, r2,
-										C, t, i, j, new Function(f, arguments));
+								}
 							}
-
 						}
 					}
 			}
@@ -296,59 +310,93 @@ public class RecurrentPair {
 	}
 
 	/**
-	 * Tries to build a common context from the
-	 * provided terms.
+	 * Checks whether <code>c_y = c[y]</code> for a
+	 * ground context <code>c</code> (that possibly
+	 * contains several occurrences of the provided
+	 * hole).
 	 * 
-	 * More precisely, checks whether 
-	 * <code>outer[k] = c[inner[k]]</code>
-	 * for all <code>k</code>, where <code>c</code>
-	 * is a common context.
+	 * BEWARE: the returned c may not contain 
+	 * the provided hole. This happens when
+	 * <code>c_y</code> is a ground function
+	 * that does not contain <code>y</code>.
 	 * 
-	 * @param outer the outer terms from which a
+	 * @param c_y the outer term from which a
 	 * context is built
-	 * @param inner the inner terms from which a
-	 * context is built
+	 * @param y the inner term from which a
+	 * context is built (supposed to be a variable)
 	 * @param square the hole to be used while
 	 * building the context
-	 * @return a context, or <code>null</code> if
-	 * no context could be built from the provided
+	 * @return a ground context, or <code>null</code>
+	 * if no context could be built from the provided
 	 * terms
 	 */
-	private synchronized static Term contextFrom(
-			Term[] outer, Term[] inner, Hole square) {
+	private synchronized static Term groundContextFrom(
+			Term c_y, Term y, Hole square) {
 
-		int n = outer.length;
+		if (c_y.isVariable())
+			// y is supposed to be a variable, hence the
+			// use of ==.
+			return (c_y == y ? square : null);
 
-		// First, we check whether we have to
-		// return the hole.
-		if (outer[0].deepEquals(inner[0])) {
-			for (int k = 1; k < n; k++)
-				if (!outer[k].deepEquals(inner[k])) return null;
-			return square;
-		}
-
-		// From here, the outer terms have to be functions.
-		if (outer[0] instanceof Function) {
-			FunctionSymbol f = outer[0].getRootSymbol();
-			// All the other outer terms must have the form f(...).
-			for (int l = 1; l < n; l++)
-				if (outer[l].getRootSymbol() != f) return null;
-
-			int a = f.getArity();
+		if (c_y instanceof Function) {
+			FunctionSymbol f = c_y.getRootSymbol();
+			int n = f.getArity();
 			LinkedList<Term> arguments = new LinkedList<Term>();
-			for (int k = 0; k < a; k++) {
-				Term[] outer_k = new Term[n];
-				for (int l = 0; l < n; l++)
-					outer_k[l] = outer[l].get(k);
-				Term C_k;
-				if ((C_k = contextFrom(outer_k, inner, square)) == null)
+			for (int k = 0; k < n; k++) {
+				Term c_k;
+				if ((c_k = groundContextFrom(c_y.get(k), y, square)) == null)
 					return null;
-				arguments.add(C_k);
+				arguments.add(c_k);
 			}
 			return new Function(f, arguments);
 		}
 
 		return null;
+	}
+
+	/**
+	 * Checks whether the provided term <code>t</code> has the
+	 * form <code>c^n[base]</code> for some <code>n</code>.
+	 * If so, then returns <code>n</code>. Otherwise, returns
+	 * a negative integer.
+	 * 
+	 * In particular, a negative integer is returned if
+	 * <code>c</code> does not contain any hole.
+	 * 
+	 * @param t a term to be checked
+	 * @param c a context (possibly with several holes)
+	 * @param base a base term
+	 * @return <code>n</code> if it exists, otherwise a
+	 * negative integer
+	 */
+	private synchronized static int towerOfContexts(Term t, Term c, Term base) {		
+		// If t is equal to base, then it is equal to c^0[base].
+		if (t.deepEquals(base)) return 0;
+
+		FunctionSymbol f = t.getRootSymbol();
+		if (f == c.getRootSymbol()) {
+			Term c_k;
+			int n = f.getArity();
+			int tow = -2;
+			for (int k = 0; k < n; k++)
+				if ((c_k = c.get(k)) instanceof Hole) {
+					int tow_k;
+					if ((tow_k = towerOfContexts(t.get(k), c, base)) < 0)
+						return -1;
+					// If this is the first instance of a hole
+					// we encounter, then we set tow to tow_k.
+					if (tow < 0) tow = tow_k;
+					// Otherwise, we check whether tow_k is
+					// equal to the value obtained with the
+					// previous holes.
+					else if (tow != tow_k) return -1;
+				}
+				else if (!c_k.deepEquals(t.get(k)))
+					return -1;
+			return tow + 1;
+		}
+
+		return -1;
 	}
 
 	/**
@@ -358,25 +406,130 @@ public class RecurrentPair {
 	 * @param r1 the right-hand side of the rule R1
 	 * @param l2 the left-hand side of the rule R2
 	 * @param r2 the right-hand side of the rule R2
-	 * @param C the ground context C
-	 * @param t the ground term t
+	 * @param c the ground context c
+	 * @param s the ground term s
+	 * @param t the term t
+	 * @param n1 the integer n1
+	 * @param n2 the integer n2
+	 * @param n3 the integer n3
 	 * @param i the position of the increasing argument
 	 * @param j the position of the decreasing argument
 	 * @param nonterminating a non-terminating term
 	 * generated by this recurrent pair
 	 */
 	private RecurrentPair(Function l1, Function r1, Function l2, Function r2,
-			Term C, Term t, int i, int j, Function nonterminating) {
+			Term c, Term s, Term t, int n1, int n2, int n3,
+			int i, int j, Function nonterminating) {
 
 		this.l1 = l1;
 		this.r1 = r1;
 		this.l2 = l2;
 		this.r2 = r2;
-		this.C  = C;
+		this.c  = c;
+		this.s  = s;
 		this.t  = t;
+		this.n1 = n1;
+		this.n2 = n2;
+		this.n3 = n3;
 		this.i  = i;
 		this.j  = j;
 		this.nonterminating = nonterminating;
+	}
+
+	/**
+	 * Returns the left-hand side of the rule R1
+	 * of this recurrent pair.
+	 */
+	public Function getLeft1() {
+		return this.l1;
+	}
+
+	/**
+	 * Returns the right-hand side of the rule R1
+	 * of this recurrent pair.
+	 */
+	public Function getRight1() {
+		return this.r1;
+	}
+
+	/**
+	 * Returns the left-hand side of the rule R2
+	 * of this recurrent pair.
+	 */
+	public Function getLeft2() {
+		return this.l2;
+	}
+
+	/**
+	 * Returns the right-hand side of the rule R2
+	 * of this recurrent pair.
+	 */
+	public Function getRight2() {
+		return this.r2;
+	}
+
+	/**
+	 * Returns the context c
+	 * of this recurrent pair.
+	 */
+	public Term getContext() {
+		return this.c;
+	}
+
+	/**
+	 * Returns the ground term s of
+	 * this recurrent pair.
+	 */
+	public Term getS() {
+		return this.s;
+	}
+
+	/**
+	 * Returns the term t of
+	 * this recurrent pair.
+	 */
+	public Term getT() {
+		return this.t;
+	}
+
+	/**
+	 * Returns the integer n1 of
+	 * this recurrent pair.
+	 */
+	public int getN1() {
+		return this.n1;
+	}
+
+	/**
+	 * Returns the integer n2 of
+	 * this recurrent pair.
+	 */
+	public int getN2() {
+		return this.n2;
+	}
+
+	/**
+	 * Returns the integer n3 of
+	 * this recurrent pair.
+	 */
+	public int getN3() {
+		return this.n3;
+	}
+
+	/**
+	 * Returns the position i of
+	 * this recurrent pair.
+	 */
+	public int getI() {
+		return this.i;
+	}
+
+	/**
+	 * Returns the position j of
+	 * this recurrent pair.
+	 */
+	public int getJ() {
+		return this.j;
 	}
 
 	/**
@@ -387,21 +540,5 @@ public class RecurrentPair {
 	 */
 	public Function getNonTerminatingTerm() {
 		return this.nonterminating;
-	}
-
-	/**
-	 * Returns a string representation of this object.
-	 * 
-	 * @return a string representation of this object
-	 */
-	@Override
-	public String toString() {
-		return
-				"Recurrent pair: < c = " + this.C +
-				", t = " + this.t +
-				", i = " + this.i +
-				", j = " + this.j +
-				", [" + this.l1 + " -> " + this.r1 +
-				", " + this.l2 + " -> " + this.r2 + "] >";
 	}
 }

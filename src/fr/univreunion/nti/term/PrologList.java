@@ -174,13 +174,31 @@ public class PrologList extends Term {
 	}
 
 	/**
-	 * Unsupported operation.
+	 * An auxiliary, internal, method which is used to check
+	 * whether this term has the same structure as the specified
+	 * term <code>t</code>. This term and <code>t</code> are
+	 * not modified by this method.
 	 * 
-	 * @throws UnsupportedOperationException
+	 * This method implements a rough, but quickly computable,
+	 * over-approximation of both the subsumption and the
+	 * unification tests. It is essentially used for computing
+	 * families (see method <code>getFamily</code> in class
+	 * <code>FD_Graph</code>).
+	 * 
+	 * Both this term and the specified term are supposed to be
+	 * the schemas of their respective class representatives.
+	 * Moreover, it is supposed that <code>this != t</code>
+	 * and that <code>t != null</code>.
+	 * 
+	 * @param t the term whose structure has to be compared
+	 * to that of this term
+	 * @return <code>true</code> if this term has the same
+	 * structure as that of the given term and <code>false</code>
+	 * otherwise
 	 */
 	@Override
 	protected boolean hasSameStructureAsAux(Term t) {
-		throw new UnsupportedOperationException();
+		return (t instanceof Variable) || (t instanceof PrologList);
 	}
 
 	/**
@@ -471,7 +489,7 @@ public class PrologList extends Term {
 		// it has already been visited and then we have to
 		// return an empty set because the set of function
 		// symbols of this term has already been considered.
-		
+
 		long time = Term.getCurrentTime();
 		if (this.mark < time) {
 			this.mark = time;
@@ -484,15 +502,30 @@ public class PrologList extends Term {
 
 		return symbols;
 	}
-	
+
 	/**
-	 * Unsupported operation.
+	 * An auxiliary, internal, method which returns
+	 * the subterm of this term at the given single
+	 * position.
 	 * 
-	 * @throws UnsupportedOperationException
+	 * This term is supposed to be the schema of its
+	 * class representative. 
+	 * 
+	 * @param i a single position
+	 * @return the subterm of this term at the given
+	 * position
+	 * @throws IndexOutOfBoundsException if <code>i</code>
+	 * is not a valid position in this term
 	 */
 	@Override
 	protected Term getAux(int i) {
-		throw new UnsupportedOperationException();
+		if (i == 0 && this.first != null)
+			return this.first;
+
+		if (i == 1 && this.tail != null)
+			return this.tail;
+
+		throw new IndexOutOfBoundsException(i + " -- " + this);
 	}
 
 	/**

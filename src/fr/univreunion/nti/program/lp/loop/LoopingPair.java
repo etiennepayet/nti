@@ -22,7 +22,6 @@ package fr.univreunion.nti.program.lp.loop;
 import java.util.LinkedList;
 import java.util.List;
 
-import fr.univreunion.nti.program.Path;
 import fr.univreunion.nti.program.lp.BinaryRuleLp;
 import fr.univreunion.nti.program.lp.Mode;
 import fr.univreunion.nti.program.lp.SoP;
@@ -150,12 +149,15 @@ public class LoopingPair implements LoopWitness {
 	 */
 	@Override
 	public String getShortDescription() {
+		return "(extracted from a looping pair)";
+		/*
 		Path path = new Path();
 		for (BinaryRuleLp R : this.binseq)
 			path.addAll(R.getPath());
-		
+
 		return "(extracted from a looping pair)\n" +
 				"  The single loop is " + path;
+		 */
 	}
 
 	/**

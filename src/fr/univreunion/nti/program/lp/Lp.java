@@ -455,7 +455,7 @@ public class Lp extends Program implements Iterable<RuleLp> {
 			LinkedList<LoopWitness> unitLoops = this.unitLoops(unfolded);
 			LinkedList<LoopWitness> loops = this.loopsFromDict(unfolded, dict);
 			loops.addAll(unitLoops);
-			*/
+			 */
 
 			LinkedList<LoopWitness> unitLoops = this.unitLoops(unfolded);
 			dict.addAll(unitLoops);
@@ -481,8 +481,12 @@ public class Lp extends Program implements Iterable<RuleLp> {
 						Function looping = L.provesLoopingnessOf(m);
 						if (looping != null) {
 							A.add(new ArgumentLoopLp(m, looping, L));
+							/*
 							proof.printlnIfVerbose("The mode " + m + " starts a " + L.getLoopKind() +
 									" because of the generated witness:\n  " + L);
+							 */
+							proof.printlnIfVerbose("The mode " + m + " is non-terminating. " +
+									"The generated witness is:\n  " + L);
 							remainingModes[k] = false;
 							nbRemainingModes--;
 						}

@@ -306,16 +306,10 @@ public class UnfoldedRuleTrsLoopComp extends UnfoldedRuleTrs {
 		Function l2 = this.second.getLeft();
 		Term r2 = this.second.getRight();
 
-		RecurrentPair recPair = 
-				RecurrentPair.getInstance(l1, r1, l2, r2);
-
-		if (recPair != null) {
+		RecurrentPair recPair;
+		if ((recPair = RecurrentPair.getInstance(l1, r1, l2, r2)) != null)
 			// Here, a recurrent pair could be built.
-			// We get a non-terminating term from it.
-			Function nonterminating = recPair.getNonTerminatingTerm();
-			if (nonterminating != null)
-				A = new ArgumentRecurrentPairTrs(nonterminating, this);
-		}
+			A = new ArgumentRecurrentPairTrs(recPair, this);
 
 		return A;
 	}

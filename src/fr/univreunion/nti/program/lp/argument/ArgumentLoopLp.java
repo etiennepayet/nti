@@ -37,18 +37,18 @@ public class ArgumentLoopLp implements Argument {
 	 * The mode whose loopingness has been proved.
 	 */
 	private final Mode m;
-	
+
 	/**
 	 * The looping atomic query that corresponds to
 	 * <code>m</code>.
 	 */
 	private final Function Q;
-	
+
 	/**
 	 * The witness that <code>m</code> is looping.
 	 */
 	private final LoopWitness witness;
-	
+
 	/**
 	 * Builds a loop argument for the specified mode.
 	 * 
@@ -63,7 +63,7 @@ public class ArgumentLoopLp implements Argument {
 		this.Q = Q;
 		this.witness = witness;
 	}
-	
+
 	/**
 	 * Returns a detailed String representation of
 	 * this argument (usually used while printing
@@ -100,15 +100,19 @@ public class ArgumentLoopLp implements Argument {
 	@Override
 	public String toString() {
 		StringBuffer result = new StringBuffer();
-		
+
+		result.append("Mode ");
 		result.append(this.m);
-		result.append(": ");
+		result.append(": the query ");
 		result.append(this.Q);
+		/*
 		result.append(" starts a ");
 		result.append(this.witness.getLoopKind());
 		result.append(" ");
+		 */
+		result.append(" is non-terminating ");
 		result.append(this.witness.getShortDescription());
-		
+
 		return result.toString();
 	}
 }

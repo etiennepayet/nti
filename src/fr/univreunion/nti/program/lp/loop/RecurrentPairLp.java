@@ -19,11 +19,15 @@
 
 package fr.univreunion.nti.program.lp.loop;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import fr.univreunion.nti.program.RecurrentPair;
 import fr.univreunion.nti.program.lp.BinaryRuleLp;
 import fr.univreunion.nti.program.lp.Mode;
 import fr.univreunion.nti.term.Function;
 import fr.univreunion.nti.term.Term;
+import fr.univreunion.nti.term.Variable;
 
 /**
  * A recurrent pair in LP for proving the
@@ -178,10 +182,13 @@ public class RecurrentPairLp implements LoopWitness {
 	 */
 	@Override
 	public String getShortDescription() {
+		return "(extracted from a recurrent pair)";
+		/*
 		return "(extracted from a recurrent pair)\n" +
 				"  The stem to the loop is " + 
 				this.R1.getPath() +
 				" and the loop is " + this.R2.getPath();
+		 */
 	}
 
 	/**
@@ -193,8 +200,24 @@ public class RecurrentPairLp implements LoopWitness {
 	 */
 	@Override
 	public String toString() {
-		if (this.recPair != null)
-			return this.recPair.toString();
+		if (this.recPair != null) {
+			Map<Variable,String> variables = new HashMap<Variable,String>();
+			return
+					"Recurrent pair: <[" +
+					this.recPair.getLeft1().toString(variables, false) +
+					" :- " + this.recPair.getRight1().toString(variables, false) +
+					", " + this.recPair.getLeft2().toString(variables, false) +
+					" :- " + this.recPair.getRight2().toString(variables, false) +
+					"], (i,j) = (" + this.recPair.getI() + "," + this.recPair.getJ() + ")" +
+					", c = " + this.recPair.getContext().toString(variables, false) +
+					", s = " + this.recPair.getS().toString(variables, false) +
+					", t = " + this.recPair.getT().toString(variables, false) +
+					", (n1,n2,n3) = (" + this.recPair.getN1() +
+					"," + this.recPair.getN2() +
+					"," + this.recPair.getN3() + ")>";
+			// return this.recPair.toString();
+		}
+
 		return super.toString();
 	}
 }

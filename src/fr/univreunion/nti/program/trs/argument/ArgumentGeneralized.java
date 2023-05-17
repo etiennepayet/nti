@@ -92,8 +92,10 @@ public class ArgumentGeneralized implements Argument {
 		String certificate = this.R.getLeft().toString(variables, false);
 		
 		return
-				"* Certificate: " + certificate + " from a " + this.getWitnessKind() +
-				"\n* Description:\n" + 
+				// "* Certificate: " + certificate + " from a " + this.getWitnessKind() +
+				// "\n* Description:\n" +
+				"* Certificate: " + certificate + " is non-terminating\n" +
+				"* Description:\n" + 
 				"The following generalized rule was detected\n" +
 				"in the analyzed TRS:\n" +
 				this.R.toString(variables, false) +

@@ -23,7 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import fr.univreunion.nti.program.Argument;
-	
+
 /**
  * A nontermination proof argument in LP. It is a collection 
  * of proof arguments for specific modes.
@@ -65,7 +65,7 @@ public class ArgumentLp implements Argument {
 	public String getDetails(int indentation) {
 		return "";
 	}
-	
+
 	/**
 	 * Returns a String representation of the kind
 	 * of witness provided by this argument.
@@ -77,7 +77,7 @@ public class ArgumentLp implements Argument {
 	public String getWitnessKind() {
 		return "collection of arguments for specific modes";
 	}
-	
+
 	/**
 	 * Returns a String representation of this proof argument.
 	 * 
@@ -87,13 +87,16 @@ public class ArgumentLp implements Argument {
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 
+		boolean first = true;
 		for (Argument A : this.proofArguments) {
-			result.append(A);			
-			result.append("\n");
+			if (first) first = false;
+			else result.append("\n");
+			result.append(A);
 		}
+		/*
 		result.append("NB: the rules are numbered in the order they occur in the file,");
 		result.append(" starting from 1");
-
+		 */
 		return result.toString();
 	}
 }
