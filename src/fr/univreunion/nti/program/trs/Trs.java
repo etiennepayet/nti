@@ -759,11 +759,13 @@ public class Trs extends Program implements Iterable<RuleTrs> {
 				public Proof call() throws Exception {
 					// The maximum number of polynomial coefficients that is allowed.
 					int maxNbCoef = 14;
+					// The maximum depth allowed for a TRS rule.
+					int maxDepth = 4;
 					// The list of processors to apply for proving termination.
 					List<Processor> procForTerm = new LinkedList<Processor>();
 					procForTerm.add(homeo); // Homeomorphic embedding
 					procForTerm.add(new ProcLpo(false)); // Lexicographic Path Order
-					procForTerm.add(new ProcPolyInterpretation(false, maxNbCoef)); // Polynomial interpretation
+					procForTerm.add(new ProcPolyInterpretation(false, maxNbCoef, maxDepth)); // Polynomial interpretation
 					procForTerm.add(new ProcKbo(false, maxNbCoef)); // Knuth-Bendix Order
 					
 					// The list of processors to apply for proving nontermination.
@@ -790,11 +792,13 @@ public class Trs extends Program implements Iterable<RuleTrs> {
 				public Proof call() throws Exception {
 					// The maximum number of polynomial coefficients that is allowed.
 					int maxNbCoef = 25; // 25 seems to be the best value to get the maximum number of successes in TermComp
+					// The maximum depth allowed for a TRS rule.
+					int maxDepth = 5;
 					// The list of processors to apply for proving termination.
 					List<Processor> procForTerm = new LinkedList<Processor>();
 					procForTerm.add(homeo); // Homeomorphic embedding
 					procForTerm.add(new ProcLpo(true)); // Lexicographic Path Order
-					procForTerm.add(new ProcPolyInterpretation(true, maxNbCoef)); // Polynomial interpretation
+					procForTerm.add(new ProcPolyInterpretation(true, maxNbCoef, maxDepth)); // Polynomial interpretation
 					procForTerm.add(new ProcKbo(true, maxNbCoef)); // Knuth-Bendix Order
 					
 					return (new TechDpFramework(procForTerm, null)).run(Trs.this.copy(null));

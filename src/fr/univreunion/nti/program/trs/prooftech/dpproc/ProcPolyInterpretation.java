@@ -100,7 +100,7 @@ public class ProcPolyInterpretation extends ProcForFiniteness {
 	 * yield very intricate constraints which are difficult
 	 * to solve.
 	 */
-	private final static int MAX_DEPTH = 5;
+	// private final static int MAX_DEPTH = 5;
 
 	/**
 	 * The maximum arity allowed for a symbol. Deep terms
@@ -119,6 +119,13 @@ public class ProcPolyInterpretation extends ProcForFiniteness {
 	private final int maxNbCoef;
 
 	/**
+	 * The maximum depth allowed for a TRS rule. If the depth
+	 * of a rule of the TRS under analysis is greater than
+	 * this bound, then the termination proof is aborted.
+	 */
+	private final int maxDepth;
+
+	/**
 	 * Builds a DP processor for proving finiteness of
 	 * DP problems using polynomial interpretations.
 	 * 
@@ -126,12 +133,16 @@ public class ProcPolyInterpretation extends ProcForFiniteness {
 	 * processor uses argument filtering
 	 * @param maxNbCoef the maximum number of coefficients
 	 * that this processor is able to instantiate
+	 * @param maxDepth the maximum depth allowed for a
+	 * TRS rule
 	 */
-	public ProcPolyInterpretation(boolean usesFiltering, int maxNbCoef) {
+	public ProcPolyInterpretation(boolean usesFiltering,
+			int maxNbCoef, int maxDepth) {
 
 		super(usesFiltering);
 
 		this.maxNbCoef = maxNbCoef;
+		this.maxDepth = maxDepth;
 	}
 
 	/**
@@ -518,7 +529,7 @@ public class ProcPolyInterpretation extends ProcForFiniteness {
 			if (arity > maxArity) maxArity = arity;
 		}
 
-		return (MAX_DEPTH < maxDepth || MAX_ARITY < maxArity);
+		return (this.maxDepth < maxDepth || MAX_ARITY < maxArity);
 	}
 
 	/**

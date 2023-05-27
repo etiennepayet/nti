@@ -175,6 +175,9 @@ public class Constraint {
 		// The list to return at the end.
 		List<Constraint> result = new LinkedList<Constraint>();
 
+		// The thread running this method.
+		Thread currentThread = Thread.currentThread();
+
 		// Some data structures used for computing the
 		// repeated applications of Diff1 and Diff2.
 		List<Constraint> x = new LinkedList<Constraint>();
@@ -193,7 +196,8 @@ public class Constraint {
 				// and the intervals using c. If unsatisfiability
 				// is detected, then we stop everything and return
 				// null.
-				if (cDiff.isEmpty() && !c.update(result, intervals))
+				if (currentThread.isInterrupted() ||
+						(cDiff.isEmpty() && !c.update(result, intervals)))
 					return null;
 				else
 					diffed.addAll(cDiff);
@@ -218,7 +222,7 @@ public class Constraint {
 		if (value == null) return false;
 
 		if (this.isStrict) return (0 < value);
-		
+
 		return (0 <= value);
 	}
 
@@ -316,7 +320,7 @@ public class Constraint {
 				// limit for c0 in 'intervals'.
 				return null;
 			}
-			
+
 			if (v0 != null && v1 == null) {
 				// Here, this.P has the form v0 - c1 >= 0
 				// or v0 - c1 > 0, i.e., v0 >= c1 or v0 > c1.
@@ -332,7 +336,7 @@ public class Constraint {
 		// Here, 'intervals' has not been modified.
 		return false;
 	}
-	
+
 	/**
 	 * Updates the specified collection of constraints and
 	 * the specified intervals using this constraint.
@@ -358,13 +362,13 @@ public class Constraint {
 		if (this.isAlwaysFalse()) return false;
 		Boolean update = this.update(intervals);
 		if (update == null) return false;
-		
+
 		// Here, we did not detect unsatisfiability. We
 		// update the specified collection of constraints
 		// only if this constraint is useful.
 		if (!update && !this.isAlwaysTrue())
 			constraints.add(this);
-		
+
 		return true;
 	}
 
