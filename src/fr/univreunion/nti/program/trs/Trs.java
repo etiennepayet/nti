@@ -771,13 +771,19 @@ public class Trs extends Program implements Iterable<RuleTrs> {
 					// The list of processors to apply for proving nontermination.
 					// We create parameters for some processors.
 					List<Processor> procForNonTerm = new LinkedList<Processor>();
+					//
 					Parameters param1 = new Parameters();
 					param1.setMaxDepth(20);
+					//
 					Parameters param2 = new Parameters();
 					param2.disableBackwardUnfolding();
+					//
+					Parameters param3 = new Parameters();
+					param3.setStrategy(StrategyLoop.ALL);
 					// We add the processors to the list.
 					procForNonTerm.add(new ProcUnfoldPayet(param1)); // Find a loop by unfolding
 					procForNonTerm.add(new ProcUnfoldPayet(param2)); // Find a loop by unfolding
+					procForNonTerm.add(new ProcUnfoldPayet(param3)); // Find a loop by unfolding
 					procForNonTerm.add(new ProcUnfoldEeg12(new Parameters())); // Non-looping nontermination
 					
 					return (new TechDpFramework(procForTerm, procForNonTerm)).run(Trs.this);

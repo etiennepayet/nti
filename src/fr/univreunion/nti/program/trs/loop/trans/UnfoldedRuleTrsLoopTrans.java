@@ -253,6 +253,8 @@ public class UnfoldedRuleTrsLoopTrans extends UnfoldedRuleTrs {
 			//
 			ParentTrs parent = ParentTrsLoopTrans.getInstance(this, R, null, false);
 			HashMap<Term,Term> copies = new HashMap<Term,Term>();
+
+			// First, we build a composed triple with [this, R].
 			Collection<UnfoldedRuleTrs> unfoldedRules =
 					UnfoldedRuleTrsLoopComp.getInstances(
 							(Function) this.left.deepCopy(copies),
@@ -267,6 +269,26 @@ public class UnfoldedRuleTrsLoopTrans extends UnfoldedRuleTrs {
 			for (UnfoldedRuleTrs U : unfoldedRules)
 				if (add(parameters, IR, proof, U, Result))
 					return Result;
+
+			// If the strategy is "all", then we also build
+			// a composed triple with [R, this].
+			if (parameters.getStrategy() == StrategyLoop.ALL) {
+				copies.clear();
+				unfoldedRules = UnfoldedRuleTrsLoopComp.getInstances(
+						(Function) R.getLeft().deepCopy(copies),
+						R.getRight().deepCopy(copies),
+						iteration,
+						parent,
+						new Path(R),
+						this.deepCopy(),
+						this.path,
+						this.scc,
+						this.simpleCycle);
+				for (UnfoldedRuleTrs U : unfoldedRules)
+					if (add(parameters, IR, proof, U, Result))
+						return Result;
+			}
+
 			//
 			this.simpleCycle.remove(R);
 			this.scc.addLast(R);
