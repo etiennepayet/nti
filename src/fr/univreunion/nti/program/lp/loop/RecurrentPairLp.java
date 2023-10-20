@@ -212,9 +212,10 @@ public class RecurrentPairLp implements LoopWitness {
 					", c = " + this.recPair.getContext().toString(variables, false) +
 					", s = " + this.recPair.getS().toString(variables, false) +
 					", t = " + this.recPair.getT().toString(variables, false) +
-					", (n1,n2,n3) = (" + this.recPair.getN1() +
+					", (n1,n2,n3,n4) = (" + this.recPair.getN1() +
 					"," + this.recPair.getN2() +
-					"," + this.recPair.getN3() + ")>";
+					"," + this.recPair.getN3() +
+					"," + this.recPair.getN4() + ")>";
 			// return this.recPair.toString();
 		}
 

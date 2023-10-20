@@ -141,8 +141,9 @@ public class ArgumentRecurrentPairTrs implements Argument {
 				(s == t ? "\ns = t = " + s.toString(variables, false) :
 					"\ns = " + s.toString(variables, false) +
 					"\nt = " + t.toString(variables, false)) +
-				"\n(n1,n2,n3) = (" + this.recPair.getN1() +
+				"\n(n1,n2,n3,n4) = (" + this.recPair.getN1() +
 				"," + this.recPair.getN2() +
-				"," + this.recPair.getN3() + ")";
+				"," + this.recPair.getN3() +
+				"," + this.recPair.getN4() + ")";
 	}
 }
