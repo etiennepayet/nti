@@ -387,7 +387,7 @@ public class ProcUnfoldPayet extends Processor {
 	public String toString() {
 		return
 				"## DP Processor: [Payet, LOPSTR'18] + " +
-				"[Payet, Non-termination in TRS and LP] (" +
+				"[Payet, WST'23] (" +
 				this.parameters + "). ";
 	}
 }
