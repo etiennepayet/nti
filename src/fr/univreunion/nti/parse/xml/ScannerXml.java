@@ -37,7 +37,7 @@ public class ScannerXml extends Scanner {
 
 	/**
 	 * Builds a new lexical analyzer for TRS/SRS
-	 * in the XML format .
+	 * in the XML format.
 	 * 
 	 * @param input the input to read
 	 */

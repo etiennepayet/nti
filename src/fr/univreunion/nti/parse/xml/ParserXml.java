@@ -119,7 +119,7 @@ public class ParserXml extends Parser {
 	private String strategy = "FULL";
 
 	/**
-	 * Builds a parser for TRS/SRS.
+	 * Builds a parser for TRS/SRS (XML format).
 	 * 
 	 * @param progName the name of the program to build
 	 * @param scanner the scanner reading the input
@@ -138,7 +138,6 @@ public class ParserXml extends Parser {
 	 */
 	@Override
 	public Program parse() throws IOException {
-		// First, we parse the file storing the program.
 		this.lookahead = this.scanner.nextToken();
 		this.S();
 

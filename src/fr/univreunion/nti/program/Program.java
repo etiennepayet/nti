@@ -26,6 +26,10 @@ import java.io.IOException;
 import fr.univreunion.nti.Options;
 import fr.univreunion.nti.parse.lp.ParserLp;
 import fr.univreunion.nti.parse.lp.ScannerLp;
+import fr.univreunion.nti.parse.srs.ParserSrs;
+import fr.univreunion.nti.parse.srs.ScannerSrs;
+import fr.univreunion.nti.parse.trs.ParserTrs;
+import fr.univreunion.nti.parse.trs.ScannerTrs;
 import fr.univreunion.nti.parse.xml.ParserXml;
 import fr.univreunion.nti.parse.xml.ScannerXml;
 
@@ -63,6 +67,14 @@ public abstract class Program {
 			else if (fileName.endsWith(".xml")) {
 				input = new BufferedReader(new FileReader(fileName));
 				program = new ParserXml(fileName, new ScannerXml(input)).parse();
+			}
+			else if (fileName.endsWith(".trs")) {
+				input = new BufferedReader(new FileReader(fileName));
+				program = new ParserTrs(fileName, new ScannerTrs(input)).parse();
+			}
+			else if (fileName.endsWith(".srs")) {
+				input = new BufferedReader(new FileReader(fileName));
+				program = new ParserSrs(fileName, new ScannerSrs(input)).parse();
 			}
 		} finally {
 			if (input != null) input.close();

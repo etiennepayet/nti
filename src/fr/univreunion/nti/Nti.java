@@ -36,7 +36,7 @@ public class Nti {
 	/**
 	 * The version of NTI.
 	 */
-	public final static String VERSION = "(October 2022)";
+	public final static String VERSION = "(November 2023)";
 
 	/**
 	 * Constructs an instance of NTI with the specified options.
@@ -152,7 +152,9 @@ public class Nti {
 		//
 		printer.println("file has one of the following suffixes:");
 		printer.println("   .pl for a pure logic program");
-		printer.println("   .xml for a TRS or an SRS in XML format");
+		printer.println("   .xml for a  TRS or an SRS in XML format");
+		printer.println("   .trs for a  TRS in the old, human readable, format");
+		printer.println("   .srs for an SRS in the old, human readable, format");
 		printer.println("file has to conform to the TPDB syntax specification (see http://termination-portal.org/wiki/TPDB)\n");
 		//
 		printer.println("action (optional) can be:");
