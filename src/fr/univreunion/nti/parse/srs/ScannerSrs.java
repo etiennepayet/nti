@@ -53,6 +53,9 @@ public class ScannerSrs extends Scanner {
 	public ScannerSrs(BufferedReader input) {
 		super(input);
 		this.keywords.put("RULES", Token.RULES);
+		this.keywords.put("STRATEGY", Token.STRATEGY);
+		this.keywords.put("LEFTMOST", Token.LEFTMOST);
+		this.keywords.put("RIGHTMOST", Token.RIGHTMOST);
 		this.keywords.put("->", Token.ARROW);
 	}
 
@@ -130,9 +133,8 @@ public class ScannerSrs extends Scanner {
 				String lexeme = lexbuf.toString();
 				Token lookahead = keywords.get(lexeme);
 				if (lookahead == null)
-					return new Pair(Token.ID, lexeme);
-				else
-					return new Pair(lookahead);
+					lookahead = Token.ID;
+				return new Pair(lookahead, lexeme);
 			}
 		// Other characters:
 			else if (state == 8) {

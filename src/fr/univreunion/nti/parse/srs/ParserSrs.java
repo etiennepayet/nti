@@ -40,6 +40,9 @@ import fr.univreunion.nti.term.Variable;
  * Tokens with corresponding lexemes:
  *   done       = {EOF}
  *   rules      = {RULES}
+ *   strategy   = {STRATEGY}
+ *   leftmost   = {LEFTMOST}
+ *   rightmost  = {RIGHTMOST}
  *   id         = non-empty sequences of characters except space,
  *                '(', ')', '"', ',' and excluding special sequence
  *                '->' and keyword RULES
@@ -49,12 +52,13 @@ import fr.univreunion.nti.term.Variable;
  *
  * Rules:
  *   Spec  -> '(' Decl ')' Spec  |  done
- *   Decl  -> rules Lr  |  rules | id L
+ *   Decl  -> rules Lr  |  rules |  strategy S  | id L
  *   L     -> '->' L  |  id L  |  string L  | '(' L ')' L
  *          |  ',' L  |  epsilon
  *   Lr    -> R ',' Lr  |  R
  *   R     -> W '->' W | W '->'
  *   W     -> id | id W 
+ *   S     -> leftmost  |  rightmost
  * 
  * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
@@ -119,7 +123,7 @@ public class ParserSrs extends Parser {
 	}
 
 	/**
-	 * Decl -> rules Lr  |  rules | id L
+	 * Decl -> rules Lr | rules | strategy S | id L
 	 * 
 	 * @throws IOException
 	 */
@@ -129,6 +133,10 @@ public class ParserSrs extends Parser {
 			this.match(token);
 			if (this.lookahead.getToken() == Token.ID)
 				this.Lr();
+		}
+		else if (token == Token.STRATEGY) {
+			this.match(token);
+			this.strategy = this.S();
 		}
 		else if (token == Token.ID) {
 			this.match(token);
@@ -227,5 +235,30 @@ public class ParserSrs extends Parser {
 			throw new RuntimeException("missing id at line " + this.scanner.getLineno());
 
 		return t;
+	}
+	
+	/**
+	 * S -> leftmost | rightmost
+	 *  
+	 * @throws IOException
+	 */
+	private String S() throws IOException {
+		// The string to be returned.
+		String result = null;
+		
+		if (this.lookahead.getToken() == Token.LEFTMOST) {
+			result = this.lookahead.getAttribute().toString();
+			this.match(Token.LEFTMOST);
+		}
+		else if (this.lookahead.getToken() == Token.RIGHTMOST) {
+			result = this.lookahead.getAttribute().toString();
+			this.match(Token.RIGHTMOST);
+		}
+		else
+			throw new RuntimeException(
+					"error at line " + this.scanner.getLineno() +
+					": unknown strategy " + this.lookahead.getAttribute());
+		
+		return result;
 	}
 }
