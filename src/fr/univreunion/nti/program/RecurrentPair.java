@@ -422,9 +422,9 @@ public class RecurrentPair {
 		this.s  = s;
 		this.t  = t;
 		this.n1 = n1;
-		this.n2 = n2;
-		this.n3 = n3;
-		this.n4 = n4;
+		this.n3 = n2;
+		this.n4 = n3;
+		this.n2 = n4;
 		this.i  = i;
 		this.j  = j;
 		this.nonterminating = nonterminating;
@@ -493,7 +493,7 @@ public class RecurrentPair {
 	public int getN1() {
 		return this.n1;
 	}
-
+	
 	/**
 	 * Returns the integer n2 of
 	 * this recurrent pair.
