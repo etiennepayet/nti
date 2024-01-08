@@ -24,7 +24,7 @@ It has one of the following suffixes:
 - `-print`: print the program in the given file
 - `-stat`: print some statistics about the program in the given file
 - `-prove`: run a (non)termination proof of the program in the given file
-**(THIS IS THE DEFAULT ACTION)** 
+**(THIS IS THE DEFAULT ACTION)**
 
 `options` (optional) can be:
 - `-v`: verbose mode (for printing proof details in the final output)
