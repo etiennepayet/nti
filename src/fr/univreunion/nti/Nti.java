@@ -148,7 +148,8 @@ public class Nti {
 		printer.println("- For TRSs, the implemented technique uses the dependency pair (DP) framework:");
 		printer.println("  first, it decomposes the initial set of DP problems into subproblems using");
 		printer.println("  sound DP processors, then it tries to prove that the unsolved subproblems");
-		printer.println("  are infinite using the approach of [Payet, LOPSTR'18].\n");
+		printer.println("  are infinite using the approaches of [Payet, TCS'08], [Payet, LOPSTR'18]");
+		printer.println("  and [Payet, JAR'24].\n");
 		//
 		printer.println("file has one of the following suffixes:");
 		printer.println("   .pl for a pure logic program");
