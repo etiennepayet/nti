@@ -10,13 +10,16 @@ NTI tries to prove (non)termination of the program in the provided file.
 - For TRSs, the implemented technique uses the dependency pair (DP) framework:
 first, it decomposes the initial set of DP problems into subproblems using
 sound DP processors, then it tries to prove that the unsolved subproblems
-are infinite using the approaches of [[Payet, TCS'08]](http://lim.univ-reunion.fr/staff/epayet/Research/Resources/tcs08.pdf)
-and [[Payet, LOPSTR'18]](http://arxiv.org/abs/1808.05065).
+are infinite using the approaches of [[Payet, TCS'08]](http://lim.univ-reunion.fr/staff/epayet/Research/Resources/tcs08.pdf),
+[[Payet, LOPSTR'18]](http://arxiv.org/abs/1808.05065) and
+[[Payet, JAR]](https://arxiv.org/abs/2312.13949).
 
 `file` has to conform to the [TPDB syntax specification](http://termination-portal.org/wiki/TPDB).
 It has one of the following suffixes:
 - `.pl` for a pure logic program
-- `.xml` for a TRS or an SRS in XML format
+- `.xml` for a  TRS or an SRS in XML format
+- `.trs` for a  TRS in the old, human readable, format
+- `.srs` for an SRS in the old, human readable, format
 
 `action` (optional) can be:
 - `-h|--help`: print this help
