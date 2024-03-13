@@ -12,7 +12,7 @@ first, it decomposes the initial set of DP problems into subproblems using
 sound DP processors, then it tries to prove that the unsolved subproblems
 are infinite using the approaches of [[Payet, TCS'08]](http://lim.univ-reunion.fr/staff/epayet/Research/Resources/tcs08.pdf),
 [[Payet, LOPSTR'18]](http://arxiv.org/abs/1808.05065) and
-[[Payet, JAR]](https://arxiv.org/abs/2312.13949).
+[[Payet, JAR'24]](https://arxiv.org/abs/2312.13949).
 
 `file` has to conform to the [TPDB syntax specification](http://termination-portal.org/wiki/TPDB).
 It has one of the following suffixes:
