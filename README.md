@@ -33,4 +33,4 @@ It has one of the following suffixes:
 - `-v`: verbose mode (for printing proof details in the final output)
 - `-t=n`: set a time bound on the nontermination proofs (`n` is the time bound in seconds)
 - `-cTI=path`: set the path to cTI (for proving termination of logic programs)  
-If no path to cTI is set, then only nontermination proofs are run for logic programs
+If no path to cTI is set, then only nontermination proofs are run for logic programs.
