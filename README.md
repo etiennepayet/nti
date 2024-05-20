@@ -14,10 +14,13 @@ are infinite using the approaches of [[Payet, TCS'08]](http://lim.univ-reunion.f
 [[Payet, LOPSTR'18]](http://arxiv.org/abs/1808.05065) and
 [[Payet, JAR'24]](https://arxiv.org/abs/2312.13949).
 
-`file` has to conform to the [TPDB syntax specification](http://termination-portal.org/wiki/TPDB).
+`file` has to conform to the TPDB syntax specification
+(see [here](http://termination-portal.org/wiki/TPDB) and
+[here](https://termination-portal.org/wiki/Term_Rewriting)).
 It has one of the following suffixes:
-- `.pl` for a pure logic program
-- `.xml` for a  TRS or an SRS in XML format
+- `.pl`  for a  pure logic program
+- `.ari` for a  TRS or an SRS in the ARI format
+- `.xml` for a  TRS or an SRS in the old XML format
 - `.trs` for a  TRS in the old, human readable, format
 - `.srs` for an SRS in the old, human readable, format
 
@@ -33,4 +36,4 @@ It has one of the following suffixes:
 - `-v`: verbose mode (for printing proof details in the final output)
 - `-t=n`: set a time bound on the nontermination proofs (`n` is the time bound in seconds)
 - `-cTI=path`: set the path to cTI (for proving termination of logic programs)  
-If no path to cTI is set, then only nontermination proofs are run for logic programs.
+If no path to cTI is set, then only nontermination proofs are run for logic programs

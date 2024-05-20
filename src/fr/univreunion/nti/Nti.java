@@ -152,7 +152,7 @@ public class Nti {
 		printer.println("  and [Payet, JAR'24].\n");
 		//
 		printer.println("'file' has one of the following suffixes:");
-		printer.println("   .pl for a pure logic program");
+		printer.println("   .pl  for a  pure logic program");
 		printer.println("   .ari for a  TRS or an SRS in the ARI format");
 		printer.println("   .xml for a  TRS or an SRS in the old XML format");
 		printer.println("   .trs for a  TRS in the old, human readable, format");
