@@ -178,7 +178,11 @@ public class Options {
 				}
 			else if ("-cTI".equals(actionOption)) pathTo_cTI = value;
 			// File:
-			else if (arg.endsWith(".pl") || arg.endsWith(".xml") || arg.endsWith(".trs") || arg.endsWith(".srs"))
+			else if (arg.endsWith(".pl") ||
+					arg.endsWith(".ari") ||
+					arg.endsWith(".xml") ||
+					arg.endsWith(".trs") ||
+					arg.endsWith(".srs"))
 				fileName = arg;
 		}
 

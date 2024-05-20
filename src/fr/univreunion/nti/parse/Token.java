@@ -54,6 +54,12 @@ public enum Token {
 	TIMES,
 	DIV,
 	
+	// ARI-format:
+	FORMAT,
+	FUN,
+	RULE,
+	TRS,
+	
 	// XML TAGS:
 	XML_TAG,
 	XML_STYLESHEET_TAG,

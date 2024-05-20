@@ -36,7 +36,7 @@ public class Nti {
 	/**
 	 * The version of NTI.
 	 */
-	public final static String VERSION = "(November 2023)";
+	public final static String VERSION = "(May 2024)";
 
 	/**
 	 * Constructs an instance of NTI with the specified options.
@@ -143,7 +143,7 @@ public class Nti {
 	private static void printHelp(Printer printer) {
 		printer.println("Usage: java -jar nti.jar <file> [action] [options]\n");
 		//
-		printer.println("This program tries to prove (non)termination of the program in the provided file.");
+		printer.println("NTI tries to prove (non)termination of the program in the provided file.");
 		printer.println("- For logic programs, the implemented technique is described in [Payet & Mesnard, TOPLAS'06].");
 		printer.println("- For TRSs, the implemented technique uses the dependency pair (DP) framework:");
 		printer.println("  first, it decomposes the initial set of DP problems into subproblems using");
@@ -151,14 +151,17 @@ public class Nti {
 		printer.println("  are infinite using the approaches of [Payet, TCS'08], [Payet, LOPSTR'18]");
 		printer.println("  and [Payet, JAR'24].\n");
 		//
-		printer.println("file has one of the following suffixes:");
+		printer.println("'file' has one of the following suffixes:");
 		printer.println("   .pl for a pure logic program");
-		printer.println("   .xml for a  TRS or an SRS in XML format");
+		printer.println("   .ari for a  TRS or an SRS in the ARI format");
+		printer.println("   .xml for a  TRS or an SRS in the old XML format");
 		printer.println("   .trs for a  TRS in the old, human readable, format");
 		printer.println("   .srs for an SRS in the old, human readable, format");
-		printer.println("file has to conform to the TPDB syntax specification (see http://termination-portal.org/wiki/TPDB)\n");
+		printer.println("file has to conform to the TPDB syntax specification");
+		printer.println("(see http://termination-portal.org/wiki/TPDB and");
+		printer.println(" https://termination-portal.org/wiki/Term_Rewriting)\n");
 		//
-		printer.println("action (optional) can be:");
+		printer.println("'action' (optional) can be:");
 		printer.println("   -h|--help: print this help");
 		printer.println("   --version: print the version of NTI");
 		printer.println("   -print: print the program in the given file");
@@ -166,7 +169,7 @@ public class Nti {
 		printer.println("   -prove: run a (non)termination proof of the program in the given file");
 		printer.println("    THIS IS THE DEFAULT ACTION\n");
 		//
-		printer.println("options (optional) can be:");
+		printer.println("'options' (optional) can be:");
 		printer.println("   -v: verbose mode (for printing proof details in the final output)");
 		printer.println("   -t=n: set a time bound on the nontermination proofs");
 		printer.println("    n is the time bound in seconds");

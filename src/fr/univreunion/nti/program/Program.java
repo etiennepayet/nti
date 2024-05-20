@@ -26,6 +26,8 @@ import java.io.IOException;
 import fr.univreunion.nti.Options;
 import fr.univreunion.nti.parse.lp.ParserLp;
 import fr.univreunion.nti.parse.lp.ScannerLp;
+import fr.univreunion.nti.parse.ari.ParserAri;
+import fr.univreunion.nti.parse.ari.ScannerAri;
 import fr.univreunion.nti.parse.srs.ParserSrs;
 import fr.univreunion.nti.parse.srs.ScannerSrs;
 import fr.univreunion.nti.parse.trs.ParserTrs;
@@ -63,6 +65,10 @@ public abstract class Program {
 			if (fileName.endsWith(".pl")) {
 				input = new BufferedReader(new FileReader(fileName));
 				program = new ParserLp(fileName, new ScannerLp(input)).parse();
+			}
+			else if (fileName.endsWith(".ari")) {
+				input = new BufferedReader(new FileReader(fileName));
+				program = new ParserAri(fileName, new ScannerAri(input)).parse();
 			}
 			else if (fileName.endsWith(".xml")) {
 				input = new BufferedReader(new FileReader(fileName));

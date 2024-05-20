@@ -126,6 +126,21 @@ public class FunctionSymbol {
 	public synchronized static FunctionSymbol getInstance(String name, int arity) {
 		return addSymbol(name, arity, false);
 	}
+	
+	/**
+	 * Returns the non-tuple symbol with the provided
+	 * name and arity, if such a symbol exists,
+	 * otherwise returns <code>null</code>.
+	 * 
+	 * @param name the name of the symbol
+	 * @param arity the arity of the symbol
+	 * @return a non-tuple symbol with the specified
+	 * name and arity, or <code>null</code> if such a
+	 * symbol does not exist
+	 */
+	public synchronized static FunctionSymbol get(String name, int arity) {
+		return lookup(name, arity, false);
+	}
 
 	/**
 	 * Constructs a symbol with the given name, arity, tuple property
