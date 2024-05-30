@@ -182,7 +182,7 @@ public class RecurrentPairLp implements LoopWitness {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "(extracted from a recurrent pair)";
+		return "(extracted from a recurrent pair [Payet, JAR'24])";
 		/*
 		return "(extracted from a recurrent pair)\n" +
 				"  The stem to the loop is " + 
@@ -208,11 +208,13 @@ public class RecurrentPairLp implements LoopWitness {
 					" :- " + this.recPair.getRight1().toString(variables, false) +
 					", " + this.recPair.getLeft2().toString(variables, false) +
 					" :- " + this.recPair.getRight2().toString(variables, false) +
-					"], (i,j) = (" + this.recPair.getI() + "," + this.recPair.getJ() + ")" +
-					", c = " + this.recPair.getContext().toString(variables, false) +
+					", c1 = " + this.recPair.getContextC1().toString(variables, false) +
+					", c2 = " + this.recPair.getContextC2().toString(variables, false) +
 					", s = " + this.recPair.getS().toString(variables, false) +
 					", t = " + this.recPair.getT().toString(variables, false) +
-					", (n1,n2,n3,n4) = (" + this.recPair.getN1() +
+					", (m1,m2) = (" + this.recPair.getM1() +
+					"," + this.recPair.getM2() + 
+					"), (n1,n2,n3,n4) = (" + this.recPair.getN1() +
 					"," + this.recPair.getN2() +
 					"," + this.recPair.getN3() +
 					"," + this.recPair.getN4() + ")>";

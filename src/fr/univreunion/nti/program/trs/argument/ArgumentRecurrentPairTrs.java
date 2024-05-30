@@ -125,25 +125,31 @@ public class ArgumentRecurrentPairTrs implements Argument {
 		Term t = this.recPair.getT();
 
 		return
-				// "* Certificate: " + certificate + " from a " + this.getWitnessKind() +
-				// "\n* Description:\n" + 
+				"* Technique: [Payet, LOPSTR'18 + JAR'24]\n" +
 				"* Certificate: " + certificate + " is non-terminating\n" +
 				"* Description:\n" + 
 				"The following recurrent pair was generated while unfolding\n" +
 				"the dependency pairs of the analyzed TRS [iteration = " +
 				this.unfolded.getIteration() + "]:\n" +
-				"r1 = " + this.recPair.getLeft1().toString(variables, false) +
+				"u1 -> v1 = " + this.recPair.getLeft1().toString(variables, false) +
 				" -> " + this.recPair.getRight1().toString(variables, false) +
-				"\nr2 = " + this.recPair.getLeft2().toString(variables, false) +
+				"\nu2 -> v2 = " + this.recPair.getLeft2().toString(variables, false) +
 				" -> " + this.recPair.getRight2().toString(variables, false) +
-				"\n(i,j) = (" + this.recPair.getI() + "," + this.recPair.getJ() + ")" +
-				"\nc = " + this.recPair.getContext().toString(variables, false) +
+				"\nWe have:" +
+				"\nu1 = c1[x,c2^m1[y]], v1 = c1[c2^n1[x],c2^n2[y]]" +
+				"\nu2 = c1[x,c2^m2[s]], v2 = c1[c2^n3[t],c2^n4[x]]" +
+				"\nfor:" +
+				"\nc1 = " + this.recPair.getContextC1().toString(variables, false) +
+				"\nc2 = " + this.recPair.getContextC2().toString(variables, false) +
 				(s == t ? "\ns = t = " + s.toString(variables, false) :
 					"\ns = " + s.toString(variables, false) +
 					"\nt = " + t.toString(variables, false)) +
-				"\n(n1,n2,n3,n4) = (" + this.recPair.getN1() +
+				"\n(m1,m2) = (" + this.recPair.getM1() + "," + this.recPair.getM2() + ")" +
+				" and (n1,n2,n3,n4) = (" + this.recPair.getN1() +
 				"," + this.recPair.getN2() +
 				"," + this.recPair.getN3() +
-				"," + this.recPair.getN4() + ")";
+				"," + this.recPair.getN4() + ")" +
+				"\nSo, the term c1[s,c2^m2[s]] = " + certificate +
+				"\nstarts an infinite rewrite sequence w.r.t. the analyzed TRS.";
 	}
 }

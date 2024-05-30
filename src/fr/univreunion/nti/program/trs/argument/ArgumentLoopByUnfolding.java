@@ -181,8 +181,7 @@ public class ArgumentLoopByUnfolding implements Argument {
 		String certificate = this.looping.toFunction().toString(variables, false);
 
 		return
-				// "* Certificate: " + certificate + " from a " + this.getWitnessKind() +
-				// "\n* Description:\n" + 
+				"* Technique: [Payet, LOPSTR'18]\n" +
 				"* Certificate: " + certificate + " is non-terminating\n" +
 				"* Description:\n" + 
 				"The following rule R was generated while unfolding\n" +
@@ -199,8 +198,6 @@ public class ArgumentLoopByUnfolding implements Argument {
 				right.get(p, this.shallow).toString(variables, this.shallow) +
 				"\nand theta2(theta1(l)) = theta1(r|p), " +
 				"i.e., l semi-unifies with r|p." +
-				// "\nHence, theta1(R) forms a single loop (Def. 3.5 of " +
-				// "\n[Payet, Non-termination in TRS and LP])." + 
 				"\nSo, the term theta1(l) = " + certificate +
 				"\nstarts an infinite rewrite sequence w.r.t. the analyzed TRS.";
 	}

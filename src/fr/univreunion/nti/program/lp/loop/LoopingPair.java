@@ -29,9 +29,10 @@ import fr.univreunion.nti.term.Function;
 import fr.univreunion.nti.term.FunctionSymbol;
 
 /**
- * A looping pair i.e, a pair of the form (BinSeq, tau)
- * where binseq is a sequence of binary logic program
- * rules and tau is a DN set of positions for binseq.
+ * A looping pair [Payet and Mesnard, TOPLAS'06] i.e,
+ * a pair of the form (BinSeq, tau) where binseq is
+ * a sequence of binary logic program rules and tau
+ * is a DN set of positions for binseq.
  * 
  * Looping pairs are used for inferring single loops.
  *   
@@ -149,7 +150,7 @@ public class LoopingPair implements LoopWitness {
 	 */
 	@Override
 	public String getShortDescription() {
-		return "(extracted from a looping pair)";
+		return "(extracted from a looping pair [Payet and Mesnard, TOPLAS'06])";
 		/*
 		Path path = new Path();
 		for (BinaryRuleLp R : this.binseq)
