@@ -1,0 +1,6 @@
+(format TRS)
+(fun f 4)
+(fun s 1)
+(fun |0| 0)
+(rule (f x z (s (s (s (s (s (s (s y))))))) z) (f x |0| (s (s y)) z) )
+(rule (f x z (s (s (s (s (s (s |0|)))))) z) (f (s (s (s (s (s (s (s (s |0|)))))))) z (s (s (s (s (s (s (s (s x)))))))) |0|) )
