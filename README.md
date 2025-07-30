@@ -5,8 +5,8 @@ or any later version. It is developed and maintained by [Étienne Payet](mailto:
 Usage: `java -jar nti.jar <file> [action] [options]`
 
 NTI tries to prove (non)termination of the program in the provided file.
-- For logic programs, the implemented technique is described in
-[[Payet & Mesnard, TOPLAS'06]](http://lim.univ-reunion.fr/staff/epayet/Research/Resources/toplas06.pdf).
+- For logic programs, the implemented techniques are described in
+[[Payet & Mesnard, TOPLAS'06]](http://lim.univ-reunion.fr/staff/epayet/Research/Resources/toplas06.pdf) and [[Payet, TPLP'25]](https://arxiv.org/abs/2507.09390).
 - For TRSs, the implemented technique uses the dependency pair (DP) framework:
 first, it decomposes the initial set of DP problems into subproblems using
 sound DP processors, then it tries to prove that the unsolved subproblems
