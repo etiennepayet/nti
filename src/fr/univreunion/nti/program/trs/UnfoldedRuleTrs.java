@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import fr.univreunion.nti.program.Argument;
-import fr.univreunion.nti.program.Path;
 import fr.univreunion.nti.program.Proof;
 import fr.univreunion.nti.program.trs.argument.ArgumentLoopByUnfolding;
 import fr.univreunion.nti.term.Function;
@@ -51,12 +50,6 @@ public abstract class UnfoldedRuleTrs extends RuleTrs {
 	protected final ParentTrs parent;
 	
 	/**
-	 * The path (in the program being unfolded) that
-	 * corresponds to this unfolded rule.
-	 */
-	protected final Path path = new Path(); 
-
-	/**
 	 * Constructs an unfolded TRS rule from the given left-hand side,
 	 * right-hand side and iteration.
 	 * 
@@ -65,15 +58,13 @@ public abstract class UnfoldedRuleTrs extends RuleTrs {
 	 * @param iteration the iteration of the unfolding operator
 	 * at which this rule is generated
 	 * @param parent the parent of this rule
-	 * @param path the path in the program being unfolded that
-	 * corresponds to this rule
 	 * @throws IllegalArgumentException if <code>right</code>
 	 * is not a variable or a function
 	 * @throws IllegalArgumentException if the given iteration
 	 * is negative
 	 */
 	protected UnfoldedRuleTrs(Function left, Term right,
-			int iteration, ParentTrs parent, Path path) {
+			int iteration, ParentTrs parent) {
 		
 		super(left, right);
 
@@ -83,7 +74,6 @@ public abstract class UnfoldedRuleTrs extends RuleTrs {
 
 		this.iteration = iteration;
 		this.parent = parent;
-		if (path != null) this.path.addAll(path);
 	}
 
 	/**

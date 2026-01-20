@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -34,7 +34,7 @@ public abstract class Parser {
 	/**
 	 * The scanner which is used for reading the input.
 	 */
-	protected final Scanner scanner;
+	protected Scanner scanner;
 
 	/**
 	 * The last pair (token, attribute) returned by the scanner.

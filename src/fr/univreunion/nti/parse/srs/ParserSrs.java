@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -208,7 +208,7 @@ public class ParserSrs extends Parser {
 		else
 			right = X;
 
-		return new RuleTrs(left, right, this.rules.size() + 1); 
+		return new RuleTrs(left, right);
 	}
 
 	/**

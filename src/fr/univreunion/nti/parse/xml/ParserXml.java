@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -227,8 +227,7 @@ public class ParserXml extends Parser {
 
 		this.match(Token.CLOSE_RULE_TAG);
 
-		// We start numbering rules from 1, hence the "+ 1" below.
-		return new RuleTrs(lhs, rhs, this.rules.size() + 1);
+		return new RuleTrs(lhs, rhs);
 	}
 
 	/**

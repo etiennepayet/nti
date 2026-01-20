@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -144,7 +144,7 @@ public class ProcUnfoldEeg12 extends Processor {
 				// pattern rules occurring in the provided problem.
 				// We also check whether a pattern rule is a
 				// nontermination witness.
-				for (UnfoldedRuleTrs R : IR.getPatternRules(prob.getDependencyPairs().iterator())) {
+				for (UnfoldedRuleTrs R : IR.getCorrectPatternRulesEeg12(prob.getDependencyPairs().iterator())) {
 					if (currentThread.isInterrupted()) break;
 
 					Collection<? extends UnfoldedRuleTrs> U_R = R.elimAndProve(this.parameters, IR, proof);

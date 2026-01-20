@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -22,12 +22,16 @@ package fr.univreunion.nti.program.lp;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
-import fr.univreunion.nti.program.Path;
-import fr.univreunion.nti.program.Rule;
+import fr.univreunion.nti.program.lp.nonloop.PatternRuleLp;
+import fr.univreunion.nti.program.lp.nonloop.PatternRuleLpInProgress;
 import fr.univreunion.nti.term.Function;
 import fr.univreunion.nti.term.Term;
 import fr.univreunion.nti.term.Variable;
+import fr.univreunion.nti.term.pattern.PatternSubstitution;
+import fr.univreunion.nti.term.pattern.PatternTerm;
+import fr.univreunion.nti.term.pattern.simple.SimplePatternTerm;
 
 /**
  * A logic program rule.
@@ -38,7 +42,7 @@ import fr.univreunion.nti.term.Variable;
  * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
 
-public class RuleLp extends Rule {
+public class RuleLp {
 
 	/**
 	 * The head of the rule.
@@ -51,22 +55,19 @@ public class RuleLp extends Rule {
 	protected final Function[] body;
 
 	/**
-	 * Constructs a logic program rule from the given head,
-	 * body and appearance number in the analyzed file.
+	 * Constructs a logic program rule from the given
+	 * head and body.
 	 * 
 	 * Called by the parser when reading the analyzed file.
 	 * 
 	 * @param head the head of the rule
 	 * @param body the body of the rule
-	 * @param numberInFile the appearance number of the rule
-	 * in the analyzed file
 	 * @throws IllegalArgumentException if the given head
 	 * is <code>null</code> or if the given body or
 	 * a given body atom is <code>null</code>
 	 */
-	public RuleLp(Function head, Function[] body, Integer numberInFile) {
-		super(numberInFile);
-		
+	public RuleLp(Function head, Function[] body) {
+
 		if (head == null)
 			throw new IllegalArgumentException(
 					"construction of an LP rule with a null head");
@@ -78,40 +79,24 @@ public class RuleLp extends Rule {
 
 		this.body = new Function[body.length];
 		int index = 0;
-		for (Function A: body)
-			if (A != null)
-				this.body[index++] = A;
+		for (Function a: body)
+			if (a != null)
+				this.body[index++] = a;
 			else
 				throw new IllegalArgumentException(
 						"construction of an LP rule with a null body atom");		
 	}
-	
-	/**
-	 * Constructs a logic program rule from the given head
-	 * and body. The appearance number of the rule is set
-	 * to <code>null</code>.
-	 * 
-	 * @param head the head of the rule 
-	 * @param body the body of the rule 
-	 * @throws IllegalArgumentException if the given head
-	 * is <code>null</code> or if the given body or
-	 * a given body atom is <code>null</code>
-	 */
-	public RuleLp(Function head, Function[] body) {
-		this(head, body, null);
-	}
 
 	/**
-	 * Constructs a logic program fact from the given head.
-	 * The appearance number of the fact is set to
-	 * <code>null</code>.
+	 * Constructs a logic program fact from the
+	 * given head.
 	 * 
 	 * @param head the head of the fact
 	 * @throws IllegalArgumentException if the given
 	 * head is <code>null</code>
 	 */
 	public RuleLp(Function head) {
-		this(head, new Function[0], null);
+		this(head, new Function[0]);
 	}
 
 	/**
@@ -137,91 +122,138 @@ public class RuleLp extends Rule {
 	}
 
 	/**
+	 * Returns the number of atoms in
+	 * body of this rule.
+	 * 
+	 * @return the number of atoms in
+	 * body of this rule
+	 */
+	public int getBodyLength() {
+		return this.body.length;
+	}
+
+	/**
+	 * Checks whether this rule is a fact,
+	 * i.e., its body is empty.
+	 * 
+	 * @return <code>true</code> iff this
+	 * rule is a fact
+	 */
+	public boolean isFact() {
+		return this.body.length == 0;
+	}
+
+	/**
+	 * Checks whether this rule is binary,
+	 * i.e., its body contains exactly one
+	 * atom.
+	 * 
+	 * @return <code>true</code> iff this
+	 * rule is binary
+	 */
+	public boolean isBinary() {
+		return this.body.length == 1;
+	}
+
+
+	/**
 	 * Unfolds this rule once using the given collection of rules.
 	 * 
-	 * @param X a collection of rules for unfolding this rule
+	 * Applies the T^{\beta}_P operator of [Codish&Taboch, 99]
+	 * to this rule.
+	 * 
+	 * @param x a collection of rules for unfolding this rule
 	 * @param iteration the current iteration of the unfolding operator
 	 * @return the resulting unfolded rules
 	 * @throws IllegalArgumentException if the given iteration
 	 * is negative or zero
 	 */
-	public Collection<UnfoldedRuleLp> unfold(Collection<UnfoldedRuleLp> X, int iteration) {
+	public Collection<UnfoldedRuleLp> unfold(Collection<UnfoldedRuleLp> x, int iteration) {
 
 		if (iteration <= 0)
 			throw new IllegalArgumentException(
 					"unfolding a rule with a negative iteration");
 
-		LinkedList<UnfoldedRuleLp> Result = new LinkedList<UnfoldedRuleLp>();
+		// The thread running this unfolding.
+		Thread currentThread = Thread.currentThread();
+
+		LinkedList<UnfoldedRuleLp> result = new LinkedList<>();
 
 		if (this.body.length == 0) {
 			// Here, this rule is a fact. We add it to the
 			// result only if we are at iteration 1.
 			if (iteration == 1) 
-				Result.add(UnfoldedRuleLp.getInstance(this.head, 1, new Path(this)));
+				result.add(UnfoldedRuleLp.getInstance(this.head, 1));
 		}
 		else {
 			// Here, this rule has a non-empty body.
 
-			// Below, we implement the slight modification of T^{\beta}_P
-			// that we have introduced in JAR'21. Generated binary rules
-			// are associated with their iteration number. We generate
-			// a new rule in Result only when we have used a rule of
-			// the immediately preceding iteration (see condition
-			// n \in {n_1,...,n_i} in JAR'21). Hence the instructions
-			// 'if (R.getIteration() == iteration - 1)...' and
-			// 'if (max == iteration - 1)...' below before adding
-			// something to Result.
+			// Below, we implement a slight modification of T^{\beta}_P.
+			// Generated binary rules are associated with their iteration
+			// number. We generate a new rule in 'result' only when we
+			// have used a rule of the immediately preceding iteration.
+			// Hence the instructions
+			// 'if (r.getIteration() == iteration - 1)...' and
+			// 'if (max == iteration - 1)...'
+			// below before adding something to result.
 
-			LinkedList<UnfoldedRuleLp> temp = new LinkedList<UnfoldedRuleLp>();
-			temp.add(UnfoldedRuleLp.getInstance(this.head, this.body, 0, new Path(this)));
+			LinkedList<UnfoldedRuleLp> temp = new LinkedList<>();
+			temp.add(UnfoldedRuleLp.getInstance(this.head, this.body, 0));
 
 			int lastIndex = this.body.length - 1;
 			for (int i = 0; i <= lastIndex; i++) {
+				if (currentThread.isInterrupted()) break;
+
 				LinkedList<UnfoldedRuleLp> unfoldedWithFacts = temp;
-				temp = new LinkedList<UnfoldedRuleLp>();
+				temp = new LinkedList<>();
 
-				for (UnfoldedRuleLp R : unfoldedWithFacts) {
-					// First, unfold R with id but only if the
+				// Suppose that this rule has the form h <- b_1,...,b_n.
+				// The invariant of this for loop is: at that point,
+				// b_1,...,b_{i-1} have been unfolded with facts and
+				// the list 'unfoldedWithFacts' contains all the
+				// corresponding instantiations of this rule. Therefore,
+				// all elements of 'unfoldedWithFacts' have the form 
+				// h' <- b'_1,...,b'_n where
+				// (h',b'_1,...,b'_n) = (h,b_1,...,b_n)\theta for a
+				// substitution \theta which is the mgu computed so far.
+
+				for (UnfoldedRuleLp r : unfoldedWithFacts) {
+					if (currentThread.isInterrupted()) break;
+
+					// First, unfold r with id but only if the
 					// resulting rule belongs to the current iteration.
-					if (R.getIteration() == iteration - 1) {
-						HashMap<Term,Term> copies = new HashMap<Term,Term>();
-						Function H = (Function) R.head.deepCopy(copies);
-						Function[] B = { (Function) R.body[i].deepCopy(copies) };
-						Result.add(UnfoldedRuleLp.getInstance(H, B, iteration, R.getPath()));
+					if (r.getIteration() == iteration - 1) {
+						HashMap<Term,Term> copies = new HashMap<>();
+						Function h = (Function) r.head.deepCopy(copies);
+						Function[] b = { (Function) r.body[i].deepCopy(copies) };
+						result.add(UnfoldedRuleLp.getInstance(h, b, iteration));
 					}
-					// Then, unfold R with the rules of X.
-					for (UnfoldedRuleLp R_X : X) {
-						int max = Math.max(R.getIteration(), R_X.getIteration());
-						UnfoldedRuleLp Rcopy = R.deepCopy();
-						UnfoldedRuleLp R_Xcopy = R_X.deepCopy();
+					// Then, unfold r with the rules of x.
+					for (UnfoldedRuleLp r_x : x) {
+						if (currentThread.isInterrupted()) break;
 
-						if (Rcopy.body[i].unifyWith(R_Xcopy.head)) {
-							Path path = new Path();
-							path.addAll(R.getPath());
-							path.addAll(R_X.getPath());
-							if (R_X.body.length == 0) {
-								// R_X is a fact:
+						int max = Math.max(r.getIteration(), r_x.getIteration());
+						UnfoldedRuleLp rCopy = r.deepCopy();
+						UnfoldedRuleLp r_xCopy = r_x.deepCopy();
+
+						if (rCopy.body[i].unifyWith(r_xCopy.head)) {
+							if (r_x.body.length == 0) { // r_x is a fact:
 								if (i < lastIndex)
 									// i is not the last index: the i-th atom in the body
-									// of R cannot be unfolded with a fact
+									// of r cannot be unfolded with a fact.
 									temp.addLast(UnfoldedRuleLp.getInstance(
-											Rcopy.head, Rcopy.body, max, path));
-								else {
-									// the last atom in the body of R can be
-									// unfolded with a fact; this results
-									// in a new fact
-									if (max == iteration - 1)
-										Result.add(UnfoldedRuleLp.getInstance(
-												Rcopy.head, iteration, path));
-								}
+											rCopy.head, rCopy.body, max));
+								else if (max == iteration - 1)
+									// The last atom in the body of r can be
+									// unfolded with a fact. This results
+									// in a new fact.
+									result.add(UnfoldedRuleLp.getInstance(
+											rCopy.head, iteration));
 							}
-							else {
-								// R_X is not a fact:
-								if (max == iteration - 1) {
-									Function[] B = { R_Xcopy.body[0] };
-									Result.add(UnfoldedRuleLp.getInstance(
-											Rcopy.head, B, iteration, path));
-								}
+							else if (max == iteration - 1) {
+								Function[] B = { r_xCopy.body[0] };
+								result.add(UnfoldedRuleLp.getInstance(
+										rCopy.head, B, iteration));
 							}
 						}
 					}
@@ -229,7 +261,189 @@ public class RuleLp extends Rule {
 			}
 		}
 
-		return Result;
+		return result;
+	}
+
+	/**
+	 * Unfolds this rule once using the given collections of rules.
+	 * 
+	 * Applies the T^{\pi}_{P,B} operator of [Payet, LOPSTR'25]
+	 * to this rule.
+	 * 
+	 * It is supposed that the provided collections consist of
+	 * pattern rules (p,q) where both p and q are simple pattern
+	 * terms (see Def. 9 of [Payet, LOPSTR'25]).
+	 * 
+	 * @param x a collection of rules for unfolding this rule
+	 * @param iteration the current iteration of the unfolding operator
+	 * @return the resulting unfolded rules
+	 * @throws IllegalArgumentException if the given iteration
+	 * is negative or zero
+	 */
+	public Collection<PatternRuleLp> unfoldPattern(Collection<PatternRuleLp> x, int iteration) {
+
+		if (iteration <= 0)
+			throw new IllegalArgumentException(
+					"unfolding a rule with a negative iteration");
+
+		// The thread running this unfolding.
+		Thread currentThread = Thread.currentThread();
+
+		LinkedList<PatternRuleLp> result = new LinkedList<>();
+
+		// Below, we implement a slight modification of T^{\pi}_{P,B}.
+		// Generated pattern rules are associated with their iteration
+		// number. We generate a new rule in 'result' only when we
+		// have used a rule of the immediately preceding iteration.
+		// Hence the instructions
+		// 'if (r.getIteration() == iteration - 1)...' and
+		// 'if (max == iteration - 1)...'
+		// below before adding something to result.
+
+		LinkedList<PatternRuleLpInProgress> temp = new LinkedList<>();
+		temp.add(new PatternRuleLpInProgress(0));
+
+		int lastIndex = this.body.length - 1;
+		for (int i = 0; i <= lastIndex; i++) {
+			if (currentThread.isInterrupted()) break;
+
+			LinkedList<PatternRuleLpInProgress> unfoldedWithFacts = temp;
+			temp = new LinkedList<>();
+
+			// Suppose that this rule has the form h <- b_1,...,b_n.
+			// The invariant of this for loop is: at that point,
+			// b_1,...,b_{i-1} have been unfolded with facts and
+			// the list 'unfoldedWithFacts' contains all the
+			// corresponding mgu's.
+
+			for (PatternRuleLpInProgress r : unfoldedWithFacts) {
+				if (currentThread.isInterrupted()) break;
+
+				PatternSubstitution theta = r.getPatternSubs();
+				if (theta != null) {
+					// First, unfold this rule with id but only if the
+					// resulting rule belongs to the current iteration.
+					if (r.getIteration() == iteration - 1) {
+						HashMap<Term,Term> copies = new HashMap<>();
+						Function h = (Function) this.head.deepCopy(copies);
+						Function b = (Function) this.body[i].deepCopy(copies);
+						theta = theta.deepCopy(copies);
+						result.add(PatternRuleLp.getInstance(
+								h, theta, b, theta, iteration));
+					}
+					// Then, unfold this rule with the rules of 'x'.
+					for (PatternRuleLp r_x : x) {
+						if (currentThread.isInterrupted()) break;
+
+						result.addAll(this.unfoldPatternAtIndex(i, r_x.deepCopy(), r, temp, lastIndex, iteration));
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Unfolds the atom at index <code>i</code> in the body of
+	 * this rule using the pattern rule <code>r_unfold</code>.
+	 * 
+	 * @param i the index of the current atom to consider in
+	 * the body of this rule
+	 * @param r_unfold the rule that we have to use to unfold
+	 * @param r the mgu computed so far during the unfolding
+	 * @param temp a collection of mgus computed so far
+	 * @param lastIndex the index of the last atom in the
+	 * body of this rule
+	 * @param iteration the current iteration of the unfolding
+	 * operator
+	 * @return a collection of unfolded rules
+	 */
+	private Collection<PatternRuleLp> unfoldPatternAtIndex(int i,
+			PatternRuleLp r_unfold,
+			PatternRuleLpInProgress r,
+			LinkedList<PatternRuleLpInProgress> temp,
+			int lastIndex, int iteration) {
+
+		// The thread running this unfolding.
+		Thread currentThread = Thread.currentThread();
+
+		// The collection to return at the end.
+		LinkedList<PatternRuleLp> result = new LinkedList<>();
+
+		int max = Math.max(r.getIteration(), r_unfold.getIteration());
+
+		// The current atom in the body of this rule.
+		PatternSubstitution r_patsub = r.getPatternSubs();
+		PatternTerm body_i = SimplePatternTerm.getInstance(this.body[i], r_patsub);
+
+		// We unify the current atom in the body of
+		// this rule with the left-hand side of the
+		// rule used to unfold.
+		Collection<? extends PatternSubstitution> mgus = body_i.unifyWith(r_unfold);
+
+		if (!mgus.isEmpty())
+			for (PatternSubstitution mgu : mgus) {
+				if (currentThread.isInterrupted()) break;
+
+				mgu = r_patsub.composeWith(mgu);
+				if (r_unfold.isFact()) {
+					if (i < lastIndex)
+						// i is not the last index: the i-th atom in the body
+						// of this rule cannot be unfolded with a fact.
+						temp.addLast(new PatternRuleLpInProgress(mgu, max));
+					else if (max == iteration - 1) {
+						// The last atom in the body of this rule can be
+						// unfolded with a fact. This results in a new fact.
+						HashMap<Term,Term> copies = new HashMap<>();
+						result.add(PatternRuleLp.getInstance(
+								(Function) this.head.deepCopy(copies),
+								mgu.deepCopy(copies),
+								iteration));
+					}
+				}
+				else if (max == iteration - 1) {
+					PatternTerm right = r_unfold.getRight();
+					PatternSubstitution theta = right.getPatternSubs().composeWith(mgu);
+					if (theta != null) {
+						HashMap<Term, Term> copies = new HashMap<>();
+						result.add(PatternRuleLp.getInstance(
+								(Function) this.head.deepCopy(copies),
+								mgu.deepCopy(copies),
+								(Function) right.getBaseTerm().deepCopy(copies),
+								theta.deepCopy(copies),
+								iteration));
+					}
+				}
+			}
+
+		return result;
+	}
+
+	/**
+	 * Returns a string representation of this
+	 * rule relatively to the given set of
+	 * variable symbols.
+	 * 
+	 * @param variables a set of pairs <code>(V,s)</code>
+	 * where <code>s</code> is the string associated to
+	 * variable <code>V</code>
+	 */
+	public String toString(Map<Variable,String> variables) {
+		StringBuffer s = new StringBuffer(this.head.toString(variables, false));
+
+		int k = this.body.length;
+		if (k > 0) {
+			s.append(" :- ");
+			for (Term A: this.body) {
+				s.append(A.toString(variables, false));
+				if (--k > 0)
+					s.append(", ");
+			}
+		}
+		s.append(".");
+
+		return s.toString();
 	}
 
 	/**
@@ -238,23 +452,6 @@ public class RuleLp extends Rule {
 	 * @return a String representation of this rule
 	 */
 	public String toString() {
-		// A set of pairs (V,s) where s is
-		// the symbol associated to variable V.
-		HashMap<Variable,String> variables = new HashMap<Variable,String>();
-
-		StringBuffer s = new StringBuffer(this.head.toString(variables, false));
-
-		if (this.body.length > 0) {
-			s.append(" :- ");
-			int k = this.body.length - 1;
-			for (Term A: this.body) {
-				s.append(A.toString(variables, false));
-				if (k-- > 0)
-					s.append(", ");
-			}
-		}
-		s.append(".");
-
-		return s.toString();
+		return this.toString(new HashMap<>());
 	}
 }

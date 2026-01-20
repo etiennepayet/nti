@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -24,6 +24,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import fr.univreunion.nti.Options;
+import fr.univreunion.nti.Printer;
 import fr.univreunion.nti.parse.lp.ParserLp;
 import fr.univreunion.nti.parse.lp.ScannerLp;
 import fr.univreunion.nti.parse.ari.ParserAri;
@@ -106,13 +107,18 @@ public abstract class Program {
 	public String getName() {
 		return this.name;
 	}
-	
+		
 	/**
-	 * Returns the size of this program.
+	 * Applies the pattern unfolding operator
+	 * <code>n</code> times to this program
+	 * and displays the result.
 	 * 
-	 * @return the size of this program
+	 * @param n the number of iterations
+	 * of the pattern unfolding operator 
+	 * @param printer the printer used
+	 * to display the result
 	 */
-	public abstract int size();
+	public abstract void patternUnfold(int n, Printer printer);
 		
 	/**
 	 * Runs a termination proof for this program.
@@ -120,6 +126,13 @@ public abstract class Program {
 	 * @return the computed proof
 	 */
 	public abstract Proof proveTermination();
+	
+	/**
+	 * Returns the size of this program.
+	 * 
+	 * @return the size of this program
+	 */
+	public abstract int size();
 	
 	/**
 	 * Returns a String representation of some statistics

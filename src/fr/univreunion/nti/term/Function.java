@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -127,12 +127,14 @@ public class Function extends Term {
 	 * 
 	 * @param i the index of the child to be returned
 	 * @return the <code>i</code>-th child of this
-	 * function
-	 * @throws IndexOutOfBoundsException if
-	 * <code>i</code> is not a valid child index in
-	 * this function
+	 * function, or <code>null</code> if <code>i</code>
+	 * is not a valid child index in this function
 	 */
 	public Term getChild(int i) {
+		// Check whether i is out of bounds.
+		if (i < 0 || i >= this.arguments.length)
+			return null;
+
 		return this.arguments[i];
 	}
 
@@ -182,8 +184,7 @@ public class Function extends Term {
 	 * to check whether some other term is equal to
 	 * this one.
 	 * 
-	 * This a deep, structural, comparison which is
-	 * used in the implementation of substitutions.
+	 * This a deep, structural, comparison.
 	 * 
 	 * Both this term and the provided term are
 	 * supposed to be the representatives of their
@@ -512,7 +513,7 @@ public class Function extends Term {
 
 		return symbols;
 	}
-	
+
 	/**
 	 * An auxiliary, internal, method which returns
 	 * the subterm of this term at the given single
@@ -522,10 +523,10 @@ public class Function extends Term {
 	 * class representative. 
 	 * 
 	 * @param i a single position
-	 * @return the subterm of this term at the given
-	 * position
-	 * @throws IndexOutOfBoundsException if <code>i</code>
-	 * is not a valid position in this term
+	 * @return the subterm of this term at position
+	 * <code>i</code>, or <code>null</code> if
+	 * <code>i</code> is not a valid position in
+	 * this term
 	 */
 	@Override
 	protected Term getAux(int i) {
@@ -556,9 +557,8 @@ public class Function extends Term {
 	 * @param shallow a boolean indicating whether a shallow
 	 * search has to be processed through this term
 	 * @return the subterm of this term at the given position
-	 * @throws IndexOutOfBoundsException if the provided
-	 * iterator does not correspond to a valid position in
-	 * this term
+	 * or <code>null</code> if the provided iterator does not
+	 * correspond to a valid position in this term
 	 */
 	@Override
 	protected Term getAux(Iterator<Integer> it, boolean shallow) {
@@ -568,9 +568,48 @@ public class Function extends Term {
 
 		// Check whether i is out of bounds.
 		if (i < 0 || i >= this.arguments.length)
-			throw new IndexOutOfBoundsException(i + " -- " + this);
+			return null;
 
 		return this.arguments[i].get(it, shallow);
+	}
+
+	/**
+	 * An auxiliary, internal, method which is used to build
+	 * a collection consisting of the hat subterms of this
+	 * term.
+	 * 
+	 * There are no duplicate in the returned collection,
+	 * i.e., if s and t are in the returned collection
+	 * then they are not equal (w.r.t. a deep, structural,
+	 * comparison).
+	 *  
+	 * This term is supposed to be the schema of its
+	 * class representative.
+	 * 
+	 * @return a collection consisting of the hat subterms
+	 * of this term
+	 */
+	@Override
+	protected Collection<Term> getHatSubtermsAux() {
+		Collection<Term> result =  new LinkedList<>();
+
+		for (Term s : this.arguments) {
+			Collection<Term> result_s = s.findSchema().getHatSubtermsAux();
+			// We add the elements of result_s to result
+			// but only if they do not already occur in
+			// result.
+			for (Term u : result_s) {
+				boolean found = false;
+				for (Term v : result)
+					if (u.deepEquals(v)) { found = true; break; }
+				if (!found) result.add(u);
+			}
+		}
+
+		if (result.isEmpty() && this.rootSymbol.isHatSymbol())
+			result.add(this);
+
+		return result;
 	}
 
 	/**
@@ -1012,6 +1051,28 @@ public class Function extends Term {
 	 */
 	@Override
 	protected Term applyAux(Substitution theta) {
+
+		if (this.arguments.length == 1) {
+			// We introduce a slight improvement here.
+			// If this term has the form s(t) where s
+			// is a unary function symbol and
+			// theta(t) = s^{a_1,...,a_l,b)(u)
+			// then we return s^{a_1,...,a_l,b+1)(u).
+			Term t = this.arguments[0].apply(theta);
+			if (t instanceof HatFunction) {
+				HatFunction hf = (HatFunction) t;
+				if (this.rootSymbol == hf.getRootSymbol().getSimpleContext().getRootSymbol()) {
+					HatFunction hf2 = new HatFunction(hf);
+					hf2.setB(hf2.getB() + 1);
+					return hf2;
+				}
+			}
+
+			Function f = new Function(this.rootSymbol);
+			f.arguments[0] = t;
+			return f;
+		}
+
 		Function f = new Function(this.rootSymbol);
 
 		int i = 0;
@@ -1019,6 +1080,26 @@ public class Function extends Term {
 			f.arguments[i++] = t.apply(theta);
 
 		return f;
+	}
+
+	/**
+	 * An auxiliary, internal, method which is used
+	 * to apply the specified substitution to this
+	 * term (which is modified by this method).
+	 * 
+	 * @param theta a substitution
+	 */
+	@Override
+	protected void applyInPlaceAux(Substitution theta) {
+		int i = 0;
+		for (Term s: this.arguments) {
+			if (s instanceof Variable) {
+				Term t = theta.get((Variable) s);
+				if (t != null) s = t.shallowCopy();
+			}
+			else s.applyInPlace(theta);
+			this.arguments[i++] = s;
+		}
 	}
 
 	/**
@@ -1852,6 +1933,48 @@ public class Function extends Term {
 		}
 
 		return this;
+	}
+
+	/**
+	 * Computes a substitution form of this term.
+	 * 
+	 * More precisely, if this term has the form
+	 * <code>f(t_1,...,t_n)</code> then, for all
+	 * <code>i</code> such that <code>t_i</code>
+	 * is ground, this method adds the mapping
+	 * <code>x_i -> t_i</code> to the provided
+	 * substitution <code>theta</code>, where
+	 * <code>x_i</code> is a new variable. At
+	 * the same time, it replaces <code>t_i</code>
+	 * by <code>x_i</code> in this term.
+	 * The term <code>s</code> resulting from
+	 * these replacements is returned.
+	 * 
+	 * This term is not modified by this method.
+	 * 
+	 * Moreover, at the end of this method
+	 * <code>s theta</code> is equal to this term.
+	 * 
+	 * @param theta a substitution
+	 * @return the term resulting from replacing
+	 * subterms of this term by new variables
+	 */
+	public Term toSubstitution(Substitution theta) {
+		// The term to return at the end.
+		Function f = new Function(this.rootSymbol);
+
+		int i = 0;
+		for (Term t : this.arguments) {
+			Term new_t = t;
+			if (t.isGround()) {
+				Variable x = new Variable();
+				theta.add(x, t);
+				new_t = x;
+			}
+			f.arguments[i++] = new_t;
+		}
+
+		return f;
 	}
 
 	/**

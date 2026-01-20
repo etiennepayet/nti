@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -27,12 +27,13 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import fr.univreunion.nti.Options;
 import fr.univreunion.nti.program.Argument;
-import fr.univreunion.nti.program.Path;
 import fr.univreunion.nti.program.Proof;
 import fr.univreunion.nti.program.trs.Parameters;
 import fr.univreunion.nti.program.trs.ParentTrs;
 import fr.univreunion.nti.program.trs.RuleTrs;
+import fr.univreunion.nti.program.trs.StrategyLoop;
 import fr.univreunion.nti.program.trs.Trs;
 import fr.univreunion.nti.program.trs.UnfoldedRuleTrs;
 import fr.univreunion.nti.program.trs.loop.comp.UnfoldedRuleTrsLoopComp;
@@ -73,8 +74,6 @@ public class UnfoldedRuleTrsLoopTrans extends UnfoldedRuleTrs {
 	 * @param iteration the iteration of the unfolding operator
 	 * at which the transitory triple is generated
 	 * @param parent the parent of the transitory triple
-	 * @param path the path in the program being unfolded that
-	 * corresponds to the transitory triple
 	 * @param scc the component \cN of the transitory triple
 	 * @param simpleCycle the component \cL of the transitory triple
 	 * @throws IllegalArgumentException if the given iteration
@@ -83,12 +82,11 @@ public class UnfoldedRuleTrsLoopTrans extends UnfoldedRuleTrs {
 	 * triple
 	 */
 	public synchronized static Collection<UnfoldedRuleTrs> getUnfoldedInstances(
-			Function left, Term right, int iteration,
-			ParentTrs parent, Path path,
+			Function left, Term right, int iteration, ParentTrs parent,
 			Collection<RuleTrs> scc, Collection<RuleTrs> simpleCycle) {
 
 		UnfoldedRuleTrsLoopTrans R = new UnfoldedRuleTrsLoopTrans(
-				left, right, iteration, parent, path, scc, simpleCycle);
+				left, right, iteration, parent, scc, simpleCycle);
 
 		Collection<UnfoldedRuleTrs> Result = new LinkedList<UnfoldedRuleTrs>();
 		Result.add(R);
@@ -103,8 +101,6 @@ public class UnfoldedRuleTrsLoopTrans extends UnfoldedRuleTrs {
 	 * @param iteration the iteration of the unfolding operator
 	 * at which this triple is generated
 	 * @param parent the parent of this triple
-	 * @param path the path in the program being unfolded that
-	 * corresponds to this triple
 	 * @param scc the component \cN of this triple
 	 * @param simpleCycle the component \cL of this triple
 	 * @throws IllegalArgumentException if <code>right</code>
@@ -112,11 +108,11 @@ public class UnfoldedRuleTrsLoopTrans extends UnfoldedRuleTrs {
 	 * @throws IllegalArgumentException if the given iteration
 	 * is negative
 	 */
-	private UnfoldedRuleTrsLoopTrans(Function left, Term right,
-			int iteration, ParentTrs parent, Path path,
+	private UnfoldedRuleTrsLoopTrans(
+			Function left, Term right, int iteration, ParentTrs parent,
 			Collection<RuleTrs> scc, Collection<RuleTrs> simpleCycle) {
 
-		super(left, right, iteration, parent, path);
+		super(left, right, iteration, parent);
 
 		this.scc.addAll(scc);
 		this.simpleCycle.addAll(simpleCycle);
@@ -152,7 +148,6 @@ public class UnfoldedRuleTrsLoopTrans extends UnfoldedRuleTrs {
 				this.right.deepCopy(copies),
 				iteration,
 				parent,
-				this.path,
 				this.scc,
 				this.simpleCycle);
 	}
@@ -246,12 +241,16 @@ public class UnfoldedRuleTrsLoopTrans extends UnfoldedRuleTrs {
 		// The thread running this method.
 		Thread currentThread = Thread.currentThread();
 
+		// A boolean indicating whether we are in verbose mode.
+		boolean verbose = Options.getInstance().isInVerboseMode();
+
 		int n = this.scc.size();
 		for (int i = 0; !currentThread.isInterrupted() && i < n; i++) {
 			RuleTrs R = this.scc.removeFirst();
 			this.simpleCycle.add(R);
-			//
-			ParentTrs parent = ParentTrsLoopTrans.getInstance(this, R, null, false);
+			// We need to build the parent only if we are in verbose mode.
+			ParentTrs parent = (verbose ?
+					ParentTrsLoopTrans.getInstance(this, R, null, false) : null);
 			HashMap<Term,Term> copies = new HashMap<Term,Term>();
 
 			// First, we build a composed triple with [this, R].
@@ -261,9 +260,7 @@ public class UnfoldedRuleTrsLoopTrans extends UnfoldedRuleTrs {
 							this.right.deepCopy(copies),
 							iteration,
 							parent,
-							this.path,
 							R.deepCopy(),
-							new Path(R),
 							this.scc,
 							this.simpleCycle);
 			for (UnfoldedRuleTrs U : unfoldedRules)
@@ -279,9 +276,7 @@ public class UnfoldedRuleTrsLoopTrans extends UnfoldedRuleTrs {
 						R.getRight().deepCopy(copies),
 						iteration,
 						parent,
-						new Path(R),
 						this.deepCopy(),
-						this.path,
 						this.scc,
 						this.simpleCycle);
 				for (UnfoldedRuleTrs U : unfoldedRules)
@@ -295,14 +290,15 @@ public class UnfoldedRuleTrsLoopTrans extends UnfoldedRuleTrs {
 		}
 
 		if (!currentThread.isInterrupted() && !IR.containsSimpleCycle(this.simpleCycle)) {
-			ParentTrs parent = ParentTrsLoopTrans.getInstance(this, null, null, false);
+			// We need to build the parent only if we are in verbose mode.
+			ParentTrs parent = (verbose ?
+					ParentTrsLoopTrans.getInstance(this, null, null, false) : null);
 			HashMap<Term,Term> copies = new HashMap<Term,Term>();
 			UnfoldedRuleTrs unfoldedRule = new UnfoldedRuleTrsLoopUnit(
 					(Function) this.left.deepCopy(copies),
 					this.right.deepCopy(copies),
 					iteration,
 					parent,
-					this.path,
 					this.simpleCycle);
 
 			n = Result.size();

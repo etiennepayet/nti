@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -26,8 +26,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import fr.univreunion.nti.Options;
 import fr.univreunion.nti.program.Argument;
-import fr.univreunion.nti.program.Path;
 import fr.univreunion.nti.program.Proof;
 import fr.univreunion.nti.program.trs.Parameters;
 import fr.univreunion.nti.program.trs.ParentTrs;
@@ -64,8 +64,6 @@ public class UnfoldedRuleTrsLoopUnit extends UnfoldedRuleTrs {
 	 * @param iteration the iteration of the unfolding operator
 	 * at which this triple is generated
 	 * @param parent the parent of this triple
-	 * @param path the path in the program being unfolded that
-	 * corresponds to this triple
 	 * @param simpleCycle the component \cL of this triple
 	 * @throws IllegalArgumentException if <code>right</code>
 	 * is not a variable or a function
@@ -73,10 +71,10 @@ public class UnfoldedRuleTrsLoopUnit extends UnfoldedRuleTrs {
 	 * is negative
 	 */
 	public UnfoldedRuleTrsLoopUnit(Function left, Term right,
-			int iteration, ParentTrs parent, Path path,
+			int iteration, ParentTrs parent,
 			Collection<RuleTrs> simpleCycle) {
 
-		super(left, right, iteration, parent, path);
+		super(left, right, iteration, parent);
 
 		this.simpleCycle.addAll(simpleCycle);
 	}
@@ -111,7 +109,6 @@ public class UnfoldedRuleTrsLoopUnit extends UnfoldedRuleTrs {
 				this.right.deepCopy(copies),
 				iteration,
 				parent,
-				this.path,
 				this.simpleCycle);
 	}
 
@@ -189,15 +186,13 @@ public class UnfoldedRuleTrsLoopUnit extends UnfoldedRuleTrs {
 		if (right != null) {
 			Term left = this.left.deepCopy(copies);
 
-			ParentTrs parent = ParentTrsLoopUnit.getInstance(this, R, p, false);
+			// We need to build the parent only if we are in verbose mode.
+			ParentTrs parent = (Options.getInstance().isInVerboseMode() ? 
+					ParentTrsLoopUnit.getInstance(this, R, p, false) : null);
 
-			Path path = new Path();
-			path.addAll(this.path);
-			path.addLast​(R);
-			
 			Result.add(new UnfoldedRuleTrsLoopUnit(
 					(Function) left, right, iteration,
-					parent, path,
+					parent,
 					this.simpleCycle));
 		}
 
@@ -233,14 +228,13 @@ public class UnfoldedRuleTrsLoopUnit extends UnfoldedRuleTrs {
 		if (left != null) {
 			Term right = this.right.deepCopy(copies);
 
-			ParentTrs parent = ParentTrsLoopUnit.getInstance(this, R, p, true);
-			
-			Path path = new Path(R);
-			path.addAll(this.path);
+			// We need to build the parent only if we are in verbose mode.
+			ParentTrs parent = (Options.getInstance().isInVerboseMode() ? 
+					ParentTrsLoopUnit.getInstance(this, R, p, true) : null);
 
 			Result.add(new UnfoldedRuleTrsLoopUnit(
 					(Function) left, right, iteration,
-					parent, path,
+					parent,
 					this.simpleCycle));
 		}
 
@@ -273,7 +267,7 @@ public class UnfoldedRuleTrsLoopUnit extends UnfoldedRuleTrs {
 
 		// The thread running this method.
 		Thread currentThread = Thread.currentThread();
-		
+
 		StrategyLoop strategy = parameters.getStrategy();
 
 		// We compute the disagreement positions of the 
@@ -284,7 +278,7 @@ public class UnfoldedRuleTrsLoopUnit extends UnfoldedRuleTrs {
 		// We iterate through these disagreement positions.
 		for (Position p : D) {
 			if (currentThread.isInterrupted()) break;
-			
+
 			if (this.left.get(p).isVariable() && this.right.get(p).isVariable()) {
 				if (addAll(proof,
 						this.unfoldForwards_var(parameters, p, IR, iteration, proof),
@@ -370,6 +364,9 @@ public class UnfoldedRuleTrsLoopUnit extends UnfoldedRuleTrs {
 		// The thread running this method.
 		Thread currentThread = Thread.currentThread();
 
+		// A boolean indicating whether we are in verbose mode.
+		boolean verbose = Options.getInstance().isInVerboseMode();
+
 		// First, we iterate through the non-empty prefixes of p.
 		for (Position q = p; !q.isEmpty(); q = q.properPrefix()) {
 			if (currentThread.isInterrupted()) break;
@@ -384,14 +381,13 @@ public class UnfoldedRuleTrsLoopUnit extends UnfoldedRuleTrs {
 					Function left = (Function) this.left.deepCopy(copies);
 					Term right = this.right.deepCopy(copies);
 					if (left.get(q).unifyWith(right.get(q))) {
-						ParentTrs parent = ParentTrsLoopUnit.getInstance(this, null, q, false);
-						Path path = new Path();
-						path.addAll(this.path);
-						path.addLast​(this);
+						// We need to build the parent only if we are in verbose mode.
+						ParentTrs parent = (verbose ?
+								ParentTrsLoopUnit.getInstance(this, null, q, false) : null);
 						UnfoldedRuleTrs unfoldedRule =
 								new UnfoldedRuleTrsLoopUnit(
 										left, right, iteration,
-										parent, path, this.simpleCycle);
+										parent, this.simpleCycle);
 						if (add(parameters, IR, proof, unfoldedRule, Result))
 							return Result;
 					}
@@ -471,6 +467,9 @@ public class UnfoldedRuleTrsLoopUnit extends UnfoldedRuleTrs {
 		// The thread running this method.
 		Thread currentThread = Thread.currentThread();
 
+		// A boolean indicating whether we are in verbose mode.
+		boolean verbose = Options.getInstance().isInVerboseMode();
+
 		// First, we iterate through the non-empty prefixes of p.
 		for (Position q = p; !q.isEmpty(); q = q.properPrefix()) {
 			if (currentThread.isInterrupted()) break;
@@ -485,13 +484,13 @@ public class UnfoldedRuleTrsLoopUnit extends UnfoldedRuleTrs {
 					Function left = (Function) this.left.deepCopy(copies);
 					Term right = this.right.deepCopy(copies);
 					if (left.get(q).unifyWith(right.get(q))) {
-						ParentTrs parent = ParentTrsLoopUnit.getInstance(this, null, q, true);
-						Path path = new Path(this);
-						path.addAll(this.path);
+						// We need to build the parent only if we are in verbose mode.
+						ParentTrs parent = (verbose ?
+								ParentTrsLoopUnit.getInstance(this, null, q, true) : null);
 						UnfoldedRuleTrs unfoldedRule =
 								new UnfoldedRuleTrsLoopUnit(
 										left, right, iteration,
-										parent, path, this.simpleCycle);
+										parent, this.simpleCycle);
 						if (add(parameters, IR, proof, unfoldedRule, Result))
 							return Result;
 					}

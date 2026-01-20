@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -17,7 +17,7 @@
  * along with NTI. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fr.univreunion.nti.program.trs.nonloop;
+package fr.univreunion.nti.program.trs.nonloop.eeg12;
 
 /**
  * An inference rule or a lemma presented in
@@ -26,7 +26,7 @@ package fr.univreunion.nti.program.trs.nonloop;
  * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
 
-public enum Eeg12Rule {
+public enum InferenceRuleEeg12 {
 	I("(I)", "Pattern rule from TRS"),
 	II("(II)", "Pattern creation 1"),
 	III("(III)", "Pattern creation 2"),
@@ -50,7 +50,7 @@ public enum Eeg12Rule {
 	 * @param shortName the short name of this rule or lemma
 	 * @param longName the long name of this rule or lemma
 	 */
-	private Eeg12Rule(String shortName, String longName) {
+	private InferenceRuleEeg12(String shortName, String longName) {
 		this.shortName = shortName;
 		this.longName = longName;
 	}

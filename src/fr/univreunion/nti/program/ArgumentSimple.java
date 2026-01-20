@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -20,7 +20,7 @@
 package fr.univreunion.nti.program;
 
 /**
- * The most simple form of a proof argument.
+ * The simplest form of a proof argument.
  * It only consists of a string that quickly
  * describes why the proof has succeeded or
  * failed.

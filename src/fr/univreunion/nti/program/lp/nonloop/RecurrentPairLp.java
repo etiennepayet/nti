@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -17,7 +17,7 @@
  * along with NTI. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fr.univreunion.nti.program.lp.loop;
+package fr.univreunion.nti.program.lp.nonloop;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,18 +25,19 @@ import java.util.Map;
 import fr.univreunion.nti.program.RecurrentPair;
 import fr.univreunion.nti.program.lp.BinaryRuleLp;
 import fr.univreunion.nti.program.lp.Mode;
+import fr.univreunion.nti.program.lp.NonTerminationWitness;
 import fr.univreunion.nti.term.Function;
 import fr.univreunion.nti.term.Term;
 import fr.univreunion.nti.term.Variable;
 
 /**
- * A recurrent pair in LP for proving the
- * existence of a binary loop.
+ * A recurrent pair in LP for proving the existence of
+ * a binary chain (see Sect. 5 of [Payet, JAR'24]).
  * 
  * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
 
-public class RecurrentPairLp implements LoopWitness {
+public class RecurrentPairLp implements NonTerminationWitness {
 
 	/**
 	 * The rule R1 of this recurrent pair.
@@ -134,20 +135,20 @@ public class RecurrentPairLp implements LoopWitness {
 
 	/**
 	 * Checks whether this pair is a witness for
-	 * the existence of a binary loop for the
+	 * the existence of a binary chain for the
 	 * given mode.
 	 * 
-	 * @param m a mode for which a binary loop is
-	 * to be found
-	 * @return a (non-<code>null</code>) query 
-	 * starting a binary loop and corresponding
+	 * @param m a mode for which a binary chain
+	 * is to be found
+	 * @return a (non-<code>null</code>) atomic
+	 * query starting a binary chain corresponding
 	 * to <code>m</code> or <code>null</code>,
 	 * if this pair is not a witness of the
-	 * existence of a binary loop for
+	 * existence of a binary chain for
 	 * <code>m</code>
 	 */
 	@Override
-	public Function provesLoopingnessOf(Mode m) {
+	public Function provesNonTerminationOf(Mode m) {
 		if (this.recPair != null) {
 			Function nonterminating = this.recPair.getNonTerminatingTerm();
 			if (nonterminating != null) {
@@ -164,31 +165,13 @@ public class RecurrentPairLp implements LoopWitness {
 	}
 
 	/**
-	 * Returns a String representation of the kind
-	 * of loopingness witnessed by this object.
-	 * 
-	 * @return a String representation of the kind
-	 * of loopingness witnessed by this object
-	 */
-	@Override
-	public String getLoopKind() {
-		return "binary loop";
-	}
-
-	/**
 	 * Returns a short String representation of this witness.
 	 * 
 	 * @return a short String representation of this witness
 	 */
 	@Override
 	public String getShortDescription() {
-		return "(extracted from a recurrent pair [Payet, JAR'24])";
-		/*
-		return "(extracted from a recurrent pair)\n" +
-				"  The stem to the loop is " + 
-				this.R1.getPath() +
-				" and the loop is " + this.R2.getPath();
-		 */
+		return "(extracted from a recurrent pair [Payet, JAR'24+LOPSTR'25])";
 	}
 
 	/**
@@ -217,7 +200,10 @@ public class RecurrentPairLp implements LoopWitness {
 					"), (n1,n2,n3,n4) = (" + this.recPair.getN1() +
 					"," + this.recPair.getN2() +
 					"," + this.recPair.getN3() +
-					"," + this.recPair.getN4() + ")>";
+					"," + this.recPair.getN4() +
+					"), non-terminating query = " +
+					this.recPair.getNonTerminatingTerm() +
+					"> (Def.3 + Cor. 1 of [Payet, LOPSTR'25])";
 			// return this.recPair.toString();
 		}
 

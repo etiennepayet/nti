@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -61,6 +61,12 @@ public class Options {
 	 * The default path to cTI.
 	 */
 	private final static String DEFAULT_PATH_TO_cTI = null;
+	
+	/**
+	 * The default number of iterations of the
+	 * pattern unfolding operator.
+	 */
+	private final static int DEFAULT_NB_ITE = 0;
 		
 	
 	/**
@@ -99,6 +105,12 @@ public class Options {
 	 * The path to cTI.
 	 */
 	private final String pathTo_cTI;
+	
+	/**
+	 * The number of iterations of the
+	 * pattern unfolding operator.
+	 */
+	private final int nbIte;
 		
 	
 	/**
@@ -148,6 +160,7 @@ public class Options {
 		long totalTimeLimit = DEFAULT_TOTAL_TIME_LIMIT;
 		long timeLimitNonTerm = DEFAULT_TIME_LIMIT_NONTERM;
 		String pathTo_cTI = DEFAULT_PATH_TO_cTI;
+		int nbIte = DEFAULT_NB_ITE;
 
 		for (String arg : args) {
 			// A well-formed command-line argument has the form
@@ -167,12 +180,22 @@ public class Options {
 			else if ("-print".equals(actionOption)) action = NtiAction.PRINT_PROG;
 			else if ("-stat".equals(actionOption)) action = NtiAction.PRINT_STAT;
 			else if ("-prove".equals(actionOption)) action = NtiAction.PROVE_TERM;
+			else if ("-patunf".equals(actionOption)) {
+				action = NtiAction.PATUNF;
+				try {
+					// We get the number of iterations of
+					// the pattern unfolding operator.
+					nbIte = Integer.parseInt(value);
+				} catch (NumberFormatException e) {
+					throw new IllegalStateException("the specified number of iterations has to be an integer");
+				}
+			}
 			// Options:
 			else if ("-v".equals(actionOption)) verbose = true;
 			else if ("-t".equals(actionOption))
 				try {
 					// We get the time in seconds.
-					timeLimitNonTerm =  Long.parseLong(value);
+					totalTimeLimit =  Long.parseLong(value);
 				} catch (NumberFormatException e) {
 					throw new IllegalStateException("the specified time limit has to be an integer");
 				}
@@ -192,6 +215,7 @@ public class Options {
 		this.totalTimeLimit = totalTimeLimit;
 		this.timeLimitNonTerm = timeLimitNonTerm;
 		this.pathTo_cTI = pathTo_cTI;
+		this.nbIte = nbIte;
 
 		// We create a printer for showing the output and error messages of NTI.
 		this.printer = new Printer(verbose);		
@@ -266,6 +290,17 @@ public class Options {
 	 */
 	public synchronized String getPathTo_cTI() {
 		return this.pathTo_cTI;
+	}
+	
+	/**
+	 * Returns the number of iterations of
+	 * the pattern unfolding operator.
+	 * 
+	 * @return the number of iterations
+	 * of the pattern unfolding operator
+	 */
+	public synchronized int getNbIte() {
+		return this.nbIte;
 	}
 		
 	/**

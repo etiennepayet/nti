@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -17,7 +17,7 @@
  * along with NTI. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fr.univreunion.nti.program.trs.nonloop;
+package fr.univreunion.nti.program.trs.nonloop.eeg12;
 
 import fr.univreunion.nti.program.trs.ParentTrs;
 import fr.univreunion.nti.program.trs.RuleTrs;
@@ -30,7 +30,7 @@ import fr.univreunion.nti.term.Position;
  * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
 
-public class ParentTrsNonLoop extends ParentTrs {
+public class ParentTrsNonLoopEeg12 extends ParentTrs {
 
 	/**
 	 * The rules (from (I) to (IX)) and lemmas
@@ -38,7 +38,7 @@ public class ParentTrsNonLoop extends ParentTrs {
 	 * used for generating the unfolded rule whose
 	 * parent is this object.
 	 */
-	private final Eeg12Rule[] rules;
+	private final InferenceRuleEeg12[] rules;
 
 	/**
 	 * Builds a parent for an unfolded rule.
@@ -52,8 +52,8 @@ public class ParentTrsNonLoop extends ParentTrs {
 	 * @param rules the rules and lemmas used for generating
 	 * the unfolded rule whose parent is this object
 	 */
-	public ParentTrsNonLoop(PatternRule father, RuleTrs mother,
-			Position position, boolean leftOrRight, Eeg12Rule... rules) {
+	public ParentTrsNonLoopEeg12(PatternRuleTrsEeg12 father, RuleTrs mother,
+			Position position, boolean leftOrRight, InferenceRuleEeg12... rules) {
 
 		super(father, mother, position, leftOrRight);
 
@@ -79,7 +79,7 @@ public class ParentTrsNonLoop extends ParentTrs {
 			StringBuffer spaces = new StringBuffer(indentation);
 			for (int i = 0; i < indentation; i++) spaces.append(" ");
 
-			if (this.rules[0] == Eeg12Rule.I) {
+			if (this.rules[0] == InferenceRuleEeg12.I) {
 				RuleTrs M = this.getMother();
 
 				String mother = (M.getLeft().getRootSymbol().isTupleSymbol() ?
@@ -89,11 +89,11 @@ public class ParentTrsNonLoop extends ParentTrs {
 				s.append("IR contains the " + mother + " " + M);
 				s.append(".\n");
 				s.append(spaces);
-				s.append("We apply " + Eeg12Rule.I.getShortName());
+				s.append("We apply " + InferenceRuleEeg12.I.getShortName());
 				s.append(" of [Emmes, Enger, Giesl, IJCAR'12] to this " + mother + ".");
 			}
 			else {
-				PatternRule F = (PatternRule) this.getFather();
+				PatternRuleTrsEeg12 F = (PatternRuleTrsEeg12) this.getFather();
 				int it = F.getIteration();
 				String l = "P" + it;
 
@@ -109,7 +109,7 @@ public class ParentTrsNonLoop extends ParentTrs {
 				s.append(spaces);
 				s.append("We apply ");
 				boolean notFirst = false;
-				for (Eeg12Rule rule : this.rules) {
+				for (InferenceRuleEeg12 rule : this.rules) {
 					if (notFirst) s.append(" + ");
 					else notFirst = true;
 					s.append(rule.getShortName());
@@ -129,7 +129,7 @@ public class ParentTrsNonLoop extends ParentTrs {
 
 				RuleTrs M = this.getMother();
 				String motherType, end;
-				if (M instanceof PatternRule) {
+				if (M instanceof PatternRuleTrsEeg12) {
 					motherType = "pattern rule";
 					end = "obtained from IR.";
 				}

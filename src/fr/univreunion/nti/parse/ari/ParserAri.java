@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -201,7 +201,7 @@ public class ParserAri extends Parser {
 
 		Term right = this.T();
 
-		this.rules.add(new RuleTrs((Function) left, right, this.rules.size() + 1));
+		this.rules.add(new RuleTrs((Function) left, right));
 	}
 
 	/**

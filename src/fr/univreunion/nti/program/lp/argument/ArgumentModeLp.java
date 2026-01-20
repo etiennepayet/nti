@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -20,45 +20,47 @@
 package fr.univreunion.nti.program.lp.argument;
 
 /**
- * A non-termination proof argument in LP. It is produced when
- * a looping atomic query has been found for a specific mode.
+ * A non-termination proof argument in LP. It is produced
+ * when a non-terminating atomic query has been found for
+ * a specific mode.
  *
  * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
 
 import fr.univreunion.nti.program.Argument;
 import fr.univreunion.nti.program.lp.Mode;
-import fr.univreunion.nti.program.lp.loop.LoopWitness;
+import fr.univreunion.nti.program.lp.NonTerminationWitness;
 import fr.univreunion.nti.term.Function;
 
-public class ArgumentLoopLp implements Argument {
+public class ArgumentModeLp implements Argument {
 
 	/**
-	 * The mode whose loopingness has been proved.
+	 * The mode whose non-termination has been proved.
 	 */
 	private final Mode m;
 
 	/**
-	 * The looping atomic query that corresponds to
-	 * <code>m</code>.
+	 * The non-terminating atomic query that corresponds
+	 * to <code>m</code>.
 	 */
 	private final Function Q;
 
 	/**
-	 * The witness that <code>m</code> is looping.
+	 * The witness that <code>m</code> is
+	 * non-terminating.
 	 */
-	private final LoopWitness witness;
+	private final NonTerminationWitness witness;
 
 	/**
-	 * Builds a loop argument for the specified mode.
+	 * Builds a non-termination argument for the specified mode.
 	 * 
-	 * @param m the mode whose loopingness has be proved
-	 * @param Q the looping atomic query that corresponds to
-	 * <code>m</code>
+	 * @param m the mode whose non-termination has be proved
+	 * @param Q the non-terminating atomic query that corresponds
+	 * to <code>m</code>
 	 * @param witness the witness that <code>m</code> is
-	 * looping
+	 * non-terminating
 	 */
-	public ArgumentLoopLp(Mode m, Function Q, LoopWitness witness) {
+	public ArgumentModeLp(Mode m, Function Q, NonTerminationWitness witness) {
 		this.m = m;
 		this.Q = Q;
 		this.witness = witness;
@@ -89,7 +91,7 @@ public class ArgumentLoopLp implements Argument {
 	 */
 	@Override
 	public String getWitnessKind() {
-		return "looping atomic query";
+		return "non-terminating atomic query";
 	}
 
 	/**
@@ -105,11 +107,6 @@ public class ArgumentLoopLp implements Argument {
 		result.append(this.m);
 		result.append(": the query ");
 		result.append(this.Q);
-		/*
-		result.append(" starts a ");
-		result.append(this.witness.getLoopKind());
-		result.append(" ");
-		 */
 		result.append(" is non-terminating ");
 		result.append(this.witness.getShortDescription());
 

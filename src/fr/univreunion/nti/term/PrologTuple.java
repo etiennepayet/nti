@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -151,8 +151,7 @@ public class PrologTuple extends Term {
 	 * to check whether some other term is equal to
 	 * this one.
 	 * 
-	 * This a deep, structural, comparison which is
-	 * used in the implementation of substitutions.
+	 * This a deep, structural, comparison.
 	 * 
 	 * Both this term and the provided term are
 	 * supposed to be the representatives of their
@@ -448,16 +447,16 @@ public class PrologTuple extends Term {
 	 * class representative. 
 	 * 
 	 * @param i a single position
-	 * @return the subterm of this term at the given
-	 * position
-	 * @throws IndexOutOfBoundsException if <code>i</code>
-	 * is not a valid position in this term
+	 * @return the subterm of this term at position
+	 * <code>i</code>, or <code>null</code> if
+	 * <code>i</code> is not a valid position in
+	 * this term
 	 */
 	@Override
 	protected Term getAux(int i) {
 		// Check whether i is out of bounds.
 		if (i < 0 || i >= this.elements.size())
-			throw new IndexOutOfBoundsException(i + " -- " + this);
+			return null;
 
 		return this.elements.get(i);
 	}
@@ -486,9 +485,8 @@ public class PrologTuple extends Term {
 	 * @param shallow a boolean indicating whether a shallow
 	 * search has to be processed through this term
 	 * @return the subterm of this term at the given position
-	 * @throws IndexOutOfBoundsException if the provided
-	 * iterator does not correspond to a valid position in
-	 * this term
+	 * or <code>null</code> if the provided iterator does not
+	 * correspond to a valid position in this term
 	 */
 	@Override
 	protected Term getAux(Iterator<Integer> it, boolean shallow) {
@@ -498,9 +496,45 @@ public class PrologTuple extends Term {
 
 		// Check whether i is out of bounds.
 		if (i < 0 || i >= this.elements.size())
-			throw new IndexOutOfBoundsException(i + " -- " + this);
+			return null;
 
 		return this.elements.get(i).get(it, shallow);
+	}
+
+	/**
+	 * An auxiliary, internal, method which is used to build
+	 * a collection consisting of the hat subterms of this
+	 * term.
+	 * 
+	 * There are no duplicate in the returned collection,
+	 * i.e., if s and t are in the returned collection
+	 * then they are not equal (w.r.t. a deep, structural,
+	 * comparison).
+	 *  
+	 * This term is supposed to be the schema of its
+	 * class representative.
+	 * 
+	 * @return a collection consisting of the hat subterms
+	 * of this term
+	 */
+	@Override
+	protected Collection<Term> getHatSubtermsAux() {
+		Collection<Term> result =  new LinkedList<>();
+
+		for (Term s : this.elements) {
+			Collection<Term> result_s = s.findSchema().getHatSubtermsAux();
+			// We add the elements of result_s to result
+			// but only if they do not already occur in
+			// result.
+			for (Term u : result_s) {
+				boolean found = false;
+				for (Term v : result)
+					if (u.deepEquals(v)) { found = true; break; }
+				if (!found) result.add(u);
+			}
+		}
+
+		return result;
 	}
 
 	/**
@@ -832,6 +866,32 @@ public class PrologTuple extends Term {
 		}
 
 		return t;
+	}
+
+	/**
+	 * An auxiliary, internal, method which is used
+	 * to apply the specified substitution to this
+	 * term (which is modified by this method).
+	 * 
+	 * @param theta a substitution
+	 */
+	@Override
+	protected void applyInPlaceAux(Substitution theta) {
+		LinkedList<Term> new_elements = new LinkedList<>();
+
+		for (Term s : this.elements) {
+			if (s instanceof Variable) {
+				Term t = theta.get((Variable) s);
+				new_elements.add(t == null ? s : t.shallowCopy());
+			}
+			else {
+				s.applyInPlace(theta);
+				new_elements.add(s);
+			}
+		}
+
+		this.elements.clear();
+		this.elements.addAll(new_elements);
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -103,6 +103,22 @@ public class Position implements Iterable<Integer> {
 	}
 
 	/**
+	 * Returns a new position whose last element is the
+	 * specified one, preceded by the elements of this
+	 * position. This position is not modified by this
+	 * operation.
+	 * 
+	 * @param i the element to be added
+	 * @return the new position
+	 */
+	public Position addLast(int i) {
+		LinkedList<Integer> L = new LinkedList<Integer>(this.elements);
+		L.addLast(i);
+
+		return new Position(L);
+	}
+
+	/**
 	 * Returns a new position whose elements are those of this
 	 * position followed by those of the specified position.
 	 * This position is not modified by this operation.
@@ -156,6 +172,10 @@ public class Position implements Iterable<Integer> {
 	 */
 	@Override
 	public String toString() {
-		return (this.elements.isEmpty() ? "epsilon" : this.elements.toString());
+		// The epsilon Greek letter (Unicode U+1D700), where
+		// U+1D700 = \uD835\uDF00 in UTF-16 (surrogate pair):
+		String epsilon = "\uD835\uDF00";
+
+		return (this.elements.isEmpty() ? epsilon : this.elements.toString());
 	}
 }

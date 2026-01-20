@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Set;
 
 import fr.univreunion.nti.program.trs.RuleTrs;
@@ -206,8 +207,7 @@ public class PrologList extends Term {
 	 * to check whether some other term is equal to
 	 * this one.
 	 * 
-	 * This a deep, structural, comparison which is
-	 * used in the implementation of substitutions.
+	 * This a deep, structural, comparison.
 	 * 
 	 * Both this term and the provided term are
 	 * supposed to be the representatives of their
@@ -512,10 +512,10 @@ public class PrologList extends Term {
 	 * class representative. 
 	 * 
 	 * @param i a single position
-	 * @return the subterm of this term at the given
-	 * position
-	 * @throws IndexOutOfBoundsException if <code>i</code>
-	 * is not a valid position in this term
+	 * @return the subterm of this term at position
+	 * <code>i</code>, or <code>null</code> if
+	 * <code>i</code> is not a valid position in
+	 * this term
 	 */
 	@Override
 	protected Term getAux(int i) {
@@ -525,7 +525,7 @@ public class PrologList extends Term {
 		if (i == 1 && this.tail != null)
 			return this.tail;
 
-		throw new IndexOutOfBoundsException(i + " -- " + this);
+		return null;
 	}
 
 	/**
@@ -539,13 +539,70 @@ public class PrologList extends Term {
 	}
 
 	/**
-	 * Unsupported operation.
+	 * An auxiliary, internal, method which is used to build
+	 * a collection consisting of the hat subterms of this
+	 * term.
 	 * 
-	 * @throws UnsupportedOperationException
+	 * There are no duplicate in the returned collection,
+	 * i.e., if s and t are in the returned collection
+	 * then they are not equal (w.r.t. a deep, structural,
+	 * comparison).
+	 *  
+	 * This term is supposed to be the schema of its
+	 * class representative.
+	 * 
+	 * @return a collection consisting of the hat subterms
+	 * of this term
+	 */
+	@Override
+	protected Collection<Term> getHatSubtermsAux() {
+		Collection<Term> result =  new LinkedList<>();
+
+		if (this != EMPTY_PROLOG_LIST) {
+			result.addAll(this.first.findSchema().getHatSubtermsAux());
+
+			Collection<Term> resultTail = this.tail.findSchema().getHatSubtermsAux();
+
+			// We add the elements of resultTail to result
+			// but only if they do not already occur in
+			// result.
+			for (Term u : resultTail) {
+				boolean found = false;
+				for (Term v : result)
+					if (u.deepEquals(v)) { found = true; break; }
+				if (!found) result.add(u);
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * An auxiliary, internal, method which is used to build
+	 * a collection consisting of the disagreement positions
+	 * of this term and the specified term.
+	 * 
+	 * Both this term and the specified term are supposed
+	 * to be the schemas of their respective class
+	 * representatives.
+	 * 
+	 * Moreover, it is supposed that <code>this != t</code>.
+	 * 
+	 * @param t a term
+	 * @param var <code>true</code> iff disagreement pairs of the
+	 * form <variable,variable> are allowed
+	 * @return a collection consisting of the disagreement positions
+	 * of this term and the given term
 	 */
 	@Override
 	protected Collection<Position> dposAux(Term t, boolean var) {
-		throw new UnsupportedOperationException();
+		// The collection to return at the end.
+		Collection<Position> C = new LinkedList<Position>();
+
+		if (!this.deepEquals(t))
+			C.add(new Position());
+
+		return C;
 	}
 
 	/**
@@ -762,6 +819,16 @@ public class PrologList extends Term {
 
 		return new PrologList(
 				this.first.apply(theta), this.tail.apply(theta));
+	}
+
+	/**
+	 * Unsupported operation.
+	 * 
+	 * @throws UnsupportedOperationException
+	 */
+	@Override
+	protected void applyInPlaceAux(Substitution theta) {
+		throw new UnsupportedOperationException();
 	}
 
 	/**

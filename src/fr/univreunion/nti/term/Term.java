@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -296,8 +296,7 @@ public abstract class Term implements Iterable<Position> {
 	 * Indicates whether some other term is equal to
 	 * this one.
 	 * 
-	 * This a deep, structural, comparison which is
-	 * used in the implementation of substitutions.
+	 * This a deep, structural, comparison.
 	 * 
 	 * @param t the reference term with which to compare
 	 * @return <code>true</code> iff this term is the
@@ -313,8 +312,7 @@ public abstract class Term implements Iterable<Position> {
 	 * to check whether some other term is equal to
 	 * this one.
 	 * 
-	 * This a deep, structural, comparison which is
-	 * used in the implementation of substitutions.
+	 * This a deep, structural, comparison.
 	 * 
 	 * @param t the reference term with which to compare
 	 * @return <code>true</code> iff this term is the
@@ -333,8 +331,7 @@ public abstract class Term implements Iterable<Position> {
 	 * to check whether some other term is equal to
 	 * this one.
 	 * 
-	 * This a deep, structural, comparison which is
-	 * used in the implementation of substitutions.
+	 * This a deep, structural, comparison.
 	 * 
 	 * Both this term and the provided term are
 	 * supposed to be the representatives of their
@@ -497,10 +494,9 @@ public abstract class Term implements Iterable<Position> {
 	 * <code>s</code>, a subterm of this term
 	 * @return a deep copy of this term
 	 */
-	protected abstract Term deepCopyAux(
-			Collection<Variable> varsToBeCopied,
+	protected abstract Term deepCopyAux(Collection<Variable> varsToBeCopied,
 			Map<Term, Term> copies);
-	
+
 	/**
 	 * Checks whether this term contains the given
 	 * term.
@@ -514,7 +510,7 @@ public abstract class Term implements Iterable<Position> {
 		Term.incCurrentTime();
 		return this.containsAux1(t);
 	}
-	
+
 	/**
 	 * An auxiliary, internal, method which is used
 	 * to check whether this term contains the given
@@ -529,7 +525,7 @@ public abstract class Term implements Iterable<Position> {
 		Term s = this.findSchema();
 
 		if (s == t) return true;
-		
+
 		return s.containsAux(t);
 	}
 
@@ -548,16 +544,6 @@ public abstract class Term implements Iterable<Position> {
 	 * contains <code>t</code>
 	 */
 	protected abstract boolean containsAux(Term t);
-
-	/**
-	 * Checks whether this term points to a variable.
-	 * 
-	 * @return <code>true</code> iff this term points
-	 * to a variable
-	 */
-	public boolean isVariable() {
-		return this.findSchema() instanceof Variable;
-	}
 
 	/**
 	 * Checks whether this term is ground i.e., contains
@@ -583,6 +569,16 @@ public abstract class Term implements Iterable<Position> {
 	 * no variable
 	 */
 	protected abstract boolean isGroundAux();
+	
+	/**
+	 * Checks whether this term points to a variable.
+	 * 
+	 * @return <code>true</code> iff this term points
+	 * to a variable
+	 */
+	public boolean isVariable() {
+		return this.findSchema() instanceof Variable;
+	}
 	
 	/**
 	 * Checks whether this term is variable disjoint with
@@ -652,7 +648,7 @@ public abstract class Term implements Iterable<Position> {
 	 * this term
 	 */
 	protected abstract void getVariableOccurrencesAux(Map<Variable, Integer> occurrences);
-	
+
 	/**
 	 * Returns the set of function symbols of this term.
 	 * 
@@ -679,15 +675,15 @@ public abstract class Term implements Iterable<Position> {
 	 * single position.
 	 * 
 	 * @param i a single position
-	 * @return the subterm of this term at the given
-	 * position
-	 * @throws IndexOutOfBoundsException if <code>i</code>
-	 * is not a valid position in this term
+	 * @return the subterm of this term at position
+	 * <code>i</code>, or <code>null</code> if
+	 * <code>i</code> is not a valid position in
+	 * this term
 	 */
 	public Term get(int i) {
 		return this.findSchema().getAux(i);
 	}
-	
+
 	/**
 	 * An auxiliary, internal, method which returns
 	 * the subterm of this term at the given single
@@ -697,13 +693,13 @@ public abstract class Term implements Iterable<Position> {
 	 * class representative. 
 	 * 
 	 * @param i a single position
-	 * @return the subterm of this term at the given
-	 * position
-	 * @throws IndexOutOfBoundsException if <code>i</code>
-	 * is not a valid position in this term
+	 * @return the subterm of this term at position
+	 * <code>i</code>, or <code>null</code> if
+	 * <code>i</code> is not a valid position in
+	 * this term
 	 */
 	protected abstract Term getAux(int i);
-	
+
 	/**
 	 * Returns the subterm of this term at the given
 	 * position.
@@ -715,10 +711,10 @@ public abstract class Term implements Iterable<Position> {
 	 * in this class).
 	 * 
 	 * @param p a position
-	 * @return the subterm of this term at the given
-	 * position
-	 * @throws IndexOutOfBoundsException if <code>p</code>
-	 * is not a valid position in this term
+	 * @return the subterm of this term at position
+	 * <code>p</code>, or <code>null</code> if
+	 * <code>p</code> is not a valid position in
+	 * this term
 	 */
 	public Term get(Position p) {
 		return this.get(p.iterator(), false);
@@ -740,10 +736,10 @@ public abstract class Term implements Iterable<Position> {
 	 * @param p a position
 	 * @param shallow a boolean indicating whether a shallow
 	 * search has to be processed through this term
-	 * @return the subterm of this term at the given
-	 * position
-	 * @throws IndexOutOfBoundsException if <code>p</code>
-	 * is not a valid position in this term
+	 * @return the subterm of this term at position
+	 * <code>p</code>, or <code>null</code> if
+	 * <code>p</code> is not a valid position in
+	 * this term
 	 */
 	public Term get(Position p, boolean shallow) {
 		return this.get(p.iterator(), shallow);
@@ -767,9 +763,8 @@ public abstract class Term implements Iterable<Position> {
 	 * @param shallow a boolean indicating whether a shallow
 	 * search has to be processed through this term
 	 * @return the subterm of this term at the given position
-	 * @throws IndexOutOfBoundsException if the provided
-	 * iterator does not correspond to a valid position in
-	 * this term
+	 * or <code>null</code> if the provided iterator does not
+	 * correspond to a valid position in this term
 	 */
 	protected Term get(Iterator<Integer> it, boolean shallow) {
 		Term s = (shallow ? this : this.findSchema());
@@ -802,11 +797,45 @@ public abstract class Term implements Iterable<Position> {
 	 * @param shallow a boolean indicating whether a shallow
 	 * search has to be processed through this term
 	 * @return the subterm of this term at the given position
-	 * @throws IndexOutOfBoundsException when the provided
-	 * iterator does not correspond to a valid position in
-	 * this term
+	 * or <code>null</code> if the provided iterator does not
+	 * correspond to a valid position in this term
 	 */
 	protected abstract Term getAux(Iterator<Integer> it, boolean shallow);
+
+	/**
+	 * Returns a collection consisting of the hat subterms
+	 * of this term. A hat term has exactly one occurrence
+	 * of a hat symbol located at the root position. 
+	 * 
+	 * There are no duplicate in the returned collection,
+	 * i.e., if s and t are in the returned collection
+	 * then they are not equal (w.r.t. a deep, structural,
+	 * comparison).
+	 *  
+	 * @return a collection consisting of the hat subterms
+	 * of this term
+	 */
+	public Collection<Term> getHatSubterms() {
+		return this.findSchema().getHatSubtermsAux();
+	}
+
+	/**
+	 * An auxiliary, internal, method which is used to build
+	 * a collection consisting of the hat subterms of this
+	 * term.
+	 * 
+	 * There are no duplicate in the returned collection,
+	 * i.e., if s and t are in the returned collection
+	 * then they are not equal (w.r.t. a deep, structural,
+	 * comparison).
+	 *  
+	 * This term is supposed to be the schema of its
+	 * class representative.
+	 * 
+	 * @return a collection consisting of the hat subterms
+	 * of this term
+	 */
+	protected abstract Collection<Term> getHatSubtermsAux();
 
 	/**
 	 * Returns a collection consisting of the disagreement
@@ -814,7 +843,7 @@ public abstract class Term implements Iterable<Position> {
 	 * 
 	 * @param t a term
 	 * @param var <code>true</code> iff disagreement pairs
-	 * of the form <variable,variable> are allowed
+	 * of the form (variable,variable) are allowed
 	 * @return a collection consisting of the disagreement
 	 * positions of this term and the given term
 	 */
@@ -860,7 +889,7 @@ public abstract class Term implements Iterable<Position> {
 	 * @param p a position in this term
 	 * @param t a replacing term
 	 * @return the term resulting from the replacement
-	 * @throws IndexOutOfBoundsException when the specified
+	 * @throws IndexOutOfBoundsException if the specified
 	 * position is not a valid position in this term
 	 */
 	public Term replace(Position p, Term t) {
@@ -922,7 +951,7 @@ public abstract class Term implements Iterable<Position> {
 	 * this term
 	 */
 	protected abstract Term replaceAux(Iterator<Integer> it, Term t);
-	
+
 	/**
 	 * Returns the term obtained from replacing, in a copy
 	 * of this term, each variable with the provided term
@@ -941,14 +970,14 @@ public abstract class Term implements Iterable<Position> {
 	public Term replaceVariables(Term t) {
 		return this.findSchema().replaceVariablesAux(t.findSchema());
 	}
-	
+
 	/**
 	 * An auxiliary, internal, method which is used to build
 	 * the term obtained from replacing, in a copy of this
 	 * term, each variable with the provided term
 	 * <code>t</code>.
 	 * 
-	 * The returned term is "flattened" i.e., each of
+	 * The returned term is "flattened", i.e., each of
 	 * its subterms is the only element of its class
 	 * and is its own schema.
 	 * 
@@ -964,8 +993,45 @@ public abstract class Term implements Iterable<Position> {
 	protected abstract Term replaceVariablesAux(Term t);
 
 	/**
+	 * Checks whether this term is a variant of the
+	 * specified term.
+	 * 
+	 * @param t a term
+	 * @return <code>true</code> iff this term is a
+	 * variant of the specified term
+	 */
+	public boolean isVariantOf(Term t) {
+		return this.isMoreGeneralThan(t) && t.isMoreGeneralThan(this);
+	}
+
+	/**
+	 * Tries to complete <code>theta</code> into a
+	 * renaming which is a matcher of this term onto
+	 * <code>t</code>, i.e., tries to complete
+	 * <code>theta</code> so that it is a renaming and
+	 * this term is more general than <code>t</code>
+	 * for <code>theta</code>.
+	 * 
+	 * This term and <code>t</code> are not modified by
+	 * this method. On the contrary, <code>theta</code>
+	 * may be modified, even if this method fails.
+	 * 
+	 * It is supposed that <code>theta</code> is a renaming,
+	 * i.e., a bijection from variables to variables.
+	 * 
+	 * @param t a term
+	 * @param theta a renaming
+	 * @return <code>true</code> iff the provided substitution
+	 * could be completed into a renaming which is a matcher
+	 * of this term onto <code>t</code>
+	 */
+	public boolean isVariantOf(Term t, Substitution theta) {
+		return this.isMoreGeneralThan(t, theta) && t.isMoreGeneralThan(this, theta);
+	}
+
+	/**
 	 * Checks whether this term matches onto the specified
-	 * term i.e., whether this term is more general than
+	 * term, i.e., whether this term is more general than
 	 * the specified term.
 	 * 
 	 * @param t a term
@@ -978,7 +1044,7 @@ public abstract class Term implements Iterable<Position> {
 
 	/**
 	 * Tries to complete <code>theta</code> into a
-	 * matcher of this term onto <code>t</code> i.e.,
+	 * matcher of this term onto <code>t</code>, i.e.,
 	 * tries to complete <code>theta</code> so that
 	 * this term is more general than <code>t</code>
 	 * for <code>theta</code>.
@@ -996,7 +1062,7 @@ public abstract class Term implements Iterable<Position> {
 	public boolean isMoreGeneralThan(Term t, Substitution theta) {
 		Term s = this.findSchema();
 		t = t.findSchema();
-		
+
 		// if (s == t) return true; // NO: for variables, we need to add s/t to theta!
 		return s.isMoreGeneralThanAux(t, theta);
 	}
@@ -1079,13 +1145,23 @@ public abstract class Term implements Iterable<Position> {
 
 		while (!(t1 = this.apply(sigma)).deepEquals(t2 = t.apply(sigma))) {
 			// We compute the disagreement pairs of t1 and t2.
-			Collection<Position> D = t1.dpos(t2, true);
+			Collection<Position> d = t1.dpos(t2, true);
 
 			// As the guard of the while loop is true, necessarily
-			// D is not empty.
-			Position p = D.iterator().next();
+			// d is not empty.
+			Position p = d.iterator().next();
 			Term t1_p = t1.get(p);
 			Term t2_p = t2.get(p);
+
+			// We try to simplify the disagreement pair
+			// (t1_p,t2_p) in case t1_p or t2_p is a hat
+			// function (i.e., of the form c^{a,b}(u)).
+			Term[] t12_p = simplifyDisagreementPair(t1_p, t2_p);
+			if (t12_p != null) {
+				// Here, we managed to simplify (t1_p,t2_p).
+				t1_p = t12_p[0];
+				t2_p = t12_p[1];
+			}
 
 			// We check whether (t1_p, t2_p) is a simple pair.
 			if (t1_p instanceof Variable && !t2_p.contains((Variable) t1_p)) {
@@ -1109,6 +1185,40 @@ public abstract class Term implements Iterable<Position> {
 			theta.add(mapping.getKey(), mapping.getValue());
 
 		return true;
+	}
+
+	/**
+	 * Attempts to simplify the disagreement pair
+	 * <code>(t1,t2)</code> in case <code>t1</code>
+	 * or <code>t2</code> is a hat function (i.e.,
+	 * of the form <code>c^{a,b}(u)</code>).
+	 * 
+	 * @param t1 a term to simplify
+	 * @param t2 a term to simplify
+	 * @return an array storing the simplified form
+	 * of <code>t1</code> and <code>t2</code>, or
+	 * <code>null</code> if no simplification could
+	 * be made
+	 */
+	private Term[] simplifyDisagreementPair(Term t1, Term t2) {
+
+		Term[] hf = null;
+
+		if (t1 instanceof HatFunction) {
+			hf = ((HatFunction) t1).minus(t2);
+			if (hf == null && t2 instanceof HatFunction)
+				hf = ((HatFunction) t2).minus(t1);
+		}
+		else if (t2 instanceof HatFunction) {
+			hf = ((HatFunction) t2).minus(t1);
+			if (hf != null) {
+				t1 = hf[1];
+				hf[1] = hf[0];
+				hf[0] = t1;
+			}
+		}
+
+		return hf;
 	}
 
 	/**
@@ -1861,6 +1971,25 @@ public abstract class Term implements Iterable<Position> {
 	protected abstract Term applyAux(Substitution theta);
 
 	/**
+	 * Applies the specified substitution to this term,
+	 * which is modified by this method.
+	 * 
+	 * @param theta a substitution
+	 */
+	public void applyInPlace(Substitution theta) {
+		this.findSchema().applyInPlaceAux(theta);
+	}
+
+	/**
+	 * An auxiliary, internal, method which is used
+	 * to apply the specified substitution to this
+	 * term (which is modified by this method).
+	 * 
+	 * @param theta a substitution
+	 */
+	protected abstract void applyInPlaceAux(Substitution theta);
+
+	/**
 	 * Rewrites this term with the rules of the provided TRS.
 	 * 
 	 * The returned terms are "flattened" i.e., each of
@@ -2084,7 +2213,7 @@ public abstract class Term implements Iterable<Position> {
 	 * @return the depth of this term
 	 */
 	protected abstract int depthAux();
-	
+
 	/**
 	 * Returns the maximum arity of a function
 	 * symbol in this term.
@@ -2527,7 +2656,7 @@ public abstract class Term implements Iterable<Position> {
 	 * the specified order succeeds
 	 */
 	protected abstract boolean kbo2a(LexOrder order, WeightFunction weights, Term t);
-	
+
 	/**
 	 * Completes the specified partial order on function symbols
 	 * so that (KBO2b) in the definition of a Knuth-Bendix order
@@ -2543,7 +2672,7 @@ public abstract class Term implements Iterable<Position> {
 	 * the specified order succeeds
 	 */
 	protected abstract boolean kbo2b(LexOrder order, WeightFunction weights, Term t);
-	
+
 	/**
 	 * Completes the specified partial order on function symbols
 	 * so that (KBO2c) in the definition of a Knuth-Bendix order
@@ -2559,7 +2688,7 @@ public abstract class Term implements Iterable<Position> {
 	 * the specified order succeeds
 	 */
 	protected abstract boolean kbo2c(LexOrder order, WeightFunction weights, Term t);
-	
+
 	/**
 	 * Builds empty filters for the function and tuple
 	 * symbols occurring in this term. The filters are
@@ -2617,6 +2746,34 @@ public abstract class Term implements Iterable<Position> {
 	 */
 	protected abstract Term applyFiltersAux(ArgFiltering filtering);
 
+	/**
+	 * Computes a substitution form of this term.
+	 * 
+	 * More precisely, fills the provided substitution
+	 * <code>theta</code> with mappings of the form
+	 * <code>x -> t</code> where <code>x</code> is a new
+	 * variable and <code>t</code> is a subterm of this
+	 * term. At the same time, replaces <code>t</code> by
+	 * <code>x</code> in this term. The term <code>s</code>
+	 * resulting from the replacements is returned.
+	 * 
+	 * This term is not modified by this method.
+	 * 
+	 * By default this method does nothing, i.e.,
+	 * it does not modify <code>theta</code> and
+	 * just returns this term. Subclasses override
+	 * this behavior.
+	 * 
+	 * @param theta a substitution
+	 * @return the term resulting from replacing
+	 * subterms of this term by new variables
+	 */
+	public Term toSubstitution(Substitution theta) {
+		// The default behaviour is to do nothing.
+		// Subclasses override this behaviour.
+		return this;
+	}
+	
 	/**
 	 * Returns a string representation of the structure
 	 * of this term. Essentially used for testing.

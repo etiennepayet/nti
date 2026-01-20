@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -137,8 +137,7 @@ public class Variable extends Term {
 	 * to check whether some other term is equal to
 	 * this one.
 	 * 
-	 * This a deep, structural, comparison which is
-	 * used in the implementation of substitutions.
+	 * This a deep, structural, comparison.
 	 * 
 	 * Both this term and the provided term are
 	 * supposed to be the representatives of their
@@ -347,13 +346,11 @@ public class Variable extends Term {
 	 * class representative. 
 	 * 
 	 * @param i a single position
-	 * @return the subterm of this term at the given
-	 * position
-	 * @throws IndexOutOfBoundsException
+	 * @return <code>null</code>
 	 */
 	@Override
 	protected Term getAux(int i) {
-		throw new IndexOutOfBoundsException(i + " -- " + this);
+		return null;
 	}
 	
 	/**
@@ -374,17 +371,40 @@ public class Variable extends Term {
 	 * 
 	 * It is also supposed that <code>it</code> has a
 	 * next element. Consequently, this method always
-	 * throws an <code>IndexOutOfBoundsException</code>.
+	 * returns <code>null</code>.
 	 * 
 	 * @param it an iterator (over a position) that has a
 	 * next element
 	 * @param shallow a boolean indicating whether a shallow
 	 * search has to be processed through this term
-	 * @throws IndexOutOfBoundsException
+	 * @return <code>null</code>
 	 */
 	@Override
 	protected Term getAux(Iterator<Integer> it, boolean shallow) {
-		throw new IndexOutOfBoundsException(it.next() + " -- " + this);
+		return null;
+	}
+	
+	/**
+	 * An auxiliary, internal, method which is used to build
+	 * a collection consisting of the hat subterms of this
+	 * term.
+	 * 
+	 * There are no duplicate in the returned collection,
+	 * i.e., if s and t are in the returned collection
+	 * then they are not equal (w.r.t. a deep, structural,
+	 * comparison).
+	 *  
+	 * This term is supposed to be the schema of its
+	 * class representative.
+	 * 
+	 * As no hat symbol occurs in a variable, this method
+	 * always returns an empty collection.
+	 * 
+	 * @return an empty collection
+	 */
+	@Override
+	protected Collection<Term> getHatSubtermsAux() {
+		return new LinkedList<Term>();
 	}
 
 	/**
@@ -722,6 +742,17 @@ public class Variable extends Term {
 		Term t = theta.get(this);
 
 		return (t == null ? this : t.shallowCopy());
+	}
+	
+	/**
+	 * Unsupported operation because one can not
+	 * apply a substitution in place to a variable.
+	 * 
+	 * @throws UnsupportedOperationException
+	 */
+	@Override
+	protected void applyInPlaceAux(Substitution theta) {
+		throw new UnsupportedOperationException();
 	}
 
 	/**

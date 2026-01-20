@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -27,8 +27,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import fr.univreunion.nti.Options;
 import fr.univreunion.nti.program.Argument;
-import fr.univreunion.nti.program.Path;
 import fr.univreunion.nti.program.Proof;
 import fr.univreunion.nti.program.RecurrentPair;
 import fr.univreunion.nti.program.trs.Parameters;
@@ -58,9 +58,6 @@ public class UnfoldedRuleTrsLoopComp extends UnfoldedRuleTrs {
 	/**
 	 * The first rule (i.e., N) of this triple is defined
 	 * by this.left and this.right.
-	 * 
-	 * Moreover, the path corresponding to this first rule
-	 * is stored in this.path.
 	 */
 
 
@@ -80,12 +77,6 @@ public class UnfoldedRuleTrsLoopComp extends UnfoldedRuleTrs {
 	private final RuleTrs second;
 
 	/**
-	 * The path corresponding to the second rule (i.e., N')
-	 * of this triple.
-	 */
-	private final Path pathSecond = new Path();
-
-	/**
 	 * Builds a composed triple from the specified parameters.
 	 * If the two rules of the triple can be merged, then also
 	 * builds a transitory triple resulting from merging these
@@ -98,11 +89,7 @@ public class UnfoldedRuleTrsLoopComp extends UnfoldedRuleTrs {
 	 * @param iteration the iteration of the unfolding operator
 	 * at which the composed triple is generated
 	 * @param parent the parent of the composed triple
-	 * @param pathFirst the path in the program being unfolded that
-	 * corresponds to the first rule of the composed triple
 	 * @param second the second rule of the composed triple
-	 * @param pathSecond the path in the program being unfolded
-	 * that corresponds to the second rule of this triple
 	 * @param scc the component \cN of the composed triple
 	 * @param simpleCycle the component \cL of the composed triple
 	 * @throws IllegalArgumentException if the given iteration
@@ -110,8 +97,7 @@ public class UnfoldedRuleTrsLoopComp extends UnfoldedRuleTrs {
 	 */
 	public synchronized static Collection<UnfoldedRuleTrs> getInstances(
 			Function left, Term right,
-			int iteration, ParentTrs parent, Path pathFirst,
-			RuleTrs second, Path pathSecond,
+			int iteration, ParentTrs parent, RuleTrs second,
 			Collection<RuleTrs> scc, Collection<RuleTrs> simpleCycle) {
 
 		// The triples to return at the end.
@@ -120,8 +106,8 @@ public class UnfoldedRuleTrsLoopComp extends UnfoldedRuleTrs {
 		// We first build a composed triple consisting of the
 		// specified two rules ("left -> right" and "second").
 		Result.add(new UnfoldedRuleTrsLoopComp(
-				left, right, iteration, parent, pathFirst,
-				second, pathSecond, scc, simpleCycle));
+				left, right, iteration, parent,
+				second, scc, simpleCycle));
 
 		// We also check whether "right" unifies with the left-hand
 		// side of "second". If the test succeeds, then we build a
@@ -133,18 +119,12 @@ public class UnfoldedRuleTrsLoopComp extends UnfoldedRuleTrs {
 
 		RuleTrs secondCopy = second.deepCopy();
 
-		if (rightCopy.unifyWith(secondCopy.getLeft())) {
+		if (rightCopy.unifyWith(secondCopy.getLeft()))
 			// This is a forward unfolding of the first rule of
-			// this triple with its second rule. We compute the
-			// corresponding path as follows.
-			Path updatedPath = new Path();
-			updatedPath.addAll(pathFirst);
-			updatedPath.addAll(pathSecond);
-
+			// this triple with its second rule.
 			Result.addAll(UnfoldedRuleTrsLoopTrans.getUnfoldedInstances(
 					leftCopy, secondCopy.getRight(),
-					iteration, parent, updatedPath, scc, simpleCycle));
-		}
+					iteration, parent, scc, simpleCycle));
 
 		return Result;
 	}
@@ -157,11 +137,7 @@ public class UnfoldedRuleTrsLoopComp extends UnfoldedRuleTrs {
 	 * @param iteration the iteration of the unfolding operator
 	 * at which this triple is generated
 	 * @param parent the parent of this triple
-	 * @param path the path in the program being unfolded that
-	 * corresponds to the first rule of this triple
 	 * @param second the second rule of this triple
-	 * @param pathSecond the path in the program being unfolded
-	 * that corresponds to the second rule of this triple
 	 * @param scc the component \cN of this triple
 	 * @param simpleCycle the component \cL of this triple
 	 * @throws IllegalArgumentException if <code>right</code>
@@ -170,11 +146,10 @@ public class UnfoldedRuleTrsLoopComp extends UnfoldedRuleTrs {
 	 * is negative
 	 */
 	private UnfoldedRuleTrsLoopComp(Function left, Term right, 
-			int iteration, ParentTrs parent, Path path,
-			RuleTrs second, Path pathSecond,
+			int iteration, ParentTrs parent, RuleTrs second,
 			Collection<RuleTrs> scc, Collection<RuleTrs> simpleCycle) {
 
-		super(left, right, iteration, parent, path);
+		super(left, right, iteration, parent);
 
 		if (second == null)
 			throw new IllegalArgumentException(
@@ -184,7 +159,6 @@ public class UnfoldedRuleTrsLoopComp extends UnfoldedRuleTrs {
 		this.simpleCycle.addAll(simpleCycle);
 
 		this.second = second;
-		this.pathSecond.addAll(pathSecond);
 	}
 
 	/**
@@ -203,28 +177,6 @@ public class UnfoldedRuleTrsLoopComp extends UnfoldedRuleTrs {
 	 */
 	public RuleTrs getSecond() {
 		return this.second;
-	}
-
-	/**
-	 * Returns the path (in the unfolded program) corresponding
-	 * to the first rule of this triple.
-	 * 
-	 * @return the path (in the unfolded program) corresponding
-	 * to the first rule of this triple
-	 */
-	public Path getPathFirst() {
-		return this.path;
-	}
-
-	/**
-	 * Returns the path (in the unfolded program) corresponding
-	 * to the second rule of this triple.
-	 * 
-	 * @return the path (in the unfolded program) corresponding
-	 * to the second rule of this triple
-	 */
-	public Path getPathSecond() {
-		return this.pathSecond;
 	}
 
 	/**
@@ -257,9 +209,7 @@ public class UnfoldedRuleTrsLoopComp extends UnfoldedRuleTrs {
 				this.right.deepCopy(copies),
 				iteration,
 				parent,
-				this.path,
 				this.second.deepCopy(),
-				this.pathSecond,
 				this.scc,
 				this.simpleCycle);
 	}
@@ -414,16 +364,13 @@ public class UnfoldedRuleTrsLoopComp extends UnfoldedRuleTrs {
 		if (right != null) {
 			Function left = (Function) this.left.deepCopy(copies);
 
-			ParentTrs parent = ParentTrsLoopComp.getInstance(this, R, p, false);
-
-			Path path = new Path();
-			path.addAll(this.path);
-			path.addLast​(R);
+			// We need to build the parent only if we are in verbose mode.
+			ParentTrs parent = (Options.getInstance().isInVerboseMode() ? 
+					ParentTrsLoopComp.getInstance(this, R, p, false) : null);
 
 			Result.addAll(UnfoldedRuleTrsLoopComp.getInstances(
-					left, right, iteration, parent, path,
-					this.second, this.pathSecond,
-					this.scc, this.simpleCycle));
+					left, right, iteration, parent,
+					this.second, this.scc, this.simpleCycle));
 		}
 
 		return Result;
@@ -458,14 +405,13 @@ public class UnfoldedRuleTrsLoopComp extends UnfoldedRuleTrs {
 		if (left != null) {
 			Term right = this.second.getRight().deepCopy(copies);
 
-			ParentTrs parent = ParentTrsLoopComp.getInstance(this, R, p, true);
-
-			Path pathSecond = new Path(R);
-			pathSecond.addAll(this.pathSecond);
+			// We need to build the parent only if we are in verbose mode.
+			ParentTrs parent = (Options.getInstance().isInVerboseMode() ? 
+					ParentTrsLoopComp.getInstance(this, R, p, true) : null);
 
 			Result.addAll(UnfoldedRuleTrsLoopComp.getInstances(
-					this.left, this.right, iteration, parent, this.path,
-					new RuleTrs((Function) left, right), pathSecond,
+					this.left, this.right, iteration, parent,
+					new RuleTrs((Function) left, right),
 					this.scc, this.simpleCycle));
 		}
 
@@ -554,6 +500,9 @@ public class UnfoldedRuleTrsLoopComp extends UnfoldedRuleTrs {
 		// The thread running this method.
 		Thread currentThread = Thread.currentThread();
 
+		// A boolean indicating whether we are in verbose mode.
+		boolean verbose = Options.getInstance().isInVerboseMode();
+
 		// First, we iterate through the non-empty prefixes of p.
 		for (Position q = p; !q.isEmpty(); q = q.properPrefix()) {
 			if (currentThread.isInterrupted()) break;
@@ -565,7 +514,9 @@ public class UnfoldedRuleTrsLoopComp extends UnfoldedRuleTrs {
 				unfoldInner = unfoldInner || unfold_q;
 				if (unfold_q) {
 					// Part (1) of the definition of F_R.
-					ParentTrs parent = ParentTrsLoopComp.getInstance(this, null, q, false);
+					// We need to build the parent only if we are in verbose mode.
+					ParentTrs parent = (verbose ?
+							ParentTrsLoopComp.getInstance(this, null, q, false) : null);
 					UnfoldedRuleTrsLoopComp thisCopy = this.deepCopy(iteration, parent);
 
 					if (thisCopy.getRight().get(q).unifyWith(
@@ -657,6 +608,9 @@ public class UnfoldedRuleTrsLoopComp extends UnfoldedRuleTrs {
 		// The thread running this method.
 		Thread currentThread = Thread.currentThread();
 
+		// A boolean indicating whether we are in verbose mode.
+		boolean verbose = Options.getInstance().isInVerboseMode();
+
 		// First, we iterate through the non-empty prefixes of p.
 		for (Position q = p; !q.isEmpty(); q = q.properPrefix()) {
 			if (currentThread.isInterrupted()) break;
@@ -668,7 +622,9 @@ public class UnfoldedRuleTrsLoopComp extends UnfoldedRuleTrs {
 				unfoldInner = unfoldInner || unfold_q;
 				if (unfold_q) {
 					// Part (1) of the definition of B_R.
-					ParentTrs parent = ParentTrsLoopComp.getInstance(this, null, q, true);
+					// We need to build the parent only if we are in verbose mode.
+					ParentTrs parent = (verbose ?
+							ParentTrsLoopComp.getInstance(this, null, q, true) : null);
 					UnfoldedRuleTrsLoopComp thisCopy = this.deepCopy(iteration, parent);
 
 					if (thisCopy.getRight().get(q).unifyWith(

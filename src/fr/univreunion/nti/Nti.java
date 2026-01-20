@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -20,8 +20,6 @@
 package fr.univreunion.nti;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-
 import fr.univreunion.nti.program.Program;
 import fr.univreunion.nti.program.Proof;
 
@@ -36,7 +34,7 @@ public class Nti {
 	/**
 	 * The version of NTI.
 	 */
-	public final static String VERSION = "(May 2024)";
+	public static final String VERSION = "(December 2025)";
 
 	/**
 	 * Constructs an instance of NTI with the specified options.
@@ -59,6 +57,9 @@ public class Nti {
 			break;
 		case PRINT_STAT:
 			printer.println(program.toStringStat());
+			break;
+		case PATUNF:
+			program.patternUnfold(options.getNbIte(), printer);
 			break;
 		default:
 			// By default, we try a termination proof.
@@ -90,8 +91,7 @@ public class Nti {
 	 * for building the options of analysis
 	 * @throws IOException if an I/O error occurs while running the analyzer
 	 */
-	public static void main(String args[])
-			throws IOException, InterruptedException, ExecutionException {
+	public static void main(String[] args) throws IOException {
 
 		// The options used for running NTI.
 		Options options = Options.getInstance(args);
@@ -166,12 +166,14 @@ public class Nti {
 		printer.println("   --version: print the version of NTI");
 		printer.println("   -print: print the program in the given file");
 		printer.println("   -stat: print some statistics about the program in the given file");
+		printer.println("   -patunf=n: apply the pattern unfolding operator n times");
+		printer.println("    to the program in the given file and print the result");
 		printer.println("   -prove: run a (non)termination proof of the program in the given file");
 		printer.println("    THIS IS THE DEFAULT ACTION\n");
 		//
 		printer.println("'options' (optional) can be:");
 		printer.println("   -v: verbose mode (for printing proof details in the final output)");
-		printer.println("   -t=n: set a time bound on the nontermination proofs");
+		printer.println("   -t=n: set a time bound on the proofs");
 		printer.println("    n is the time bound in seconds");
 		printer.println("   -cTI=path: set the path to cTI (for proving termination of logic programs)");
 		printer.println("    if no path to cTI is set then only nontermination proofs are run for");

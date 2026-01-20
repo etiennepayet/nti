@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -37,25 +37,28 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import fr.univreunion.nti.Options;
-import fr.univreunion.nti.program.Path;
+import fr.univreunion.nti.Printer;
 import fr.univreunion.nti.program.Program;
 import fr.univreunion.nti.program.Proof;
 import fr.univreunion.nti.program.trs.argfiltering.PairOfTerms;
 import fr.univreunion.nti.program.trs.family.Family;
 import fr.univreunion.nti.program.trs.family.FdGraph;
 import fr.univreunion.nti.program.trs.loop.trans.UnfoldedRuleTrsLoopTrans;
-import fr.univreunion.nti.program.trs.nonloop.Eeg12Rule;
-import fr.univreunion.nti.program.trs.nonloop.ParentTrsNonLoop;
-import fr.univreunion.nti.program.trs.nonloop.PatternRule;
+import fr.univreunion.nti.program.trs.nonloop.eeg12.InferenceRuleEeg12;
+import fr.univreunion.nti.program.trs.nonloop.eeg12.ParentTrsNonLoopEeg12;
+import fr.univreunion.nti.program.trs.nonloop.eeg12.PatternRuleTrsEeg12;
+import fr.univreunion.nti.program.trs.nonloop.iclp25.CorrectPatternRuleTrsProducer;
+import fr.univreunion.nti.program.trs.nonloop.iclp25.PatternRuleTrsIclp25;
 import fr.univreunion.nti.program.trs.prooftech.TechDpFramework;
 import fr.univreunion.nti.program.trs.prooftech.TechGeneralizedRule;
 import fr.univreunion.nti.program.trs.prooftech.dpproc.ProcHomeoEmbed;
 import fr.univreunion.nti.program.trs.prooftech.dpproc.ProcKbo;
 import fr.univreunion.nti.program.trs.prooftech.dpproc.ProcLpo;
 import fr.univreunion.nti.program.trs.prooftech.dpproc.ProcPolyInterpretation;
-import fr.univreunion.nti.program.trs.prooftech.dpproc.ProcUnfoldEeg12;
+import fr.univreunion.nti.program.trs.prooftech.dpproc.ProcUnfoldIclp25;
 import fr.univreunion.nti.program.trs.prooftech.dpproc.ProcUnfoldPayet;
 import fr.univreunion.nti.program.trs.prooftech.dpproc.Processor;
+import fr.univreunion.nti.program.trs.prooftech.dpproc.ResultDp;
 import fr.univreunion.nti.term.Function;
 import fr.univreunion.nti.term.FunctionSymbol;
 import fr.univreunion.nti.term.Position;
@@ -121,7 +124,7 @@ public class Trs extends Program implements Iterable<RuleTrs> {
 	 * of [Emmes, Enger, Giesl, IJCAR'12] to the rules of this TRS.
 	 * Used for proving non-looping non-termination.
 	 */
-	private Collection<PatternRule> rules_as_PatternRules;
+	private Collection<PatternRuleTrsEeg12> rules_as_PatternRules;
 
 	/**
 	 * Builds a term rewrite system (TRS).
@@ -201,7 +204,7 @@ public class Trs extends Program implements Iterable<RuleTrs> {
 		// graph of this new object.
 		this.dependencyGraph = new DependencyGraph(this);
 	}
-	
+
 	/**
 	 * Shallow copy constructor, i.e., the rules
 	 * are deeply copied but the dependency pairs
@@ -245,7 +248,7 @@ public class Trs extends Program implements Iterable<RuleTrs> {
 	public Trs copy(Map<RuleTrs, RuleTrs> dpairsCopy) {
 		return new Trs(this, dpairsCopy);
 	}
-	
+
 	/**
 	 * Returns a shallow copy of this TRS, i.e., the
 	 * rules are deeply copied but the dependency pairs
@@ -316,7 +319,7 @@ public class Trs extends Program implements Iterable<RuleTrs> {
 	 * @return an iterator over the pattern rules of this
 	 * TRS
 	 */
-	public Iterator<PatternRule> iteratorPatternRules() {
+	public Iterator<PatternRuleTrsEeg12> iteratorPatternRules() {
 		// We create the initial pattern rules if needed.
 		this.initForUnfoldingNL();
 
@@ -483,8 +486,7 @@ public class Trs extends Program implements Iterable<RuleTrs> {
 				if (this.isRootDefined(subterm_p))
 					dpairs.add(new RuleTrs(
 							(Function) R.getLeft().toTuple(),
-							subterm_p.toTuple(),
-							R.getNumberInFile()));
+							subterm_p.toTuple()));
 			}
 		}
 
@@ -546,7 +548,7 @@ public class Trs extends Program implements Iterable<RuleTrs> {
 			Collection<RuleTrs> simpleCycle = new LinkedList<RuleTrs>();
 			simpleCycle.add(R);
 			Loops.addAll(UnfoldedRuleTrsLoopTrans.getUnfoldedInstances(
-					R.getLeft(), R.getRight(), 0, null, new Path(R), Scopy, simpleCycle));
+					R.getLeft(), R.getRight(), 0, null, Scopy, simpleCycle));
 			Scopy.addLast(R);
 		}
 
@@ -592,23 +594,27 @@ public class Trs extends Program implements Iterable<RuleTrs> {
 	 * @return the pattern rules that can be built from the
 	 * rules provided by the specified iterator
 	 */
-	public Collection<PatternRule> getPatternRules(Iterator<RuleTrs> it) {
+	public Collection<PatternRuleTrsEeg12> getCorrectPatternRulesEeg12(Iterator<RuleTrs> it) {
 		// The collection to return at the end.
-		Collection<PatternRule> result = new LinkedList<PatternRule>();
+		Collection<PatternRuleTrsEeg12> result = new LinkedList<>();
+
+		// A boolean indicating whether we are in verbose mode.
+		boolean verbose = Options.getInstance().isInVerboseMode();
 
 		// First, we apply (I) of [Emmes, Enger, Giesl, IJCAR'12].
-		Collection<PatternRule> I = new LinkedList<PatternRule>();
+		Collection<PatternRuleTrsEeg12> I = new LinkedList<>();
 		while (it.hasNext()) {
 			RuleTrs R = it.next();
-			I.add(new PatternRule(
-					R, 0,
-					new ParentTrsNonLoop(null, R, null, false, Eeg12Rule.I),
-					null));
+			// We need to build the parent only if we are in verbose mode.
+			ParentTrs parent = (verbose ?
+					new ParentTrsNonLoopEeg12(
+							null, R, null, false, InferenceRuleEeg12.I) : null);
+			I.add(new PatternRuleTrsEeg12(R, 0, parent));
 		}
 		result.addAll(I);
 
 		// Then, we apply (II) of [Emmes, Enger, Giesl, IJCAR'12].
-		for (PatternRule R : I) {
+		for (PatternRuleTrsEeg12 R : I) {
 			Map<Term, Term> copies = new HashMap<Term, Term>();
 			Function s = R.getLeft();
 			Term sRenamed = s.deepCopy(copies);
@@ -636,11 +642,13 @@ public class Trs extends Program implements Iterable<RuleTrs> {
 				// we set sigma = (tau.rho^-1)|V(t).
 				Substitution sigma = tau.composeWith(invrho).restrictTo(t.getVariables());
 				if (theta.commutesWith(sigma) && s.apply(theta).deepEquals(t.apply(sigma))) {
-					PatternRule RR = new PatternRule(
+					// We need to build the parent only if we are in verbose mode.
+					ParentTrs parent = (verbose ?
+							new ParentTrsNonLoopEeg12(R, null, null, false, InferenceRuleEeg12.II) : null);
+					PatternRuleTrsEeg12 RR = new PatternRuleTrsEeg12(
 							s, sigma, new Substitution(),
 							t, theta, new Substitution(),
-							0, new ParentTrsNonLoop(R, null, null, false, Eeg12Rule.II),
-							null);
+							0, parent);
 					RR.normalizeStrongly();
 					result.add(RR);
 				}
@@ -648,7 +656,7 @@ public class Trs extends Program implements Iterable<RuleTrs> {
 		}
 
 		// Finally, we apply (III) of [Emmes, Enger, Giesl, IJCAR'12].
-		for (PatternRule R : I) {
+		for (PatternRuleTrsEeg12 R : I) {
 			Function s = R.getLeft();
 			Term t = R.getRight();
 			for (Position p : t)
@@ -669,12 +677,14 @@ public class Trs extends Program implements Iterable<RuleTrs> {
 							if (sigmaExtended.add(z, u)) {
 								Substitution mu = new Substitution();
 								mu.add(z, t_p);
-								PatternRule RR = new PatternRule(
+								// We need to build the parent only if we are in verbose mode.
+								ParentTrs parent = (verbose ?
+										new ParentTrsNonLoopEeg12(R, null, p, false, InferenceRuleEeg12.III) : null);
+								PatternRuleTrsEeg12 RR = new PatternRuleTrsEeg12(
 										s, sigma, new Substitution(),
 										u, sigmaExtended, mu,
 										0,
-										new ParentTrsNonLoop(R, null, p, false, Eeg12Rule.III),
-										null);
+										parent);
 								RR.normalizeStrongly();
 								result.add(RR);
 							}
@@ -693,12 +703,72 @@ public class Trs extends Program implements Iterable<RuleTrs> {
 	 * 
 	 * @return a collection of pattern rules
 	 */
-	public Collection<? extends UnfoldedRuleTrs> getPatternRules() {
+	public Collection<PatternRuleTrsEeg12> getCorrectPatternRulesEeg12() {
 		// The collection that will be returned.
-		Collection<UnfoldedRuleTrs> result = new LinkedList<UnfoldedRuleTrs>();
+		Collection<PatternRuleTrsEeg12> result = new LinkedList<>();
 
 		for (Dpairs dpairs : this.getDependencyGraph().getSCCs())
-			result.addAll(this.getPatternRules(dpairs.iterator()));
+			result.addAll(this.getCorrectPatternRulesEeg12(dpairs.iterator()));
+
+		return result;
+	}
+
+	/**
+	 * Implements Prop. 9 of [Payet, WST'25].
+	 * 
+	 * @return a list of pattern rules that are
+	 * correct w.r.t. this program
+	 */
+	public Collection<PatternRuleTrsIclp25> getCorrectPatternRulesIclp25() {
+		// The collection to be returned at the end.
+		LinkedList<PatternRuleTrsIclp25> result = new LinkedList<>();
+
+		// A set that contains the rules of this
+		// TRS that have been successfully
+		// used while applying Prop. 9 of
+		// [Payet, WST'25].
+		Set<RuleTrs> used = new HashSet<>();
+
+		// We try to construct pattern facts
+		// using Prop. 9 of [Payet, WST'25].
+		for (RuleTrs r1 : this.rules)
+			for (RuleTrs r2 : this.rules)
+				if (r1 != r2) {
+					Collection<PatternRuleTrsIclp25> correctRules =
+							CorrectPatternRuleTrsProducer.getCorrectPatternRules(r1, r2);
+					if (!correctRules.isEmpty()) {
+						used.add(r1); // r1 has been used
+						used.add(r2); // r2 has been used
+						result.addAll(correctRules);
+					}
+					else {
+						correctRules = CorrectPatternRuleTrsProducer.getCorrectPatternRules3(r1, r2);
+						if (!correctRules.isEmpty()) {
+							used.add(r1); // r1 has been used
+							used.add(r2); // r2 has been used
+							result.addAll(correctRules);
+						}
+					}
+					for (RuleTrs r3 : this.rules) 
+						if (r3 != r1 && r3 != r2) {
+							PatternRuleTrsIclp25 r =
+									CorrectPatternRuleTrsProducer.getCorrectPatternRules4(r1, r2, r3);
+							if (r != null) {
+								used.add(r1); // r1 has been used
+								used.add(r2); // r2 has been used
+								used.add(r3); // r3 has been used
+								result.add(r);
+							}
+						}
+				}
+
+		// Now, we consider all rules of this
+		// program that have not been used.
+		for (RuleTrs r : this.rules)
+			if (!used.contains(r))
+				// If r = (left -> right) then we add
+				// (left^* -> right^*) to the result.
+				result.add(CorrectPatternRuleTrsProducer.getCorrectPatternRules2(r));
 
 		return result;
 	}
@@ -718,9 +788,21 @@ public class Trs extends Program implements Iterable<RuleTrs> {
 	public void initForUnfoldingNL() {
 		// We create the initial pattern rules if needed.
 		if (this.rules_as_PatternRules == null)
-			this.rules_as_PatternRules = this.getPatternRules(this.rules.iterator());
+			this.rules_as_PatternRules = this.getCorrectPatternRulesEeg12(this.rules.iterator());
 	}
-	
+
+	/**
+	 * Runs a termination proof for this program.
+	 * 
+	 * @return the computed proof
+	 */
+	/*
+	@Override
+	public Proof proveTermination() {
+		return this.proveNonTerminationOnly();
+	}
+	 */
+
 	/**
 	 * Runs a termination proof for this program.
 	 * 
@@ -737,7 +819,7 @@ public class Trs extends Program implements Iterable<RuleTrs> {
 		// we try with the dependency pair framework.
 		if (!proof.isSuccess()) {
 			proof.printlnIfVerbose();
-			
+
 			// Only one instance of a processor checking
 			// for homeomorphic embedding is necessary.
 			ProcHomeoEmbed homeo = new ProcHomeoEmbed();
@@ -767,7 +849,7 @@ public class Trs extends Program implements Iterable<RuleTrs> {
 					procForTerm.add(new ProcLpo(false)); // Lexicographic Path Order
 					procForTerm.add(new ProcPolyInterpretation(false, maxNbCoef, maxDepth)); // Polynomial interpretation
 					procForTerm.add(new ProcKbo(false, maxNbCoef)); // Knuth-Bendix Order
-					
+
 					// The list of processors to apply for proving nontermination.
 					// We create parameters for some processors.
 					List<Processor> procForNonTerm = new LinkedList<Processor>();
@@ -784,8 +866,9 @@ public class Trs extends Program implements Iterable<RuleTrs> {
 					procForNonTerm.add(new ProcUnfoldPayet(param1)); // Find a loop by unfolding
 					procForNonTerm.add(new ProcUnfoldPayet(param2)); // Find a loop by unfolding
 					procForNonTerm.add(new ProcUnfoldPayet(param3)); // Find a loop by unfolding
-					procForNonTerm.add(new ProcUnfoldEeg12(new Parameters())); // Non-looping nontermination
-					
+					procForNonTerm.add(new ProcUnfoldIclp25(new Parameters())); // Non-looping nontermination
+					// procForNonTerm.add(new ProcUnfoldEeg12(new Parameters())); // Non-looping nontermination
+
 					return (new TechDpFramework(procForTerm, procForNonTerm)).run(Trs.this);
 				}
 			}));
@@ -806,7 +889,7 @@ public class Trs extends Program implements Iterable<RuleTrs> {
 					procForTerm.add(new ProcLpo(true)); // Lexicographic Path Order
 					procForTerm.add(new ProcPolyInterpretation(true, maxNbCoef, maxDepth)); // Polynomial interpretation
 					procForTerm.add(new ProcKbo(true, maxNbCoef)); // Knuth-Bendix Order
-					
+
 					return (new TechDpFramework(procForTerm, null)).run(Trs.this.copy(null));
 				}
 			}));
@@ -814,7 +897,7 @@ public class Trs extends Program implements Iterable<RuleTrs> {
 			executor.shutdown();
 
 			Proof proofDP = null;
-			
+
 			try {
 				long seconds = Options.getInstance().getTotalTimeLimit();
 				for (int i = 0; i < nbThreads; i++) {
@@ -836,11 +919,115 @@ public class Trs extends Program implements Iterable<RuleTrs> {
 				for (Future<Proof> f : futures)
 					f.cancel(true);
 			}
-			
+
 			if (proofDP != null) proof.merge(proofDP);
 		}
 
 		return proof;
+	}
+
+	/**
+	 * Runs a nontermination proof for this program.
+	 * 
+	 * Mainly used for testing.
+	 * 
+	 * @return the computed proof
+	 */
+	public Proof proveNonTerminationOnly() {
+		// The processors used for proving nontermination.
+		Processor proc = new ProcUnfoldIclp25(new Parameters()); // Non-looping nontermination
+
+		// The result to consider at the end.
+		ResultDp result = null;
+
+		// We consider the initial DP problems to solve.
+		DpProbCollection initialProblems = this.getInitialDPProblems();
+		for (DpProblem prob : initialProblems) {
+			result = proc.run(prob, null, 0);
+			break; // For the moment, we only consider the first DP problem.
+		}
+
+		if (result == null)
+			result = ResultDp.getFailedInstance(new Proof());
+
+		Proof proof = result.getProof();
+
+		if (result.isInfinite()) proof.setResult(Proof.ProofResult.NO); 
+
+		return proof;
+	}
+
+	/**
+	 * Applies the pattern unfolding operator
+	 * <code>n</code> times to this program
+	 * and displays the result.
+	 * 
+	 * @param n the number of iterations
+	 * of the pattern unfolding operator 
+	 * @param printer the printer used
+	 * to display the result
+	 */
+	@Override
+	public void patternUnfold(int n, Printer printer) {
+
+		// The thread running this method.
+		Thread currentThread = Thread.currentThread();
+
+		Collection<PatternRuleTrsIclp25> correct = this.getCorrectPatternRulesIclp25();
+
+		// Some data structures used for unfolding.
+		LinkedList<PatternRuleTrsIclp25> x = new LinkedList<>();
+		LinkedList<PatternRuleTrsIclp25> unfolded = new LinkedList<>();
+
+		// We track the number of generated unfolded rules.
+		int generated = 0 ;
+
+		printer.println("== Pattern unfoldings ==");
+
+		for (int i = 0; i <= n; i++) {
+			if (currentThread.isInterrupted()) break;
+
+			printer.println("** Iteration " + i + ":");
+
+			int generated_i = 0;
+
+			if (i == 0) {
+				// At the first iteration, we have to initialize the
+				// set of unfolded rules: we initialize it to the
+				// pattern rules occurring in the provided problem.
+				// We also check whether a pattern rule is a
+				// nontermination witness.
+				for (RuleTrs r : this.rules) {
+					if (currentThread.isInterrupted()) break;
+					unfolded.add(CorrectPatternRuleTrsProducer.getCorrectPatternRules2(r));
+				}
+				generated_i = this.rules.size();
+			}
+			else {
+				x.clear();
+				x.addAll(unfolded);
+				unfolded.clear();
+				for (PatternRuleTrsIclp25 r : x) {
+					if (currentThread.isInterrupted()) break;
+
+					// We unfold r and check whether nontermination
+					// can be proved from the new unfolded rules.
+					Collection<PatternRuleTrsIclp25> u_r = r.unfold(null, correct, i, null);
+					generated_i += u_r.size();
+					unfolded.addAll(u_r);
+				}
+			}
+			generated += generated_i;
+
+			// We display the unfolded pattern rules that
+			// were computed during this iteration.
+			for (PatternRuleTrsIclp25 r : unfolded)
+				printer.println(r);
+			printer.println("** " + generated_i + " unfolded rules generated");
+		}
+
+		printer.println("================");
+		printer.println("Total number of generated unfolded rules = " + generated);
 	}
 
 	/**
@@ -853,7 +1040,7 @@ public class Trs extends Program implements Iterable<RuleTrs> {
 	public Collection<PairOfTerms> toPairsOfTerms() {
 
 		// The collection to return at the end.
-		Collection<PairOfTerms> L = new LinkedList<PairOfTerms>();
+		Collection<PairOfTerms> L = new LinkedList<>();
 
 		for (RuleTrs R : this.rules)
 			L.add(new PairOfTerms(R, R.getLeft(), R.getRight()));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -17,19 +17,18 @@
  * along with NTI. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fr.univreunion.nti.program.lp.loop;
+package fr.univreunion.nti.program.lp;
 
-import fr.univreunion.nti.program.lp.BinaryRuleLp;
-import fr.univreunion.nti.program.lp.Mode;
 import fr.univreunion.nti.term.Function;
 
 /**
- * An object that witnesses the existence of a loop.
+ * An object that witnesses the existence
+ * of an infinite derivation.
  * 
  * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
 
-public interface LoopWitness {
+public interface NonTerminationWitness {
 	
 	/**
 	 * Adds the provided binary rule to this witness.
@@ -38,29 +37,20 @@ public interface LoopWitness {
 	 * @return the witness resulting from adding the
 	 * provided rule to this witness
 	 */
-	public LoopWitness add(BinaryRuleLp R);
+	public NonTerminationWitness add(BinaryRuleLp R);
 	
 	/**
-	 * Checks whether this object is a witness of the
-	 * loopingness of the given mode.
+	 * Checks whether this object is a nontermination
+	 * witness of the given mode.
 	 * 
-	 * @param m a mode whose loopingness is to be proved
-	 * @return a (non-<code>null</code>) looping atomic
-	 * query corresponding to <code>m</code> or
-	 * <code>null</code>, if this object is not a witness
-	 * of the loopingness of <code>m</code>
+	 * @param m a mode whose nontermination is to be proved
+	 * @return a (non-<code>null</code>) nonterminating
+	 * atomic query corresponding to <code>m</code> or
+	 * <code>null</code>, if this object is not a 
+	 * nontermination witness of <code>m</code>
 	 */
-	public Function provesLoopingnessOf(Mode m);
-	
-	/**
-	 * Returns a String representation of the kind
-	 * of loopingness witnessed by this object.
-	 * 
-	 * @return a String representation of the kind
-	 * of loopingness witnessed by this object
-	 */
-	public String getLoopKind();
-	
+	public Function provesNonTerminationOf(Mode m);
+		
 	/**
 	 * Returns a short String representation of this witness.
 	 * 

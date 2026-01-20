@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -55,70 +55,7 @@ public class Substitution implements Iterable<Map.Entry<Variable, Term>> {
 	public Substitution(Substitution sigma) {
 		this.mappings.putAll(sigma.mappings);
 	}
-
-	/**
-	 * Checks whether this substitution is the empty
-	 * (identity) substitution.
-	 * 
-	 * @return <code>true</code> iff this substitution
-	 * is empty
-	 */
-	public boolean isEmpty() {
-		return this.mappings.isEmpty();
-	}
-
-	/**
-	 * Returns an iterator over the mappings of
-	 * this substitution.
-	 * 
-	 * It makes no guarantees as to the iteration
-	 * order of the set of mappings.
-	 * 
-	 * @return an <code>Iterator</code>
-	 */
-	@Override
-	public Iterator<Map.Entry<Variable, Term>> iterator() {
-		return this.mappings.entrySet().iterator();
-	}
-
-	/**
-	 * Removes all of the mappings from this substitution.
-	 */
-	public void clear() {
-		this.mappings.clear();
-	}
-
-	/**
-	 * Returns a deep copy of this substitution i.e., a
-	 * substitution where each subterm is also copied,
-	 * even variable subterms. The specified map is used
-	 * to store subterm copies and is constructed
-	 * incrementally.
-	 * 
-	 * Everything is copied: the domain and also the
-	 * range of this substitution.
-	 * 
-	 * The returned copy is "flattened" i.e., each of
-	 * its subterms is the only element of its class
-	 * and is its own schema.
-	 * 
-	 * @param copies a set of pairs <code>(s,t)</code>
-	 * where the term <code>t</code> is a deep copy of
-	 * <code>s</code>, a subterm of this term
-	 * @return a deep copy of this substitution
-	 */
-	public Substitution deepCopy(Map<Term, Term> copies) {
-		// The value to return at the end.
-		Substitution sigma = new Substitution();
-
-		for (Map.Entry<Variable, Term> e : this.mappings.entrySet())
-			sigma.mappings.put(
-					(Variable) e.getKey().deepCopy(copies),
-					e.getValue().deepCopy(copies));
-
-		return sigma;
-	}
-
+	
 	/**
 	 * Adds the mapping <code>v->t</code> to this substitution.
 	 * 
@@ -178,82 +115,12 @@ public class Substitution implements Iterable<Map.Entry<Variable, Term>> {
 	}
 	
 	/**
-	 * Removes the mapping <code>v/s</code> from
-	 * this substitution if it is present. If
-	 * this mapping is not present, then this
-	 * substitution is kept unchanged.
-	 *  
-	 * @param v a variable
-	 * @param s a term
-	 * @return <code>true</code> if and only if 
-	 * the mapping <code>v/s</code> was removed
-	 * from this substitution
+	 * Removes all of the mappings from this substitution.
 	 */
-	public boolean remove(Variable v, Term s) {
-		Term t = this.mappings.get(v);
-		if (t != null && t.deepEquals(s)) {
-			this.mappings.remove(v);
-			return true;
-		}
-		
-		return false;
+	public void clear() {
+		this.mappings.clear();
 	}
-
-	/**
-	 * Returns the term to which the specified variable is
-	 * mapped, or <code>null</code> if this substitution
-	 * contains no mapping for the variable.
-	 * 
-	 * @param v the variable whose associated term is to
-	 * be returned
-	 * @return the term to which the specified variable is
-	 * mapped, or <code>null</code> if this substitution
-	 * contains no mapping for the variable
-	 */
-	public Term get(Variable v) {
-		return this.mappings.get(v);
-	}
-
-	/**
-	 * Returns the domain of this substitution as a set.
-	 * 
-	 * @return the domain of this substitution, as a set
-	 */
-	public Set<Variable> getDomain() {
-		return new HashSet<Variable>(this.mappings.keySet());
-	}
-
-	/**
-	 * Checks whether this substitution includes
-	 * the specified variable in its domain.
-	 * 
-	 * @param v a variable whose presence in the
-	 * domain of this substitution is to be tested
-	 * @return <code>true</code> iff this substitution
-	 * includes the specified variable in its domain
-	 */
-	public boolean inDomain(Variable v) {
-		return this.mappings.containsKey(v);
-	}
-
-	/**
-	 * Checks whether this substitution contains
-	 * the given variable.
-	 * 
-	 * @param v a variable whose presence in this
-	 * substitution is to be tested
-	 * @return <code>true</code> iff this substitution
-	 * contains <code>v</code>
-	 */
-	public boolean contains(Variable v) {
-		for (Map.Entry<Variable, Term> e : this.mappings.entrySet()) {
-			if (e.getKey().contains(v) || e.getValue().contains(v))
-				return true;
-		}
-
-		return false;
-	}
-
+	
 	/**
 	 * Checks whether this substitution commutes with the
 	 * provided one i.e., for all variable <code>V</code>,
@@ -286,6 +153,190 @@ public class Substitution implements Iterable<Map.Entry<Variable, Term>> {
 		// Here, all the checks succeeded, hence we
 		// return true.
 		return true;
+	}
+	
+	/**
+	 * Computes the composition of this substitution with
+	 * the provided substitution.
+	 * 
+	 * This substitution and <code>theta</code> are not
+	 * modified by this method.
+	 * 
+	 * @param theta the substitution to compose with this
+	 * substitution
+	 * @return the result of composing this substitution
+	 * with the provided substitution
+	 */
+	public Substitution composeWith(Substitution theta) {
+		// The value to return at the end.
+		Substitution sigma = new Substitution();
+
+		// We implement Lemma 2.3 (Composition) of the book
+		// [Apt, "From Logic Programming to Prolog", 1997].
+
+		// First, we compute the bindings resulting from
+		// those of this substitution.
+		for (Map.Entry<Variable, Term> e : this.mappings.entrySet()) {
+			Variable v = e.getKey();
+			Term s = e.getValue();
+
+			Term t = s.apply(theta);
+			if (!v.deepEquals(t))
+				sigma.mappings.put(v, t);
+		}
+
+		// Then, we compute the bindings resulting from
+		// those of theta.
+		Set<Variable> domThis = this.mappings.keySet();
+		for (Map.Entry<Variable, Term> e : theta.mappings.entrySet()) {
+			Variable v = e.getKey();
+			Term s = e.getValue();
+
+			if (!domThis.contains(v))
+				sigma.mappings.put(v, s);
+		}
+
+		return sigma;
+	}
+	
+	/**
+	 * Checks whether this substitution contains
+	 * the given variable.
+	 * 
+	 * @param v a variable whose presence in this
+	 * substitution is to be tested
+	 * @return <code>true</code> iff this substitution
+	 * contains <code>v</code>
+	 */
+	public boolean contains(Variable v) {
+		for (Map.Entry<Variable, Term> e : this.mappings.entrySet()) {
+			if (e.getKey().contains(v) || e.getValue().contains(v))
+				return true;
+		}
+
+		return false;
+	}
+	
+	/**
+	 * Returns a deep copy of this substitution i.e., a
+	 * substitution where each subterm is also copied,
+	 * even variable subterms. The specified map is used
+	 * to store subterm copies and is constructed
+	 * incrementally.
+	 * 
+	 * Everything is copied: the domain and also the
+	 * range of this substitution.
+	 * 
+	 * The returned copy is "flattened" i.e., each of
+	 * its subterms is the only element of its class
+	 * and is its own schema.
+	 * 
+	 * @param copies a set of pairs <code>(s,t)</code>
+	 * where the term <code>t</code> is a deep copy of
+	 * <code>s</code>
+	 * @return a deep copy of this substitution
+	 */
+	public Substitution deepCopy(Map<Term, Term> copies) {
+		// The value to return at the end.
+		Substitution sigma = new Substitution();
+
+		for (Map.Entry<Variable, Term> e : this.mappings.entrySet())
+			sigma.mappings.put(
+					(Variable) e.getKey().deepCopy(copies),
+					e.getValue().deepCopy(copies));
+
+		return sigma;
+	}
+
+	/**
+	 * Returns the term to which the specified variable is
+	 * mapped, or <code>null</code> if this substitution
+	 * contains no mapping for the variable.
+	 * 
+	 * @param v the variable whose associated term is to
+	 * be returned
+	 * @return the term to which the specified variable is
+	 * mapped, or <code>null</code> if this substitution
+	 * contains no mapping for the variable
+	 */
+	public Term get(Variable v) {
+		return this.mappings.get(v);
+	}
+	
+	/**
+	 * Returns the term to which the specified variable is
+	 * mapped, or <code>defaultValue</code> if this
+	 * substitution contains no mapping for the variable.
+	 * 
+	 * @param v the variable whose associated term is to
+	 * be returned
+	 * @param defaultValue the default mapping of the 
+	 * variable
+	 * @return the term to which the specified variable
+	 * is mapped, or <code>defaultValue</code> if this
+	 * substitution contains no mapping for the variable
+	 */
+	public Term getOrDefault(Variable v, Term defaultValue) {
+		return this.mappings.getOrDefault(v, defaultValue);
+	}
+
+	/**
+	 * Returns the domain of this substitution as a set.
+	 * 
+	 * @return the domain of this substitution, as a set
+	 */
+	public Set<Variable> getDomain() {
+		return new HashSet<Variable>(this.mappings.keySet());
+	}
+
+	/**
+	 * Checks whether this substitution includes
+	 * the specified variable in its domain.
+	 * 
+	 * @param v a variable whose presence in the
+	 * domain of this substitution is to be tested
+	 * @return <code>true</code> iff this substitution
+	 * includes the specified variable in its domain
+	 */
+	public boolean inDomain(Variable v) {
+		return this.mappings.containsKey(v);
+	}
+	
+	/**
+	 * Checks whether the set of variables of this
+	 * substitution is disjoint from the specified
+	 * set.
+	 * 
+	 * @param vars a set of variables
+	 * @return <code>true</code> if and only if the
+	 * set of variables of this substitution is
+	 * disjoint from the specified set
+	 */
+	public boolean isDisjointFrom(Collection<Variable> vars) {
+		// We check whether each mapping of this substitution
+		// is disjoint from vars.
+		for (Map.Entry<Variable, Term> e : this.mappings.entrySet())
+			if (vars.contains(e.getKey()))
+				return false;
+			else
+				for (Variable v : e.getValue().getVariables())
+					if (vars.contains(v))
+						return false;
+
+		// If we get there, then no variable of this substitution
+		// occurs in vars.
+		return true;
+	}
+	
+	/**
+	 * Checks whether this substitution is the empty
+	 * (identity) substitution.
+	 * 
+	 * @return <code>true</code> iff this substitution
+	 * is empty
+	 */
+	public boolean isEmpty() {
+		return this.mappings.isEmpty();
 	}
 
 	/**
@@ -358,46 +409,95 @@ public class Substitution implements Iterable<Map.Entry<Variable, Term>> {
 	}
 
 	/**
-	 * Computes the composition of this substitution with
-	 * the provided substitution.
+	 * Returns an iterator over the mappings of
+	 * this substitution.
 	 * 
-	 * @param theta the substitution to compose with this
-	 * substitution
-	 * @return the result of composing this substitution
-	 * with the provided substitution
+	 * It makes no guarantees as to the iteration
+	 * order of the set of mappings.
+	 * 
+	 * @return an <code>Iterator</code>
 	 */
-	public Substitution composeWith(Substitution theta) {
+	@Override
+	public Iterator<Map.Entry<Variable, Term>> iterator() {
+		return this.mappings.entrySet().iterator();
+	}
+	
+	/**
+	 * Removes the mapping <code>v/s</code> from
+	 * this substitution if it is present. If
+	 * this mapping is not present, then this
+	 * substitution is kept unchanged.
+	 *  
+	 * @param v a variable
+	 * @param s a term
+	 * @return <code>true</code> if and only if 
+	 * the mapping <code>v/s</code> was removed
+	 * from this substitution
+	 */
+	public boolean remove(Variable v, Term s) {
+		Term t = this.mappings.get(v);
+		if (t != null && t.deepEquals(s)) {
+			this.mappings.remove(v);
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Renames this substitution using the provided one,
+	 * which is supposed to be a renaming (i.e., it maps
+	 * variables to variables).
+	 * 
+	 * This substitution is not modified by this method.
+	 * 
+	 * @param theta a renaming
+	 * @return the substitution obtained from renaming
+	 * this substitution using the given one, or
+	 * <code>null</code> if some variable in the domain
+	 * of this substitution is not mapped to a variable
+	 * by <code>theta</code>
+	 */
+	public Substitution renameWith(Substitution theta) {
+		// The value to return at the end.
+		Substitution sigma = new Substitution();
+		
+		for (Map.Entry<Variable, Term> e : this.mappings.entrySet()) {
+			Variable x = e.getKey();
+			
+			Term t = theta.getOrDefault(x, x);
+			if (!t.isVariable()) return null;
+			
+			Variable y = (Variable) t;
+			sigma.add(y, e.getValue().apply(theta));
+		}
+		
+		return sigma;
+	}
+
+	/**
+	 * Computes the substitution obtained from restricting the
+	 * domain of this substitution to the specified set.
+	 * 
+	 * This substitution is not modified by this method.
+	 * 
+	 * @param vars a set of variables
+	 * @return the substitution obtained from restricting the
+	 * domain of this substitution to the specified set
+	 */
+	public Substitution restrictTo(Collection<Variable> vars) {
 		// The value to return at the end.
 		Substitution sigma = new Substitution();
 
-		// We implement Lemma 2.3 (Composition) of the book
-		// [Apt, "From Logic Programming to Prolog", 1997].
-
-		// First, we compute the bindings resulting from
-		// those of this substitution.
 		for (Map.Entry<Variable, Term> e : this.mappings.entrySet()) {
 			Variable v = e.getKey();
-			Term s = e.getValue();
-
-			Term t = s.apply(theta);
-			if (!v.deepEquals(t))
-				sigma.mappings.put(v, t);
-		}
-
-		// Then, we compute the bindings resulting from
-		// those of theta.
-		Set<Variable> domThis = this.mappings.keySet();
-		for (Map.Entry<Variable, Term> e : theta.mappings.entrySet()) {
-			Variable v = e.getKey();
-			Term s = e.getValue();
-
-			if (!domThis.contains(v))
-				sigma.mappings.put(v, s);
+			if (vars.contains(v))
+				sigma.mappings.put(v, e.getValue());
 		}
 
 		return sigma;
 	}
-
+	
 	/**
 	 * Rewrites the range of this substitution using the rules
 	 * of the specified TRS.
@@ -421,7 +521,7 @@ public class Substitution implements Iterable<Map.Entry<Variable, Term>> {
 
 		return result;
 	}
-
+	
 	/**
 	 * Computes the union of this substitution with the
 	 * provided one, if possible (i.e., if the domain of
@@ -446,53 +546,6 @@ public class Substitution implements Iterable<Map.Entry<Variable, Term>> {
 	}
 
 	/**
-	 * Computes the substitution obtained from restricting the
-	 * domain of this substitution to the specified set.
-	 * 
-	 * @param vars a set of variables
-	 * @return the substitution obtained from restricting the
-	 * domain of this substitution to the specified set
-	 */
-	public Substitution restrictTo(Collection<Variable> vars) {
-		// The value to return at the end.
-		Substitution sigma = new Substitution();
-
-		for (Map.Entry<Variable, Term> e : this.mappings.entrySet()) {
-			Variable v = e.getKey();
-			if (vars.contains(v))
-				sigma.mappings.put(v, e.getValue());
-		}
-
-		return sigma;
-	}
-
-	/**
-	 * Checks whether the set of variables of this
-	 * substitution is disjoint from the specified
-	 * set.
-	 * 
-	 * @param vars a set of variables
-	 * @return <code>true</code> if and only if the
-	 * set of variables of this substitution is
-	 * disjoint from the specified set
-	 */
-	public boolean isDisjointFrom(Collection<Variable> vars) {
-		// We check whether each mapping of this substitution
-		// is disjoint from vars.
-		for (Map.Entry<Variable, Term> e : this.mappings.entrySet())
-			if (vars.contains(e.getKey()))
-				return false;
-			else
-				for (Variable v : e.getValue().getVariables())
-					if (vars.contains(v))
-						return false;
-
-		// If we get there, then no variable of this substitution
-		// occurs in vars.
-		return true;
-	}
-
-	/**
 	 * Returns a string representation of this substitution
 	 * relatively to the given set of variable symbols.
 	 * 
@@ -509,16 +562,25 @@ public class Substitution implements Iterable<Map.Entry<Variable, Term>> {
 		for (Map.Entry<Variable, Term> e : entries) {
 			Variable v = e.getKey();
 			Term t = e.getValue();
-			if (v != t) {
+			//if (v != t) {
 				if (k > 0) s.append(", ");
 				s.append(v.toString(variables, true));
 				s.append("->");
 				s.append(t.toString(variables, false));
 				k++;
-			}
+			//}
 		}
 
 		s.append('}');
 		return s.toString();
+	}
+	
+	/**
+	 * Returns a string representation of this
+	 * substitution.
+	 */
+	@Override
+	public String toString() {
+		return this.toString(new HashMap<>());
 	}
 }

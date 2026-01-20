@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -24,6 +24,7 @@ import java.util.List;
 
 import fr.univreunion.nti.program.lp.BinaryRuleLp;
 import fr.univreunion.nti.program.lp.Mode;
+import fr.univreunion.nti.program.lp.NonTerminationWitness;
 import fr.univreunion.nti.program.lp.SoP;
 import fr.univreunion.nti.term.Function;
 import fr.univreunion.nti.term.FunctionSymbol;
@@ -34,12 +35,12 @@ import fr.univreunion.nti.term.FunctionSymbol;
  * a sequence of binary logic program rules and tau
  * is a DN set of positions for binseq.
  * 
- * Looping pairs are used for inferring single loops.
+ * Looping pairs are used for inferring loops.
  *   
  * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
 
-public class LoopingPair implements LoopWitness {
+public class LoopingPair implements NonTerminationWitness {
 
 	/**
 	 * The binary sequence of this pair, ie a 
@@ -100,21 +101,21 @@ public class LoopingPair implements LoopWitness {
 
 	/**
 	 * Checks whether this pair is a witness of the
-	 * existence of a single loop for the given mode,
-	 * ie if the positions that are distinguished by
+	 * existence of a loop for the given mode, i.e.,
+	 * if the positions that are distinguished by
 	 * the set of positions of this pair include
 	 * the given mode.
 	 * 
-	 * @param m a mode for which a single loop is to
-	 * be found
-	 * @return a (non-<code>null</code>) query
-	 * starting a single loop and corresponding to
+	 * @param m a mode for which a loop is to be
+	 * found
+	 * @return a (non-<code>null</code>) atomic
+	 * query starting a loop corresponding to
 	 * <code>m</code> or <code>null</code>, if this
 	 * pair is not a witness of the existence of a
-	 * single loop for <code>m</code>
+	 * loop for <code>m</code>
 	 */
 	@Override
-	public Function provesLoopingnessOf(Mode m) {
+	public Function provesNonTerminationOf(Mode m) {
 		if (this.binseq.isEmpty())
 			return null;
 
@@ -132,18 +133,6 @@ public class LoopingPair implements LoopWitness {
 	}
 
 	/**
-	 * Returns a String representation of the kind
-	 * of loopingness witnessed by this object.
-	 * 
-	 * @return a String representation of the kind
-	 * of loopingness witnessed by this object
-	 */
-	@Override
-	public String getLoopKind() {
-		return "single loop";
-	}
-
-	/**
 	 * Returns a short String representation of this witness.
 	 * 
 	 * @return a short String representation of this witness
@@ -151,14 +140,6 @@ public class LoopingPair implements LoopWitness {
 	@Override
 	public String getShortDescription() {
 		return "(extracted from a looping pair [Payet and Mesnard, TOPLAS'06])";
-		/*
-		Path path = new Path();
-		for (BinaryRuleLp R : this.binseq)
-			path.addAll(R.getPath());
-
-		return "(extracted from a looping pair)\n" +
-				"  The single loop is " + path;
-		 */
 	}
 
 	/**
@@ -176,6 +157,7 @@ public class LoopingPair implements LoopWitness {
 		}
 		s.append(">, DN set of positions = ");
 		s.append(this.tau);
+		s.append(" (see [Payet and Mesnard, TOPLAS'06])");
 
 		return s.toString();
 	}

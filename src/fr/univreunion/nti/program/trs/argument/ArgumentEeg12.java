@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -23,12 +23,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.univreunion.nti.program.Argument;
-import fr.univreunion.nti.program.trs.nonloop.PatternRule;
-import fr.univreunion.nti.program.trs.nonloop.PatternTerm;
+import fr.univreunion.nti.program.trs.nonloop.eeg12.PatternRuleTrsEeg12;
 import fr.univreunion.nti.term.Position;
 import fr.univreunion.nti.term.Substitution;
 import fr.univreunion.nti.term.Term;
 import fr.univreunion.nti.term.Variable;
+import fr.univreunion.nti.term.pattern.PatternTerm;
 
 /**
  * A nontermination argument produced when searching for a
@@ -45,7 +45,7 @@ public class ArgumentEeg12 implements Argument {
 	/**
 	 * The pattern rule that provides this argument.
 	 */
-	private PatternRule R;
+	private PatternRuleTrsEeg12 R;
 
 	/**
 	 * The integer <code>m</code> used in Theorem 8.
@@ -85,7 +85,7 @@ public class ArgumentEeg12 implements Argument {
 	 * @param muPrime the substitution <code>mu'</code> used
 	 * in Theorem 8
 	 */
-	public ArgumentEeg12(PatternRule R, int m, int b, Position pi,
+	public ArgumentEeg12(PatternRuleTrsEeg12 R, int m, int b, Position pi,
 			Substitution sigmaPrime, Substitution muPrime) {
 
 		this.R = R;
@@ -101,7 +101,7 @@ public class ArgumentEeg12 implements Argument {
 	 * 
 	 * @return the pattern rule that provides this argument
 	 */
-	public PatternRule getPatternRule() {
+	public PatternRuleTrsEeg12 getPatternRule() {
 		return this.R;
 	}
 	

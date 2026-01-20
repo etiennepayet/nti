@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -34,10 +34,9 @@ public class FunctionSymbol {
 	/**
 	 * The symbols that are generated. This data structure
 	 * is shared by all the threads that perform termination
-	 * or non-termination proofs concurrently.
+	 * or nontermination proofs concurrently.
 	 */
-	private static final LinkedList<FunctionSymbol> SYMBOL_TABLE =
-			new LinkedList<FunctionSymbol>();
+	private static final LinkedList<FunctionSymbol> SYMBOL_TABLE = new LinkedList<>();
 
 	/**
 	 * The name of this symbol.
@@ -155,7 +154,7 @@ public class FunctionSymbol {
 	 * @throws IllegalArgumentException if <code>name</code> is
 	 * <code>null</code> or <code>arity</code> is not positive
 	 */
-	private FunctionSymbol(String name, int arity, boolean tupleSymbol, int index) {
+	protected FunctionSymbol(String name, int arity, boolean tupleSymbol, int index) {
 		if (name == null || arity < 0)
 			throw new IllegalArgumentException(
 					"a function symbol must have a non-null name" +
@@ -228,11 +227,22 @@ public class FunctionSymbol {
 	 * Returns <code>true</code> iff this symbol is a
 	 * tuple symbol.
 	 * 
-	 * @return <code>false</code>, always, as this symbol
-	 * is not a tuple symbol
+	 * @return <code>true</code> iff this symbol is a
+	 * tuple symbol
 	 */
 	public boolean isTupleSymbol() {
 		return this.tupleSymbol;
+	}
+	
+	/**
+	 * Returns <code>true</code> iff this symbol is a
+	 * hat symbol.
+	 * 
+	 * @return <code>true</code> iff this symbol is a
+	 * hat symbol
+	 */
+	public boolean isHatSymbol() {
+		return false;
 	}
 
 	/**

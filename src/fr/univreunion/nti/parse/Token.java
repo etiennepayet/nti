@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -29,6 +29,7 @@ public enum Token {
 	// MISC.:
 	ANONYMOUS_VAR,
 	ARROW,
+	LPARROW,
 	COMMA,
 	DOT,
 	DONE,
@@ -42,6 +43,8 @@ public enum Token {
 	CLOSE_PAR,
 	OPEN_SQ_PAR,
 	CLOSE_SQ_PAR,
+	OPEN_BRACE,
+	CLOSE_BRACE,
 	PIPE,
 	RULES,
 	STRING,

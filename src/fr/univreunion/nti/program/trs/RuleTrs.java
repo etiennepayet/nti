@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -22,7 +22,6 @@ package fr.univreunion.nti.program.trs;
 import java.util.HashMap;
 import java.util.Map;
 
-import fr.univreunion.nti.program.Rule;
 import fr.univreunion.nti.term.Function;
 import fr.univreunion.nti.term.Position;
 import fr.univreunion.nti.term.Term;
@@ -35,7 +34,7 @@ import fr.univreunion.nti.term.Variable;
  * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
 
-public class RuleTrs extends Rule {
+public class RuleTrs {
 
 	/**
 	 * The left-hand side of this rule.
@@ -55,13 +54,10 @@ public class RuleTrs extends Rule {
 	 * 
 	 * @param left the left-hand side of the rule 
 	 * @param right the right-hand side of the rule
-	 * @param numberInFile the appearance number of the rule
-	 * in the analyzed file
 	 * @throws IllegalArgumentException if <code>right</code>
 	 * is not a variable or a function
 	 */
-	public RuleTrs(Function left, Term right, Integer numberInFile) {
-		super(numberInFile);
+	public RuleTrs(Function left, Term right) {
 		
 		if (right instanceof Variable || right instanceof Function) {
 			this.left = left;
@@ -72,19 +68,6 @@ public class RuleTrs extends Rule {
 					"construction of a TRS rule from an illegal RHS: " + right);
 	}
 	
-	/**
-	 * Builds a TRS rule. The appearance number of the rule
-	 * is set to <code>null</code>.
-	 * 
-	 * @param left the left-hand side of the rule 
-	 * @param right the right-hand side of the rule
-	 * @throws IllegalArgumentException if <code>right</code>
-	 * is not a variable or a function
-	 */
-	public RuleTrs(Function left, Term right) {
-		this(left, right, null);
-	}
-
 	/**
 	 * Returns a deep copy of this rule i.e., a rule
 	 * whose left-hand and right-hand sides are deep
@@ -97,7 +80,7 @@ public class RuleTrs extends Rule {
 	 * @return a deep copy of this rule
 	 */
 	public RuleTrs deepCopy() {
-		return this.deepCopy(new HashMap<Term,Term>());
+		return this.deepCopy(new HashMap<>());
 	}
 
 	/**
@@ -120,8 +103,7 @@ public class RuleTrs extends Rule {
 	public RuleTrs deepCopy(Map<Term,Term> copies) {
 		return new RuleTrs(
 				(Function) this.left.deepCopy(copies),
-				this.right.deepCopy(copies),
-				this.getNumberInFile());
+				this.right.deepCopy(copies));
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -25,7 +25,7 @@ import java.util.List;
 import fr.univreunion.nti.program.Argument;
 
 /**
- * A nontermination proof argument in LP. It is a collection 
+ * A non-termination proof argument in LP. It is a collection 
  * of proof arguments for specific modes.
  * 
  * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
@@ -36,7 +36,7 @@ public class ArgumentLp implements Argument {
 	/**
 	 * The proof arguments.
 	 */
-	private final List<Argument> proofArguments = new LinkedList<Argument>();
+	private final List<Argument> proofArguments = new LinkedList<>();
 
 	/**
 	 * Appends the specified argument to this argument.
@@ -47,6 +47,16 @@ public class ArgumentLp implements Argument {
 	public boolean add(Argument A) {
 		return this.proofArguments.add(A);
 	}
+
+	/**
+	 * Checks whether this argument is empty.
+	 * 
+	 * @return <code>true</code> iff this
+	 * argument is empty
+	 */
+	public boolean isEmpty() {
+		return this.proofArguments.isEmpty();
+	} 
 
 	/**
 	 * Returns a detailed String representation of
@@ -93,10 +103,7 @@ public class ArgumentLp implements Argument {
 			else result.append("\n");
 			result.append(A);
 		}
-		/*
-		result.append("NB: the rules are numbered in the order they occur in the file,");
-		result.append(" starting from 1");
-		 */
+
 		return result.toString();
 	}
 }

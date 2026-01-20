@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -107,7 +107,7 @@ public class ArgumentLoopByUnfolding implements Argument {
 		this.theta1 = theta1;
 		this.theta2 = theta2;
 	}
-	
+
 	/**
 	 * Returns the unfolded rule that provides this argument
 	 * 
@@ -116,7 +116,7 @@ public class ArgumentLoopByUnfolding implements Argument {
 	public UnfoldedRuleTrs getUnfoldedRule() {
 		return this.U;
 	}
-	
+
 	/**
 	 * Returns a detailed String representation of
 	 * this argument (usually used while printing
@@ -131,12 +131,12 @@ public class ArgumentLoopByUnfolding implements Argument {
 	@Override
 	public String getDetails(int indentation) {
 		StringBuffer s = new StringBuffer();
-		
+
 		for (int i = 0; i < indentation; i++) s.append(" ");
 		s.append("Here is the successful unfolding. Let IR be the TRS under analysis.\n");
-		
+
 		int n = this.U.getIteration();
-		
+
 		ParentTrs parent;
 		if ((parent = this.U.getParent()) != null) {
 			s.append(parent.toString(indentation) + "\n");
@@ -148,10 +148,10 @@ public class ArgumentLoopByUnfolding implements Argument {
 			s.append("L" + n + " = " + this.U);
 		}
 		s.append(" is in U_IR^" + n + ".");
-		
+
 		return s.toString();
 	}
-	
+
 	/**
 	 * Returns a String representation of the kind
 	 * of witness provided by this argument.
@@ -164,7 +164,7 @@ public class ArgumentLoopByUnfolding implements Argument {
 		// return "single loop";
 		return "loop";
 	}
-	
+
 	/**
 	 * Returns a string representation of this argument.
 	 * 
@@ -173,12 +173,16 @@ public class ArgumentLoopByUnfolding implements Argument {
 	@Override
 	public String toString() {
 		Map<Variable,String> variables = new HashMap<Variable,String>();
-		
+
 		// We remove the tuple symbols (see the dependency pair framework)
 		// from the rule that provides this argument.
 		Term left = this.U.getLeft(); //.toFunction();
 		Term right = this.U.getRight(); //.toFunction();
 		String certificate = this.looping.toFunction().toString(variables, false);
+		
+		// The theta Greek letter (Unicode U+1D6F3), where
+		// U+1D6F3 = \uD835\uDEF3 in UTF-16 (surrogate pair):
+		String theta = "\uD835\uDEF3";
 
 		return
 				"* Technique: [Payet, LOPSTR'18]\n" +
@@ -191,14 +195,14 @@ public class ArgumentLoopByUnfolding implements Argument {
 				" -> " +
 				right.toString(variables, this.shallow) +
 				"\nLet l be the left-hand side and r be the right-hand side of R." +
-				"\nLet p = " + p +
-				", theta1 = " + this.theta1.toString(variables) +
-				" and theta2 = " + this.theta2.toString(variables) + "." +
+				"\nConsider the position p = " + p + " in r and the substitutions\n" +
+				theta + "1 = " + this.theta1.toString(variables) + " and " + 
+				theta + "2 = " + this.theta2.toString(variables) + "." +
 				"\nWe have r|p = " +
 				right.get(p, this.shallow).toString(variables, this.shallow) +
-				"\nand theta2(theta1(l)) = theta1(r|p), " +
+				"\nand " + theta + "2(" + theta + "1(l)) = " + theta + "1(r|p), " +
 				"i.e., l semi-unifies with r|p." +
-				"\nSo, the term theta1(l) = " + certificate +
+				"\nSo, the term " + theta + "1(l) = " + certificate +
 				"\nstarts an infinite rewrite sequence w.r.t. the analyzed TRS.";
 	}
 }

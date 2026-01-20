@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -17,7 +17,7 @@
  * along with NTI. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fr.univreunion.nti.program.trs.nonloop;
+package fr.univreunion.nti.program.trs.nonloop.eeg12;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,8 +27,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import fr.univreunion.nti.Options;
 import fr.univreunion.nti.program.Argument;
-import fr.univreunion.nti.program.Path;
 import fr.univreunion.nti.program.Proof;
 import fr.univreunion.nti.program.trs.Parameters;
 import fr.univreunion.nti.program.trs.ParentTrs;
@@ -41,6 +41,7 @@ import fr.univreunion.nti.term.Position;
 import fr.univreunion.nti.term.Substitution;
 import fr.univreunion.nti.term.Term;
 import fr.univreunion.nti.term.Variable;
+import fr.univreunion.nti.term.pattern.PatternTerm;
 
 /**
  * A pattern rule, as defined in [Emmes, Enger, Giesl, IJCAR'12].
@@ -48,7 +49,7 @@ import fr.univreunion.nti.term.Variable;
  * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
 
-public class PatternRule extends UnfoldedRuleTrs {
+public class PatternRuleTrsEeg12 extends UnfoldedRuleTrs {
 
 	/**
 	 * The pumping substitution on the left-hand side
@@ -82,16 +83,14 @@ public class PatternRule extends UnfoldedRuleTrs {
 	 * @param iteration the iteration of the unfolding operator
 	 * at which this pattern rule is generated
 	 * @param parent the parent of this pattern rule
-	 * @param path the path in the program being unfolded that
-	 * corresponds to this pattern rule
 	 * @throws IllegalArgumentException if the given iteration
 	 * is negative
 	 */
-	public PatternRule(PatternTerm left, PatternTerm right,
-			int iteration, ParentTrs parent, Path path) {
+	public PatternRuleTrsEeg12(PatternTerm left, PatternTerm right,
+			int iteration, ParentTrs parent) {
 
 		super((Function) left.getBaseTerm(), right.getBaseTerm(),
-				iteration, parent, path);
+				iteration, parent);
 
 		this.sigmaLeft = left.getPumping();
 		this.muLeft = left.getClosing();
@@ -114,15 +113,13 @@ public class PatternRule extends UnfoldedRuleTrs {
 	 * @param iteration the iteration of the unfolding operator
 	 * at which this pattern rule is generated
 	 * @param parent the parent of this pattern rule
-	 * @param path the path in the program being unfolded that
-	 * corresponds to this pattern rule
 	 * @throws IllegalArgumentException if <code>right</code>
 	 * is not a variable or a function
 	 * @throws IllegalArgumentException if the given iteration
 	 * is negative
 	 */
-	public PatternRule(RuleTrs R, int iteration, ParentTrs parent, Path path) {
-		super(R.getLeft(), R.getRight(), iteration, parent, path);
+	public PatternRuleTrsEeg12(RuleTrs R, int iteration, ParentTrs parent) {
+		super(R.getLeft(), R.getRight(), iteration, parent);
 
 		this.sigmaLeft = new Substitution();
 		this.muLeft = new Substitution();
@@ -148,18 +145,16 @@ public class PatternRule extends UnfoldedRuleTrs {
 	 * @param iteration the iteration of the unfolding operator
 	 * at which this pattern rule is generated
 	 * @param parent the parent of this pattern rule
-	 * @param path the path in the program being unfolded that
-	 * corresponds to this pattern rule
 	 * @throws IllegalArgumentException if <code>right</code>
 	 * is not a variable or a function
 	 * @throws IllegalArgumentException if the given iteration
 	 * is negative
 	 */
-	public PatternRule(Function left, Substitution sigmaLeft, Substitution muLeft,
+	public PatternRuleTrsEeg12(Function left, Substitution sigmaLeft, Substitution muLeft,
 			Term right, Substitution sigmaRight, Substitution muRight,
-			int iteration, ParentTrs parent, Path path) {
+			int iteration, ParentTrs parent) {
 
-		super(left, right, iteration, parent, path);
+		super(left, right, iteration, parent);
 
 		this.sigmaLeft = sigmaLeft;
 		this.muLeft = muLeft;
@@ -203,7 +198,7 @@ public class PatternRule extends UnfoldedRuleTrs {
 	public UnfoldedRuleTrs deepCopy(int iteration, ParentTrs parent) {
 		HashMap<Term, Term> copies = new HashMap<Term, Term>();
 
-		return new PatternRule(
+		return new PatternRuleTrsEeg12(
 				(Function) this.left.deepCopy(copies),
 				this.sigmaLeft.deepCopy(copies),
 				this.muLeft.deepCopy(copies),
@@ -211,8 +206,7 @@ public class PatternRule extends UnfoldedRuleTrs {
 				this.sigmaRight.deepCopy(copies),
 				this.muRight.deepCopy(copies),
 				iteration,
-				parent,
-				this.path);
+				parent);
 	}
 
 	/**
@@ -220,7 +214,7 @@ public class PatternRule extends UnfoldedRuleTrs {
 	 * 
 	 * @param R the rule to copy
 	 */
-	private void copy(PatternRule R) {
+	private void copy(PatternRuleTrsEeg12 R) {
 		// We copy the left-hand side of R into this rule.
 		this.left = R.left;
 		this.sigmaLeft = R.sigmaLeft;
@@ -303,7 +297,7 @@ public class PatternRule extends UnfoldedRuleTrs {
 	 */
 	@Override
 	public Collection<? extends UnfoldedRuleTrs> elim(Parameters parameters, Trs IR) {
-		LinkedList<PatternRule> Result = new LinkedList<PatternRule>();
+		LinkedList<PatternRuleTrsEeg12> Result = new LinkedList<PatternRuleTrsEeg12>();
 		Result.add(this);
 		return Result;
 	}
@@ -329,8 +323,8 @@ public class PatternRule extends UnfoldedRuleTrs {
 
 		// If R is a pattern rule, then we narrow this rule with R.
 		// Otherwise, we rewrite this rule with R.
-		PatternRule N = (R instanceof PatternRule ? 
-				this.narrowWith((PatternRule) R, p, iteration) :
+		PatternRuleTrsEeg12 N = (R instanceof PatternRuleTrsEeg12 ? 
+				this.narrowWith((PatternRuleTrsEeg12) R, p, iteration) :
 					this.rewriteWith(R, p, iteration));
 		if (N != null) result.add(N);
 
@@ -384,7 +378,7 @@ public class PatternRule extends UnfoldedRuleTrs {
 
 				// If nontermination was not detected, then we try
 				// to narrow this pattern rule with IR.
-				for (Iterator<PatternRule> it = IR.iteratorPatternRules(); it.hasNext(); )
+				for (Iterator<PatternRuleTrsEeg12> it = IR.iteratorPatternRules(); it.hasNext(); )
 					for (UnfoldedRuleTrs U : this.unfoldForwardsWith(parameters, it.next(), p, iteration))
 						if (add(parameters, IR, proof, U, result))
 							return result;
@@ -411,12 +405,14 @@ public class PatternRule extends UnfoldedRuleTrs {
 	 * @return the pattern rule resulting from the narrowing,
 	 * or <code>null</code> if the narrowing fails
 	 */
-	private PatternRule narrowWith(PatternRule R, Position p, int iteration) {
+	private PatternRuleTrsEeg12 narrowWith(PatternRuleTrsEeg12 R, Position p, int iteration) {
 		// We work with copies of this pattern rule and R,
 		// in order to keep this rule and R unchanged.
-		ParentTrs parent = new ParentTrsNonLoop(this, R, p, false, Eeg12Rule.VI);
-		PatternRule thisCopy = (PatternRule) this.deepCopy(iteration, parent);
-		PatternRule Rcopy = (PatternRule) R.deepCopy(iteration, parent);
+		// We need to build the parent only if we are in verbose mode.
+		ParentTrs parent = (Options.getInstance().isInVerboseMode() ? 
+				new ParentTrsNonLoopEeg12(this, R, p, false, InferenceRuleEeg12.VI) : null);
+		PatternRuleTrsEeg12 thisCopy = (PatternRuleTrsEeg12) this.deepCopy(iteration, parent);
+		PatternRuleTrsEeg12 Rcopy = (PatternRuleTrsEeg12) R.deepCopy(iteration, parent);
 
 		// First, we apply steps 1-3 of the strategy.
 		if (thisCopy.makeNarrowingApplicable(Rcopy, p, iteration)) {
@@ -434,10 +430,10 @@ public class PatternRule extends UnfoldedRuleTrs {
 
 			Term v = Rcopy.right;
 
-			return new PatternRule(
+			return new PatternRuleTrsEeg12(
 					thisCopy.left, thisCopy.sigmaLeft, thisCopy.muLeft,
 					t.replace(p, v), thisCopy.sigmaLeft, thisCopy.muLeft,
-					iteration, parent, this.path);
+					iteration, parent);
 		}
 
 		return null;
@@ -465,7 +461,7 @@ public class PatternRule extends UnfoldedRuleTrs {
 	 * @return <code>true</code> iff steps 1-3 succeed
 	 */
 	private boolean makeNarrowingApplicable(
-			PatternRule R, Position p, int iteration) {
+			PatternRuleTrsEeg12 R, Position p, int iteration) {
 
 		// First, we apply step 1 of the strategy.
 		if (this.narrowWith1(R, p, iteration)) {
@@ -478,23 +474,23 @@ public class PatternRule extends UnfoldedRuleTrs {
 			// First, in this, we make the pumping substitutions
 			// equal and the closing substitutions equal.
 
-			PatternRule thisNormalized = this.normalizedForm(iteration);
+			PatternRuleTrsEeg12 thisNormalized = this.normalizedForm(iteration);
 			if (thisNormalized != null) {
 
 				// Then, in R, we make the pumping substitutions
 				// equal and the closing substitutions equal.
 
-				PatternRule RNormalized = R.normalizedForm(iteration);
+				PatternRuleTrsEeg12 RNormalized = R.normalizedForm(iteration);
 				if (RNormalized != null) {
 
 					// Finally, we make the pumping substitutions
 					// of this and R equal.
 
-					PatternRule R1 = thisNormalized.
+					PatternRuleTrsEeg12 R1 = thisNormalized.
 							instantiatePumpingWith(RNormalized.sigmaLeft, iteration);
 					if (R1 != null) {
 
-						PatternRule R2 = RNormalized.
+						PatternRuleTrsEeg12 R2 = RNormalized.
 								instantiatePumpingWith(thisNormalized.sigmaRight, iteration);
 						if (R2 != null) {
 
@@ -548,7 +544,7 @@ public class PatternRule extends UnfoldedRuleTrs {
 	 * operator where this step takes place
 	 * @return <code>true</code> iff this step succeeds
 	 */
-	private boolean narrowWith1(PatternRule R, Position p, int iteration) {
+	private boolean narrowWith1(PatternRuleTrsEeg12 R, Position p, int iteration) {
 		// This rule is built from dependency pairs.
 		// Hence, if p = epsilon, then we replace the
 		// root tuple symbol with the equivalent function
@@ -569,7 +565,7 @@ public class PatternRule extends UnfoldedRuleTrs {
 			Term s = mapping.getValue();
 
 			// Now, let us implement steps 1a-1e.
-			PatternRule RR = this;
+			PatternRuleTrsEeg12 RR = this;
 			PatternTerm pp = RR.getRightPatternTerm();
 			if (R.left.contains(x) || R.sigmaLeft.contains(x) || R.muLeft.contains(x)) {
 				RR = R;
@@ -647,15 +643,15 @@ public class PatternRule extends UnfoldedRuleTrs {
 	 * operator where this step takes place
 	 * @return <code>true</code> iff this step succeeds
 	 */
-	private boolean narrowWith1a(PatternRule R,
-			PatternRule RR, PatternTerm pp,
+	private boolean narrowWith1a(PatternRuleTrsEeg12 R,
+			PatternRuleTrsEeg12 RR, PatternTerm pp,
 			Variable x, Term s, int iteration) {
 
 		Term ss = s.deepCopy(pp.getDomainVariable());
 		Substitution rho = new Substitution();
 		rho.add(x, ss);
 
-		PatternRule RR1 = RR.instantiateWith(rho, iteration);
+		PatternRuleTrsEeg12 RR1 = RR.instantiateWith(rho, iteration);
 
 		if (RR1 == null) return false;
 
@@ -693,8 +689,8 @@ public class PatternRule extends UnfoldedRuleTrs {
 	 * operator where this step takes place
 	 * @return <code>true</code> iff this step succeeds
 	 */
-	private boolean narrowWith1b(PatternRule R,
-			PatternRule RR, PatternTerm pp,
+	private boolean narrowWith1b(PatternRuleTrsEeg12 R,
+			PatternRuleTrsEeg12 RR, PatternTerm pp,
 			Variable x, Variable s, int iteration) {
 
 		Term ss = pp.getPumping().get(s);
@@ -703,7 +699,7 @@ public class PatternRule extends UnfoldedRuleTrs {
 			Substitution rho = new Substitution();
 			rho.add(x, ss);
 
-			PatternRule RR1 = RR.instantiatePumpingWith(rho, iteration);
+			PatternRuleTrsEeg12 RR1 = RR.instantiatePumpingWith(rho, iteration);
 
 			if (RR1 == null) return false;
 
@@ -745,15 +741,15 @@ public class PatternRule extends UnfoldedRuleTrs {
 	 * operator where this step takes place
 	 * @return <code>true</code> iff this step succeeds
 	 */
-	private boolean narrowWith1c(PatternRule R,
-			PatternRule RR, PatternTerm pp,
+	private boolean narrowWith1c(PatternRuleTrsEeg12 R,
+			PatternRuleTrsEeg12 RR, PatternTerm pp,
 			Variable x, Variable s, int iteration) {
 
 		Substitution rho = new Substitution();
 		rho.add(x, s);
 
 		if (rho.commutesWith(pp.getPumping())) {
-			PatternRule RR1 = RR.instantiateClosingWith(rho, iteration);
+			PatternRuleTrsEeg12 RR1 = RR.instantiateClosingWith(rho, iteration);
 			if (RR == this && RR1.muRight.remove(x, s) && !RR1.muRight.inDomain(s)) {
 				this.left  = RR1.left;
 				this.sigmaLeft = RR1.sigmaLeft;
@@ -804,8 +800,8 @@ public class PatternRule extends UnfoldedRuleTrs {
 	 * @param iteration the current iteration of the unfolding
 	 * operator where this step takes place
 	 */
-	private void narrowWith1d(PatternRule R,
-			PatternRule RR, PatternTerm pp,
+	private void narrowWith1d(PatternRuleTrsEeg12 R,
+			PatternRuleTrsEeg12 RR, PatternTerm pp,
 			Variable x, Term s, int iteration) {
 
 		Substitution rho = new Substitution();
@@ -839,7 +835,7 @@ public class PatternRule extends UnfoldedRuleTrs {
 	 * @return the normalized rule, or <code>null</code>
 	 * if normalization failed
 	 */
-	private PatternRule normalizedForm(int iteration) {
+	private PatternRuleTrsEeg12 normalizedForm(int iteration) {
 
 		// If this rule is already in normal form, then
 		// we have nothing to do.
@@ -880,14 +876,17 @@ public class PatternRule extends UnfoldedRuleTrs {
 			if (this.muRight.get(x) != mu2.get(x)) return null;
 		}
 
+		// We need to build the parent only if we are in verbose mode.
+		ParentTrs parent = (Options.getInstance().isInVerboseMode() ? 
+				new ParentTrsNonLoopEeg12(this, null, null, false,
+						InferenceRuleEeg12.IV, InferenceRuleEeg12.Lemma6) : null);
+
 		// We return the normalized rule.
-		return new PatternRule(
+		return new PatternRuleTrsEeg12(
 				this.left, sigma2, mu2,
 				this.right, sigma2, mu2,
 				iteration,
-				new ParentTrsNonLoop(this, null, null, false,
-						Eeg12Rule.IV, Eeg12Rule.Lemma6),
-				this.path);
+				parent);
 	}
 
 	/**
@@ -1038,10 +1037,10 @@ public class PatternRule extends UnfoldedRuleTrs {
 	 * of instantiating this pattern rule with <code>rho</code>,
 	 * else <code>null</code>
 	 */
-	private PatternRule instantiateWith(Substitution rho, int iteration) {
+	private PatternRuleTrsEeg12 instantiateWith(Substitution rho, int iteration) {
 
 		// The value to return at the end.
-		PatternRule result = null;
+		PatternRuleTrsEeg12 result = null;
 
 		// We compute the union of the domains of the
 		// pumping and the closing substitutions.
@@ -1072,10 +1071,13 @@ public class PatternRule extends UnfoldedRuleTrs {
 			Substitution sigma2 = (this.sigmaLeft == this.sigmaRight ? sigma1 : rightInstantiated.getPumping());
 			Substitution mu2 = (this.muLeft == this.muRight ? mu1 : rightInstantiated.getClosing());
 
-			result = new PatternRule(l, sigma1, mu1, r, sigma2, mu2,
-					iteration,
-					new ParentTrsNonLoop(this, null, null, false, Eeg12Rule.V),
-					this.path);
+			// We need to build the parent only if we are in verbose mode.
+			ParentTrs parent = (Options.getInstance().isInVerboseMode() ? 
+					new ParentTrsNonLoopEeg12(
+							this, null, null, false, InferenceRuleEeg12.V) : null);
+
+			result = new PatternRuleTrsEeg12(l, sigma1, mu1, r, sigma2, mu2,
+					iteration, parent);
 		}
 
 		return result;
@@ -1099,9 +1101,9 @@ public class PatternRule extends UnfoldedRuleTrs {
 	 * substitution, or <code>null</code> if the provided
 	 * substitution is not suitable  
 	 */
-	private PatternRule instantiatePumpingWith(Substitution rho, int iteration) {
+	private PatternRuleTrsEeg12 instantiatePumpingWith(Substitution rho, int iteration) {
 		// The value to return at the end.
-		PatternRule R = null;
+		PatternRuleTrsEeg12 R = null;
 
 		// The substitutions on the left-hand side.
 		Substitution sigma_l = this.sigmaLeft;
@@ -1115,12 +1117,16 @@ public class PatternRule extends UnfoldedRuleTrs {
 		if (rho.commutesWith(sigma_l) && rho.commutesWith(mu_l) &&
 				rho.commutesWith(sigma_r) && rho.commutesWith(mu_r)) {
 
-			R = new PatternRule(
+			// We need to build the parent only if we are in verbose mode.
+			ParentTrs parent = (Options.getInstance().isInVerboseMode() ?
+					new ParentTrsNonLoopEeg12(
+							this, null, null, false, InferenceRuleEeg12.VII) : null);
+
+			R = new PatternRuleTrsEeg12(
 					this.left, sigma_l.composeWith(rho), mu_l,
 					this.right, sigma_r.composeWith(rho), mu_r,
 					iteration,
-					new ParentTrsNonLoop(this, null, null, false, Eeg12Rule.VII),
-					this.path);
+					parent);
 		}
 
 		return R;
@@ -1139,13 +1145,17 @@ public class PatternRule extends UnfoldedRuleTrs {
 	 * substitutions of this pattern rule with the provided
 	 * substitution
 	 */
-	private PatternRule instantiateClosingWith(Substitution rho, int iteration) {
-		return new PatternRule(
+	private PatternRuleTrsEeg12 instantiateClosingWith(Substitution rho, int iteration) {
+		// We need to build the parent only if we are in verbose mode.
+		ParentTrs parent = (Options.getInstance().isInVerboseMode() ? 
+				new ParentTrsNonLoopEeg12(
+						this, null, null, false, InferenceRuleEeg12.VIII) : null);
+
+		return new PatternRuleTrsEeg12(
 				this.left, this.sigmaLeft, this.muLeft.composeWith(rho),
 				this.right, this.sigmaRight, this.muRight.composeWith(rho),
 				iteration,
-				new ParentTrsNonLoop(this, null, null, false, Eeg12Rule.VIII),
-				this.path);
+				parent);
 	}
 
 	/**
@@ -1162,9 +1172,9 @@ public class PatternRule extends UnfoldedRuleTrs {
 	 * @return the pattern rule resulting from the rewriting,
 	 * or <code>null</code> if the rewriting fails
 	 */
-	private PatternRule rewriteWith(RuleTrs R, Position p, int iteration) {
+	private PatternRuleTrsEeg12 rewriteWith(RuleTrs R, Position p, int iteration) {
 		// The value to return at the end.
-		PatternRule result = null;
+		PatternRuleTrsEeg12 result = null;
 
 		// We only rewrite the base term on the right-hand side
 		// of this pattern rule. We do not rewrite the pumping
@@ -1177,31 +1187,38 @@ public class PatternRule extends UnfoldedRuleTrs {
 			// First, we try a usual rewriting with R.
 			Substitution theta = new Substitution();
 			if (R.getLeft().isMoreGeneralThan(t_p, theta)) {
+				
+				// We need to build the parent only if we are in verbose mode.
+				ParentTrs parent = (Options.getInstance().isInVerboseMode() ? 
+						new ParentTrsNonLoopEeg12(this, R, p, false, InferenceRuleEeg12.IX) : null);
+				
 				Term u = this.right.replace(p, R.getRight().apply(theta));
-				result = new PatternRule(
+				result = new PatternRuleTrsEeg12(
 						this.left, this.sigmaLeft, this.muLeft,
 						u, this.sigmaRight, this.muRight,
 						iteration,
-						new ParentTrsNonLoop(this, R, p, false, Eeg12Rule.IX),
-						this.path);
+						parent);
 			}
 			else {
 				// If usual rewriting fails, then we try to instantiate
 				// this rule to enforce rewriting.
 				theta.clear();
 				if (t_p.isMoreGeneralThan(R.getLeft(), theta)) {
-					PatternRule instantiated = this.instantiateWith(theta, iteration);
+					PatternRuleTrsEeg12 instantiated = this.instantiateWith(theta, iteration);
 					if (instantiated != null) {
 						// Now, we have instantiated.right|_p = R.left.
 
+						// We need to build the parent only if we are in verbose mode.
+						ParentTrs parent = (Options.getInstance().isInVerboseMode() ? 
+								new ParentTrsNonLoopEeg12(this, R, p, false,
+										InferenceRuleEeg12.V, InferenceRuleEeg12.IX) : null);
+
 						Term u = instantiated.right.replace(p, R.getRight());
-						result = new PatternRule(
+						result = new PatternRuleTrsEeg12(
 								instantiated.left, instantiated.sigmaLeft, instantiated.muLeft, 
 								u, instantiated.sigmaRight, instantiated.muRight,
 								iteration,
-								new ParentTrsNonLoop(this, R, p, false,
-										Eeg12Rule.V, Eeg12Rule.IX),
-								this.path);
+								parent);
 					}
 				}
 			}

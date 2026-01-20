@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -183,8 +183,7 @@ public class ParserLp extends Parser {
 		for (Function A: body)
 			B[index++] = A;
 		
-		// We start numbering rules from 1, hence the "+ 1" below. 
-		return new RuleLp(head, B, this.rules.size() + 1);
+		return new RuleLp(head, B);
 	}
 
 	/**

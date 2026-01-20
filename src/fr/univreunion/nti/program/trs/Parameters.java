@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -57,6 +57,7 @@ public class Parameters {
 	 */
 	private final static StrategyLoop DEFAULT_STRATEGY = StrategyLoop.LEFTMOST_NE;
 
+
 	/**
 	 * True if and only if forward unfolding is enabled.
 	 * Used while searching for loops.
@@ -109,12 +110,12 @@ public class Parameters {
 		this.maxDepth = DEFAULT_MAX_DEPTH;
 		this.strategy = DEFAULT_STRATEGY;
 	}
-
+	
 	/**
 	 * Copy constructor.
 	 * 
 	 * @param parameters the set of parameters to
-	 *                   copy
+	 * copy
 	 */
 	private Parameters(Parameters parameters) {
 		this.unfoldForwards = parameters.unfoldForwards;
@@ -123,7 +124,7 @@ public class Parameters {
 		this.maxDepth = parameters.maxDepth;
 		this.strategy = parameters.strategy;
 	}
-
+	
 	/**
 	 * Returns a copy of this set of parameters.
 	 * 
@@ -132,13 +133,13 @@ public class Parameters {
 	public Parameters copy() {
 		return new Parameters(this);
 	}
-
+	
 	/**
 	 * Returns <tt>true</tt> if and only if forward unfolding
 	 * is enabled.
 	 * 
 	 * @return <tt>true</tt> if and only if forward unfolding
-	 *         is enabled
+	 * is enabled
 	 */
 	public synchronized boolean isForwardUnfoldingEnabled() {
 		return this.unfoldForwards;
@@ -149,12 +150,12 @@ public class Parameters {
 	 * is enabled.
 	 * 
 	 * @return <tt>true</tt> if and only if backward unfolding
-	 *         is enabled
+	 * is enabled
 	 */
 	public synchronized boolean isBackwardUnfoldingEnabled() {
 		return this.unfoldBackwards;
 	}
-
+	
 	/**
 	 * Disable backward unfolding.
 	 */
@@ -167,7 +168,7 @@ public class Parameters {
 	 * positions is enabled.
 	 * 
 	 * @return <tt>true</tt> if and only if unfolding of variable
-	 *         positions is enabled
+	 * positions is enabled
 	 */
 	public synchronized boolean isVariableUnfoldingEnabled() {
 		return this.unfoldVar;
@@ -177,7 +178,7 @@ public class Parameters {
 	 * Enables/disables unfolding of variable positions.
 	 * 
 	 * @param enabled <code>true</code> iff unfolding of
-	 *                variable positions is enabled
+	 * variable positions is enabled
 	 */
 	public synchronized void setVariableUnfolding(boolean enabled) {
 		this.unfoldVar = enabled;
@@ -197,7 +198,7 @@ public class Parameters {
 	 * the specified integer.
 	 * 
 	 * @param maxDepth the maximum depth of an
-	 *                 unfolded rule
+	 * unfolded rule
 	 */
 	public synchronized void setMaxDepth(int maxDepth) {
 		this.maxDepth = maxDepth;
@@ -208,23 +209,23 @@ public class Parameters {
 	 * pair positions.
 	 * 
 	 * @return the strategy for selecting disagreement
-	 *         pair positions
+	 * pair positions
 	 */
 	public synchronized StrategyLoop getStrategy() {
 		return this.strategy;
 	}
-
+	
 	/**
 	 * Sets the strategy for selecting disagreement
 	 * pair positions.
 	 * 
 	 * @param strategy the strategy for selecting
-	 *                 disagreement pair positions
+	 * disagreement pair positions
 	 */
 	public synchronized void setStrategy(StrategyLoop strategy) {
 		this.strategy = strategy;
 	}
-
+	
 	/**
 	 * Returns a String representation of this
 	 * set of parameters.
@@ -239,7 +240,7 @@ public class Parameters {
 		s.append(this.unfoldBackwards);
 		s.append(", max=");
 		s.append(this.maxDepth);
-
+		
 		return s.toString();
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -125,11 +125,12 @@ public class ArgumentRecurrentPairTrs implements Argument {
 		Term t = this.recPair.getT();
 
 		return
-				"* Technique: [Payet, LOPSTR'18 + JAR'24]\n" +
+				"* Technique: [Payet, LOPSTR'18 + JAR'24 + LOPSTR'25]\n" +
 				"* Certificate: " + certificate + " is non-terminating\n" +
 				"* Description:\n" + 
-				"The following recurrent pair was generated while unfolding\n" +
-				"the dependency pairs of the analyzed TRS [iteration = " +
+				"The following recurrent pair (Def. 3 of [Payet, LOPSTR'25])\n" +
+				"was generated while unfolding the dependency pairs of\n" +
+				"the analyzed TRS [iteration = " +
 				this.unfolded.getIteration() + "]:\n" +
 				"u1 -> v1 = " + this.recPair.getLeft1().toString(variables, false) +
 				" -> " + this.recPair.getRight1().toString(variables, false) +
@@ -149,7 +150,8 @@ public class ArgumentRecurrentPairTrs implements Argument {
 				"," + this.recPair.getN2() +
 				"," + this.recPair.getN3() +
 				"," + this.recPair.getN4() + ")" +
-				"\nSo, the term c1[s,c2^m2[s]] = " + certificate +
-				"\nstarts an infinite rewrite sequence w.r.t. the analyzed TRS.";
+				"\nSo, by Corollary 1 of [Payet, LOPSTR'25], the term\n" +
+				"c1[s,c2^m2[s]] = " + certificate +
+				"\nstarts an infinite rewrite sequence w.r.t.\nthe analyzed TRS.";
 	}
 }

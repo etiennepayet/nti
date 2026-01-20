@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -54,7 +54,7 @@ public abstract class Scanner {
 	public Scanner(BufferedReader input) {
 		this.input = input;
 	}
-
+	
 	/**
 	 * Returns the current line number in the input.
 	 * 

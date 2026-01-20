@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -26,6 +26,7 @@ package fr.univreunion.nti;
  */
 
 public enum NtiAction {
+	PATUNF,
 	PRINT_HELP,
 	PRINT_VERSION,
 	PRINT_PROG,

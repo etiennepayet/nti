@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -34,7 +34,7 @@ import fr.univreunion.nti.Options;
  */
 
 public class Proof {
-	
+
 	/**
 	 * A value indicating whether termination or
 	 * non-termination could be proved.
@@ -95,7 +95,7 @@ public class Proof {
 	public void setArgument(Argument argument) {
 		this.argument = argument;
 	}
-	
+
 	/**
 	 * Sets the argument of this proof to a simple
 	 * argument created from the specified string.
@@ -125,7 +125,7 @@ public class Proof {
 	public ProofResult getResult() {
 		return this.result;
 	}
-	
+
 	/**
 	 * Sets the result of this proof to the specified
 	 * result.
@@ -284,7 +284,7 @@ public class Proof {
 		if (this.verbose)
 			this.content.append("\n");
 	}
-	
+
 	/**
 	 * Returns a String representation of this proof.
 	 * 
@@ -292,6 +292,12 @@ public class Proof {
 	 */
 	@Override
 	public String toString() {
+		String submitproblem = (this.result == ProofResult.MAYBE ?
+				"\n\nPlease submit challenging problems to\n" +
+				"the corresponding benchmark collection\n" +
+				"see https://mysolvertimesout.org"
+				: "");
+
 		String arg = (this.argument == null ? "" :
 			"\n\n** BEGIN proof argument **\n" + this.argument + "\n** END proof argument **");
 
@@ -301,6 +307,8 @@ public class Proof {
 			separator2 = "\n** END proof description **";
 		}
 
-		return this.result + arg + separator1 + this.content + separator2;
+		return
+				this.result + submitproblem + arg +
+				separator1 + this.content + separator2;
 	}
 }

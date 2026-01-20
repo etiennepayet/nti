@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -22,7 +22,6 @@ package fr.univreunion.nti.program.lp;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import fr.univreunion.nti.program.Path;
 import fr.univreunion.nti.term.Function;
 import fr.univreunion.nti.term.FunctionSymbol;
 import fr.univreunion.nti.term.Substitution;
@@ -54,17 +53,15 @@ public class BinaryRuleLp extends UnfoldedRuleLp {
 	 * @param body the only atom of the body
 	 * @param iteration the iteration of the unfolding operator
 	 * at which this binary rule is generated
-	 * @param path the path in the program being unfolded that
-	 * corresponds to the rule
 	 * @throws IllegalArgumentException if the given head
 	 * or body atom is <code>null</code>
 	 * @throws IllegalArgumentException if the given iteration
 	 * is negative
 	 */
-	public BinaryRuleLp(Function head, Function body,
-			int iteration, Path path) {
+	public BinaryRuleLp(
+			Function head, Function body, int iteration) {
 		
-		super(head, new Function[] { body }, iteration, path);
+		super(head, new Function[] { body }, iteration);
 	}
 
 	/**

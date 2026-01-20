@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -51,13 +51,13 @@ public class ProcUnfoldPayet extends Processor {
 	 * greater than this bound, then the proof is
 	 * aborted.
 	 */
-	private final static int NB_UNF = Integer.MAX_VALUE / 2;
+	private static final int NB_UNF = Integer.MAX_VALUE / 2;
 	
 	/**
 	 * The maximum number of iterations of
 	 * the unfolding operator.
 	 */
-	private final static int NB_ITE = Integer.MAX_VALUE / 2;
+	private static final int NB_ITE = Integer.MAX_VALUE / 2;
 	
 	
 	/**
@@ -243,8 +243,8 @@ public class ProcUnfoldPayet extends Processor {
 		Integer generatedMaxDepth = -1;
 
 		// Some data structures used for unfolding.
-		LinkedList<UnfoldedRuleTrs> X = new LinkedList<UnfoldedRuleTrs>();
-		LinkedList<UnfoldedRuleTrs> unfolded = new LinkedList<UnfoldedRuleTrs>();
+		LinkedList<UnfoldedRuleTrs> X = new LinkedList<>();
+		LinkedList<UnfoldedRuleTrs> unfolded = new LinkedList<>();
 
 		// We track the number of iterations of the unfolding operator.
 		int i = 0; // The current number of iterations.
@@ -386,8 +386,7 @@ public class ProcUnfoldPayet extends Processor {
 	@Override
 	public String toString() {
 		return
-				"## DP Processor: [Payet, LOPSTR'18] + " +
-				"[Payet, JAR'24] (" +
+				"## DP Processor: [Payet, LOPSTR'18 + JAR'24 + LOPSTR'25] (" +
 				this.parameters + "). ";
 	}
 }

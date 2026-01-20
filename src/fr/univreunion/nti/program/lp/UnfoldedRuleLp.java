@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Etienne Payet <etienne.payet at univ-reunion.fr>
+ * Copyright 2025 Etienne Payet <etienne.payet at univ-reunion.fr>
  * 
  * This file is part of NTI.
  * 
@@ -21,7 +21,6 @@ package fr.univreunion.nti.program.lp;
 
 import java.util.HashMap;
 
-import fr.univreunion.nti.program.Path;
 import fr.univreunion.nti.term.Function;
 import fr.univreunion.nti.term.Term;
 
@@ -40,12 +39,6 @@ public class UnfoldedRuleLp extends RuleLp {
 	private final int iteration;
 	
 	/**
-	 * The path (in the program being unfolded) that
-	 * corresponds to this unfolded rule.
-	 */
-	private final Path path = new Path(); 
-
-	/**
 	 * Static factory method. Constructs an unfolded LP rule
 	 * from the given elements.
 	 * 
@@ -53,21 +46,19 @@ public class UnfoldedRuleLp extends RuleLp {
 	 * @param body the body of the rule 
 	 * @param iteration the iteration of the unfolding operator
 	 * at which the rule is generated
-	 * @param path the path in the program being unfolded that
-	 * corresponds to the rule
 	 * @throws IllegalArgumentException if the given head
 	 * is <code>null</code> or if the given body or
 	 * a given body atom is <code>null</code>
 	 * @throws IllegalArgumentException if the given iteration
 	 * is negative
 	 */
-	public static UnfoldedRuleLp getInstance(Function head, Function[] body,
-			int iteration, Path path) {
+	public static UnfoldedRuleLp getInstance(
+			Function head, Function[] body, int iteration) {
 
 		if (body != null && body.length == 1)
-			return new BinaryRuleLp(head, body[0], iteration, path);
+			return new BinaryRuleLp(head, body[0], iteration);
 
-		return new UnfoldedRuleLp(head, body, iteration, path);
+		return new UnfoldedRuleLp(head, body, iteration);
 	}
 
 	/**
@@ -77,17 +68,15 @@ public class UnfoldedRuleLp extends RuleLp {
 	 * @param head the head of the fact
 	 * @param iteration the iteration of the unfolding operator
 	 * at which the fact is generated
-	 * @param path the path in the program being unfolded that
-	 * corresponds to the fact
 	 * @throws IllegalArgumentException if the given
 	 * head is <code>null</code>
 	 * @throws IllegalArgumentException if the given iteration
 	 * is negative
 	 */
-	public static UnfoldedRuleLp getInstance(Function head,
-			int iteration, Path path) {
+	public static UnfoldedRuleLp getInstance(
+			Function head, int iteration) {
 
-		return new UnfoldedRuleLp(head, iteration, path);
+		return new UnfoldedRuleLp(head, iteration);
 	}
 
 	/**
@@ -98,16 +87,14 @@ public class UnfoldedRuleLp extends RuleLp {
 	 * @param body the body of the rule 
 	 * @param iteration the iteration of the unfolding operator
 	 * at which the rule is generated
-	 * @param path the path in the program being unfolded that
-	 * corresponds to the rule
 	 * @throws IllegalArgumentException if the given head
 	 * is <code>null</code> or if the given body or
 	 * a given body atom is <code>null</code>
 	 * @throws IllegalArgumentException if the given iteration
 	 * is negative
 	 */
-	protected UnfoldedRuleLp(Function head, Function[] body,
-			int iteration, Path path) {
+	protected UnfoldedRuleLp(
+			Function head, Function[] body, int iteration) {
 		
 		super(head, body);
 
@@ -116,7 +103,6 @@ public class UnfoldedRuleLp extends RuleLp {
 					"construction of an unfolded LP rule with a negative iteration");
 
 		this.iteration = iteration;
-		this.path.addAll(path);
 	}
 
 	/**
@@ -126,14 +112,12 @@ public class UnfoldedRuleLp extends RuleLp {
 	 * @param head the head of the fact
 	 * @param iteration the iteration of the unfolding operator
 	 * at which this fact is generated
-	 * @param path the path in the program being unfolded that
-	 * corresponds to the fact
 	 * @throws IllegalArgumentException if the given head 
 	 * is <code>null</code>
 	 * @throws IllegalArgumentException if the given iteration
 	 * is negative
 	 */
-	protected UnfoldedRuleLp(Function head, int iteration, Path path) {
+	protected UnfoldedRuleLp(Function head, int iteration) {
 		super(head);
 
 		if (iteration < 0)
@@ -141,7 +125,6 @@ public class UnfoldedRuleLp extends RuleLp {
 					"construction of an unfolded LP rule with a negative iteration");
 
 		this.iteration = iteration;
-		this.path.addAll(path);
 	}
 
 	/**
@@ -154,17 +137,6 @@ public class UnfoldedRuleLp extends RuleLp {
 	public int getIteration() {
 		return this.iteration;
 	}
-
-	/**
-	 * Returns the path (in the unfolded program) that
-	 * corresponds to this unfolded rule.
-	 * 
-	 * @return the path (in the unfolded program) that
-	 * corresponds to this unfolded rule
-	 */
-	public Path getPath() {
-		return this.path;
-	}
 	
 	/**
 	 * Returns a deep copy of this rule i.e., a copy where
@@ -176,7 +148,7 @@ public class UnfoldedRuleLp extends RuleLp {
 	 * @return a deep copy of this rule
 	 */
 	public UnfoldedRuleLp deepCopy(int iteration) {
-		HashMap<Term,Term> copies = new HashMap<Term,Term>();
+		HashMap<Term,Term> copies = new HashMap<>();
 
 		Function[] bodyCopy = new Function[this.body.length];
 		int index = 0;
@@ -184,7 +156,7 @@ public class UnfoldedRuleLp extends RuleLp {
 			bodyCopy[index++] = (Function) A.deepCopy(copies);
 
 		return new UnfoldedRuleLp((Function) head.deepCopy(copies),
-				bodyCopy, iteration, this.path);
+				bodyCopy, iteration);
 	}
 
 	/**
