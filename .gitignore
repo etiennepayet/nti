@@ -11,3 +11,5 @@
 *.snm
 *.vrb
 *.vtc
+target/
+.idea/

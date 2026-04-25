@@ -19,22 +19,7 @@
 
 package fr.univreunion.nti.program;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-
-import fr.univreunion.nti.Options;
 import fr.univreunion.nti.Printer;
-import fr.univreunion.nti.parse.lp.ParserLp;
-import fr.univreunion.nti.parse.lp.ScannerLp;
-import fr.univreunion.nti.parse.ari.ParserAri;
-import fr.univreunion.nti.parse.ari.ScannerAri;
-import fr.univreunion.nti.parse.srs.ParserSrs;
-import fr.univreunion.nti.parse.srs.ScannerSrs;
-import fr.univreunion.nti.parse.trs.ParserTrs;
-import fr.univreunion.nti.parse.trs.ScannerTrs;
-import fr.univreunion.nti.parse.xml.ParserXml;
-import fr.univreunion.nti.parse.xml.ScannerXml;
 
 /**
  * A program (LP, SRS, TRS, ...)
@@ -48,47 +33,6 @@ public abstract class Program {
 	 * The name of this program.
 	 */
 	private final String name;
-	
-	/**
-	 * Static factory method.
-	 * 
-	 * @return a program
-	 * @throws IOException if an I/O error occurs while building the program
-	 */
-	public static Program getInstance() throws IOException {
-		// The program to return.
-		Program program = null;
-
-		String fileName = Options.getInstance().getFileName();
-
-		BufferedReader input = null;
-		try {
-			if (fileName.endsWith(".pl")) {
-				input = new BufferedReader(new FileReader(fileName));
-				program = new ParserLp(fileName, new ScannerLp(input)).parse();
-			}
-			else if (fileName.endsWith(".ari")) {
-				input = new BufferedReader(new FileReader(fileName));
-				program = new ParserAri(fileName, new ScannerAri(input)).parse();
-			}
-			else if (fileName.endsWith(".xml")) {
-				input = new BufferedReader(new FileReader(fileName));
-				program = new ParserXml(fileName, new ScannerXml(input)).parse();
-			}
-			else if (fileName.endsWith(".trs")) {
-				input = new BufferedReader(new FileReader(fileName));
-				program = new ParserTrs(fileName, new ScannerTrs(input)).parse();
-			}
-			else if (fileName.endsWith(".srs")) {
-				input = new BufferedReader(new FileReader(fileName));
-				program = new ParserSrs(fileName, new ScannerSrs(input)).parse();
-			}
-		} finally {
-			if (input != null) input.close();
-		}
-
-		return program;
-	}
 
 	/**
 	 * Builds a program.

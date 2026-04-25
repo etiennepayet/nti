@@ -20,6 +20,8 @@
 package fr.univreunion.nti;
 
 import java.io.IOException;
+
+import fr.univreunion.nti.parse.ProgramFactory;
 import fr.univreunion.nti.program.Program;
 import fr.univreunion.nti.program.Proof;
 
@@ -34,7 +36,7 @@ public class Nti {
 	/**
 	 * The version of NTI.
 	 */
-	public static final String VERSION = "(December 2025)";
+	public static final String VERSION = "(May 2026)";
 
 	/**
 	 * Constructs an instance of NTI with the specified options.
@@ -48,7 +50,7 @@ public class Nti {
 		Printer printer = options.getPrinter();
 
 		// We build the program to analyze.
-		Program program = Program.getInstance();
+		Program program = ProgramFactory.parse(options.getFileName());
 
 		// Then, we analyze it.
 		switch (options.getAction()) {
@@ -106,7 +108,7 @@ public class Nti {
 			break;
 		default:
 			if (options.getFileName() == null) {
-				printer.println("No suitable file to analyze (type \'java -jar nti.jar -h\' for help)");
+				printer.println("No suitable file to analyze (type 'java -jar nti.jar -h' for help)");
 			}
 			else
 				// We create a new instance of NTI, which does everything itself.
@@ -144,7 +146,8 @@ public class Nti {
 		printer.println("Usage: java -jar nti.jar <file> [action] [options]\n");
 		//
 		printer.println("NTI tries to prove (non)termination of the program in the provided file.");
-		printer.println("- For logic programs, the implemented technique is described in [Payet & Mesnard, TOPLAS'06].");
+		printer.println("- For logic programs, the implemented techniques are described in");
+		printer.println("  [Payet & Mesnard, TOPLAS'06] and [Payet, ICLP'25].");
 		printer.println("- For TRSs, the implemented technique uses the dependency pair (DP) framework:");
 		printer.println("  first, it decomposes the initial set of DP problems into subproblems using");
 		printer.println("  sound DP processors, then it tries to prove that the unsolved subproblems");
