@@ -216,7 +216,7 @@ public class Lp extends Program implements Iterable<RuleLp> {
 	 */
 	@Override
 	public void patternUnfold(int n, Printer printer) {
-		printer.println("Not implemented yet for logic programs!");
+		printer.println("Printing of pattern unfolding is not implemented yet for logic programs");
 	}
 
 	/**
