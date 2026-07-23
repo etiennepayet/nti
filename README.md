@@ -45,14 +45,16 @@ Usage: `java -jar target/nti.jar <file> [action] [options]`
 
 NTI tries to prove (non)termination of the program in the provided file.
 - For logic programs, the implemented techniques are described in
-[[Payet & Mesnard, TOPLAS'06]](http://lim.univ-reunion.fr/staff/epayet/Research/Resources/toplas06.pdf)
-and [[Payet, ICLP'25]](https://www.cambridge.org/core/journals/theory-and-practice-of-logic-programming/article/nontermination-of-logic-programs-using-patterns/55645892F7FEEA8A14B8033377A6A812).
+  [[Payet & Mesnard, TOPLAS'06]](http://lim.univ-reunion.fr/staff/epayet/Research/Resources/toplas06.pdf),
+  [[Payet, LOPSTR'25]](https://lim.univ-reunion.fr/staff/epayet/Research/Resources/lopstr25-1.pdf)
+  and [[Payet, ICLP'25]](https://www.cambridge.org/core/journals/theory-and-practice-of-logic-programming/article/nontermination-of-logic-programs-using-patterns/55645892F7FEEA8A14B8033377A6A812).
 - For TRSs, the implemented technique uses the dependency pair (DP) framework:
-first, it decomposes the initial set of DP problems into subproblems using
-sound DP processors, then it tries to prove that the unsolved subproblems
-are infinite using the approaches of [[Payet, TCS'08]](http://lim.univ-reunion.fr/staff/epayet/Research/Resources/tcs08.pdf),
-[[Payet, LOPSTR'18]](http://arxiv.org/abs/1808.05065) and
-[[Payet, JAR'24]](https://arxiv.org/abs/2312.13949).
+  first, it decomposes the initial set of DP problems into subproblems using
+  sound DP processors, then it tries to prove that the unsolved subproblems
+  are infinite using the approaches of [[Payet, TCS'08]](http://lim.univ-reunion.fr/staff/epayet/Research/Resources/tcs08.pdf),
+  [[Payet, LOPSTR'18]](http://arxiv.org/abs/1808.05065),
+  [[Payet, LOPSTR'25]](https://lim.univ-reunion.fr/staff/epayet/Research/Resources/lopstr25-1.pdf)
+  and [[Payet, ICLP'25]](https://www.cambridge.org/core/journals/theory-and-practice-of-logic-programming/article/nontermination-of-logic-programs-using-patterns/55645892F7FEEA8A14B8033377A6A812) (adapted to TRSs).
 
 `file` has to conform to the TPDB syntax specification
 (see [here](http://termination-portal.org/wiki/TPDB) and
@@ -70,12 +72,12 @@ It has one of the following suffixes:
 - `-print`: print the program in the given file
 - `-stat`: print some statistics about the program in the given file
 - `-patunf=n`: apply the pattern unfolding operator `n` times
-to the program in the given file and print the result
+  to the program in the given file and print the result
 - `-prove`: run a (non)termination proof of the program in the given file
-**(THIS IS THE DEFAULT ACTION)**
+  **(THIS IS THE DEFAULT ACTION)**
 
 `options` (optional) can be:
 - `-v`: verbose mode (for printing proof details in the final output)
 - `-t=n`: set a time bound on the nontermination proofs (`n` is the time bound in seconds)
 - `-cTI=path`: set the path to cTI (for proving termination of logic programs)  
-If no path to cTI is set, then only nontermination proofs are run for logic programs
+  If no path to cTI is set, then only nontermination proofs are run for logic programs
