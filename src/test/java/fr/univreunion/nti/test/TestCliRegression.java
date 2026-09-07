@@ -218,11 +218,11 @@ public class TestCliRegression {
 
     @Test
     void rootClosingLookaheadRetainsHistoricalHydraProofs() throws Exception {
-        Path hydras = Path.of("examples", "TC20-MAYBE", "Hydras");
+        Path hydras = Path.of("src", "test", "resources", "examples", "Hydras");
 
         for (int index : List.of(4, 5, 6, 8, 9, 10)) {
             CliResult result = runCli(
-                    hydras.resolve("lepper_" + index + ".xml").toString());
+                    hydras.resolve("lepper_" + index + ".ari").toString());
 
             assertEquals(0, result.exitCode());
             assertTrue(result.stdout().startsWith("NO"),
@@ -236,9 +236,8 @@ public class TestCliRegression {
     @Test
     void unaryMarkerShuttleProvesFourZantemaExamples() throws Exception {
         for (int index : List.of(1, 4, 8, 9)) {
-            String corpus = index < 8 ? "TC20-NonLoop" : "TC20-MAYBE";
-            Path program = Path.of("examples", corpus, "Zantema_15",
-                    "ex%02d.xml".formatted(index));
+            Path program = Path.of("src", "test", "resources", "examples", "Zantema_15",
+                    "ex%02d.ari".formatted(index));
 
             CliResult result = runCli(program.toString());
 
@@ -254,8 +253,8 @@ public class TestCliRegression {
     @Test
     void modularBlockShuttleProvesBothZantemaExamples() throws Exception {
         for (int index : List.of(2, 3)) {
-            Path program = Path.of("examples", "TC20-MAYBE", "Zantema_15",
-                    "ex%02d.xml".formatted(index));
+            Path program = Path.of("src", "test", "resources", "examples", "Zantema_15",
+                    "ex%02d.ari".formatted(index));
 
             CliResult result = runCli(program.toString());
 
@@ -272,11 +271,11 @@ public class TestCliRegression {
     @Test
     void arithmeticCounterGrowthProvesBothEmmesEx2Examples() throws Exception {
         Path examples = Path.of(
-                "examples", "TC20-NonLoop", "EEG_IJCAR_12");
+                "src", "test", "resources", "examples", "EEG_IJCAR_12");
 
         for (String name : List.of(
-                "emmes-nonloop-ex2_4.xml",
-                "emmes-nonloop-ex2_5.xml")) {
+                "emmes-nonloop-ex2_4.ari",
+                "emmes-nonloop-ex2_5.ari")) {
             CliResult result = runCli(examples.resolve(name).toString());
 
             assertEquals(0, result.exitCode());
@@ -293,12 +292,12 @@ public class TestCliRegression {
     @Test
     void guardedListGrowthProvesThreeAddExamples() throws Exception {
         for (Path program : List.of(
-                Path.of("examples", "TC20-NonLoop", "EEG_IJCAR_12",
-                        "enger-nonloop-add.xml"),
-                Path.of("examples", "TC20-NonLoop", "EEG_IJCAR_12",
-                        "enger-nonloop-addTrue.xml"),
-                Path.of("examples", "TC20-NonLoop", "AProVE_10",
-                        "ex4.xml"))) {
+                Path.of("src", "test", "resources", "examples", "EEG_IJCAR_12",
+                        "enger-nonloop-add.ari"),
+                Path.of("src", "test", "resources", "examples", "EEG_IJCAR_12",
+                        "enger-nonloop-addTrue.ari"),
+                Path.of("src", "test", "resources", "examples", "AProVE_10",
+                        "ex4.ari"))) {
             CliResult result = runCli(program.toString());
 
             assertEquals(0, result.exitCode());
@@ -313,12 +312,12 @@ public class TestCliRegression {
 	@Test
 	void guardedEvaluatorGrowthProvesThreeCrossFamilyExamples() throws Exception {
 		for (Path program : List.of(
-				Path.of("examples", "TC20-MAYBE", "AProVE_10",
-						"challenge_fab.xml"),
-				Path.of("examples", "TC20-MAYBE", "AProVE_10",
-						"downfrom.xml"),
-				Path.of("examples", "TC20-MAYBE", "Zantema_15",
-						"ex05.xml"))) {
+				Path.of("src", "test", "resources", "examples", "AProVE_10",
+						"challenge_fab.ari"),
+				Path.of("src", "test", "resources", "examples", "AProVE_10",
+						"downfrom.ari"),
+				Path.of("src", "test", "resources", "examples", "Zantema_15",
+						"ex05.ari"))) {
 			CliResult result = runCli(program.toString());
 
 			assertEquals(0, result.exitCode());
@@ -336,11 +335,11 @@ public class TestCliRegression {
     @Test
     void symbolicEvaluatorProvesBothEmmesEx6Examples() throws Exception {
         Path examples = Path.of(
-                "examples", "TC20-NonLoop", "EEG_IJCAR_12");
+                "src", "test", "resources", "examples", "EEG_IJCAR_12");
 
         for (String name : List.of(
-                "emmes-nonloop-ex6_1.xml",
-                "emmes-nonloop-ex6_2.xml")) {
+                "emmes-nonloop-ex6_1.ari",
+                "emmes-nonloop-ex6_2.ari")) {
             CliResult result = runCli(examples.resolve(name).toString());
 
             assertEquals(0, result.exitCode());
@@ -356,11 +355,9 @@ public class TestCliRegression {
     @Test
     void lengthGuardedGrowthProvesFiveEmmesEx7Examples() throws Exception {
         for (int index : List.of(1, 2, 4, 7, 9)) {
-            String corpus = index == 4 || index == 9 ?
-                    "TC20-MAYBE" : "TC20-NonLoop";
-            String name = "emmes-nonloop-ex7_" + index + ".xml";
+            String name = "emmes-nonloop-ex7_" + index + ".ari";
             Path program = Path.of(
-                    "examples", corpus, "EEG_IJCAR_12", name);
+                    "src", "test", "resources", "examples", "EEG_IJCAR_12", name);
             CliResult result = runCli(program.toString());
 
             assertEquals(0, result.exitCode());

@@ -1,0 +1,13 @@
+; @xtcfilename "./TRS_Standard/Zantema_15/ex05.xml"
+(format TRS)
+(fun f 4)
+(fun true 0)
+(fun s 1)
+(fun isNat 1)
+(fun double 1)
+(fun |0| 0)
+(rule (f true true x (s y)) (f (isNat x) (isNat y) (s x) (double (s y))))
+(rule (isNat |0|) true)
+(rule (isNat (s x)) (isNat x))
+(rule (double |0|) |0|)
+(rule (double (s x)) (s (s (double x))))

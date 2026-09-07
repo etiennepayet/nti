@@ -1,0 +1,18 @@
+; @origtpdbfilename TRS//AProVE_10/downfrom.trs
+; @xtcfilename "./TRS_Standard/AProVE_10/downfrom.xml"
+(format TRS)
+(fun isList 1)
+(fun nil 0)
+(fun tt 0)
+(fun Cons 2)
+(fun downfrom 1)
+(fun |0| 0)
+(fun s 1)
+(fun f 1)
+(fun cond 2)
+(rule (isList nil) tt)
+(rule (isList (Cons x xs)) (isList xs))
+(rule (downfrom |0|) nil)
+(rule (downfrom (s x)) (Cons (s x) (downfrom x)))
+(rule (f x) (cond (isList (downfrom x)) (s x)))
+(rule (cond tt x) (f x))

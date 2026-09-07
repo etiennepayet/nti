@@ -1,0 +1,15 @@
+; @origtpdbfilename emmes-nonloop-ex6_1.trs
+; @xtcfilename "./TRS_Standard/EEG_IJCAR_12/emmes-nonloop-ex6_1.xml"
+(format TRS)
+(fun f 2)
+(fun true 0)
+(fun isList 1)
+(fun append 2)
+(fun cons 2)
+(fun a 0)
+(fun nil 0)
+(rule (f true xs) (f (isList xs) (append (cons a nil) xs)))
+(rule (isList nil) true)
+(rule (isList (cons x xs)) (isList xs))
+(rule (append nil ys) ys)
+(rule (append (cons x xs) ys) (cons x (append xs ys)))
