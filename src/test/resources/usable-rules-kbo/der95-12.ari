@@ -1,0 +1,11 @@
+; @origtpdbfilename ./TRS/D33/12.trs
+; @xtcfilename "./TRS_Standard/Der95/12.xml"
+(format TRS)
+(fun not 1)
+(fun or 2)
+(fun and 2)
+(rule (not (not x)) x)
+(rule (not (or x y)) (and (not x) (not y)))
+(rule (not (and x y)) (or (not x) (not y)))
+(rule (and x (or y z)) (or (and x y) (and x z)))
+(rule (and (or y z) x) (or (and x y) (and x z)))

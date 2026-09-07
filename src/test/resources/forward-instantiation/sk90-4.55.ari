@@ -1,0 +1,8 @@
+; @origtpdbfilename ./TRS/SK90/4.55.trs
+(format TRS)
+(fun f 2)
+(fun a 0)
+(fun b 0)
+(fun c 0)
+(rule (f x x) (f a b))
+(rule b c)

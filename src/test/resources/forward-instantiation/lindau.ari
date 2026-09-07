@@ -1,0 +1,10 @@
+; @origtpdbfilename ./TRS/Rubio/lindau.trs
+(format TRS)
+(fun c 1)
+(fun b 1)
+(fun a 1)
+(fun e 0)
+(rule (c (b (a X))) (a (a (b (b (c (c X)))))))
+(rule (a X) e)
+(rule (b X) e)
+(rule (c X) e)

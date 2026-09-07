@@ -1,0 +1,13 @@
+; @origtpdbfilename ./TRS/AProVE/forward_instantiation2.trs
+(format TRS)
+(fun f 3)
+(fun g 3)
+(fun |0| 0)
+(fun |1| 0)
+(fun a 0)
+(fun b 0)
+(fun c 0)
+(rule (f x y z) (g x y z))
+(rule (g |0| |1| x) (f x x x))
+(rule a b)
+(rule a c)

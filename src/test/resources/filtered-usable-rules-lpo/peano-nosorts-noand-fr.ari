@@ -1,0 +1,16 @@
+; @origtpdbfilename ./TRS/TRCSR/PEANO_nosorts-noand_FR.trs
+; @origtpdbfilename ./TRS/TRCSR/PEANO_nosorts-noand_Z.trs
+; @xtcfilename "./TRS_Standard/Transformed_CSR_04/PEANO_nosorts-noand_FR.xml"
+(format TRS)
+(fun U11 3)
+(fun tt 0)
+(fun U12 3)
+(fun activate 1)
+(fun s 1)
+(fun plus 2)
+(fun |0| 0)
+(rule (U11 tt M N) (U12 tt (activate M) (activate N)))
+(rule (U12 tt M N) (s (plus (activate N) (activate M))))
+(rule (plus N |0|) N)
+(rule (plus N (s M)) (U11 tt M N))
+(rule (activate X) X)

@@ -1,0 +1,12 @@
+; @origtpdbfilename ./TRS/nontermin/Rubio-inn/test830.trs
+(format TRS)
+(fun f 1)
+(fun s 1)
+(fun g 1)
+(fun cons 2)
+(fun |0| 0)
+(fun h 1)
+(rule (f (s X)) (f X))
+(rule (g (cons |0| Y)) (g Y))
+(rule (g (cons (s X) Y)) (s X))
+(rule (h (cons X Y)) (h (g (cons X Y))))

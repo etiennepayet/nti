@@ -1,0 +1,10 @@
+; @origtpdbfilename ./TRS/various/02.trs
+(format TRS)
+(fun f 3)
+(fun |0| 0)
+(fun |1| 0)
+(fun |2| 0)
+(rule (f |0| |1| x) (f x x x))
+(rule (f x y z) |2|)
+(rule |0| |2|)
+(rule |1| |2|)

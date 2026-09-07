@@ -1,0 +1,10 @@
+; @origtpdbfilename ./TRS/TRCSR/Ex4_7_15_Bor03_L.trs
+(format TRS)
+(fun f 1)
+(fun |0| 0)
+(fun cons 1)
+(fun s 1)
+(fun p 1)
+(rule (f |0|) (cons |0|))
+(rule (f (s |0|)) (f (p (s |0|))))
+(rule (p (s |0|)) |0|)

@@ -1,0 +1,12 @@
+; @origtpdbfilename ./TRS/SchneiderKamp/trs/cade04t.trs
+(format TRS)
+(fun minus 2)
+(fun cond 3)
+(fun min 2)
+(fun s 1)
+(fun |0| 0)
+(rule (minus x y) (cond (min x y) x y))
+(rule (cond y x y) (s (minus x (s y))))
+(rule (min |0| v) |0|)
+(rule (min u |0|) |0|)
+(rule (min (s u) (s v)) (s (min u v)))

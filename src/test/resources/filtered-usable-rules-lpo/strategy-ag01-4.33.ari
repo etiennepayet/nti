@@ -1,0 +1,14 @@
+; @origtpdbfilename ./TRS/nontermin/AG01/#4.33.trs
+; @xtcfilename "./TRS_Standard/Strategy_removed_AG01/#4.33.xml"
+(format TRS)
+(fun sum 2)
+(fun cons 2)
+(fun s 1)
+(fun |0| 0)
+(fun nil 0)
+(fun weight 1)
+(rule (sum (cons (s n) x) (cons m y)) (sum (cons n x) (cons (s m) y)))
+(rule (sum (cons |0| x) y) (sum x y))
+(rule (sum nil y) y)
+(rule (weight (cons n (cons m x))) (weight (sum (cons n (cons m x)) (cons |0| x))))
+(rule (weight (cons n nil)) n)

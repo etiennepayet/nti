@@ -1,0 +1,5 @@
+; @origtpdbfilename ./TRS/HofWald/2.trs
+(format TRS)
+(fun f 2)
+(fun a 0)
+(rule (f a (f (f a a) x)) (f (f a a) (f a (f a x))))

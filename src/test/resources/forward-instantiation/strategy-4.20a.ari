@@ -1,0 +1,9 @@
+; @origtpdbfilename ./TRS/nontermin/AG01/#4.20a.trs
+(format TRS)
+(fun f 1)
+(fun s 1)
+(fun g 1)
+(fun |0| 0)
+(rule (f (f x)) (f x))
+(rule (f (s x)) (f x))
+(rule (g (s |0|)) (g (f (s |0|))))
