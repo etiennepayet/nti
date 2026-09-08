@@ -188,6 +188,7 @@ final class NtiRunner {
 		printer.println("   -stat: print some statistics about the program in the given file");
 		printer.println("   -patunf=n: apply the pattern unfolding operator n times");
 		printer.println("    to the TRS or SRS in the given file and print the result");
+		printer.println("    n must be a non-negative integer (zero prints only the initial pattern rules)");
 		printer.println("    Printing pattern unfoldings is not implemented for logic programs (.pl)");
 		printer.println("   -prove: run a (non)termination proof of the program in the given file");
 		printer.println("    THIS IS THE DEFAULT ACTION\n");
@@ -196,8 +197,9 @@ final class NtiRunner {
 		printer.println("   -v: verbose mode (for printing proof details in the final output)");
 		printer.println("   -vv: very verbose mode (also print work retained from every prover thread)");
 		printer.println("   -cti=path: set the path to cTI (for proving termination of logic programs)");
-		printer.println("    if no path to cTI is set then only nontermination proofs are run for");
-		printer.println("    logic programs");
+		printer.println("    Without cTI, NTI still runs its internal binary and pattern unfolding analyses.");
+		printer.println("    Besides searching for nontermination, binary unfolding can also prove termination");
+		printer.println("    when an unfolding iteration generates no rules.");
 		printer.println("To bound the complete execution time, use an external process supervisor");
 		printer.println("such as GNU timeout.");
 	}

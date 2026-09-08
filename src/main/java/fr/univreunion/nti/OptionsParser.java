@@ -82,8 +82,8 @@ final class OptionsParser {
 	private void parseArgument(String arg) {
 		// A well-formed command-line argument has the form
 		// -actionOrOption or -actionOrOption=value.
-		// First, we split the given argument around matches of '='.
-		String[] parts = arg.split("=");
+		// Split only at the first '=' to preserve the complete option value.
+		String[] parts = arg.split("=", 2);
 
 		// The action or option identifier occurs on the left of '='.
 		String actionOption = parts[0];
@@ -174,26 +174,33 @@ final class OptionsParser {
 	 * @param arg the argument to parse
 	 */
 	private void parseFileName(String arg) {
-		if (arg.endsWith(".pl") ||
+		if (!arg.startsWith("-") && (arg.endsWith(".pl") ||
 				arg.endsWith(".ari") ||
 				arg.endsWith(".xml") ||
 				arg.endsWith(".trs") ||
-				arg.endsWith(".srs"))
+				arg.endsWith(".srs")))
 			this.fileName = arg;
+		else
+			throw new IllegalStateException("unrecognized argument: " + arg);
 	}
 
 	/**
-	 * Parses the number of pattern-unfolding iterations.
+	 * Parses the non-negative number of pattern-unfolding iterations.
 	 *
 	 * @param value the string representation of the integer
 	 * @return the parsed iteration count
 	 */
 	private static int parseIterationCount(String value) {
+		int count;
 		try {
-			return Integer.parseInt(value);
+			count = Integer.parseInt(value);
 		} catch (NumberFormatException e) {
 			throw new IllegalStateException(
-					"the specified number of iterations has to be an integer");
+					"the specified number of iterations has to be a non-negative integer");
 		}
+		if (count < 0)
+			throw new IllegalStateException(
+					"the specified number of iterations has to be a non-negative integer");
+		return count;
 	}
 }

@@ -104,7 +104,8 @@ The following restrictions apply:
 - `-print`: print the program in the given file
 - `-stat`: print some statistics about the program in the given file
 - `-patunf=n`: apply the pattern unfolding operator `n` times
-to the TRS or SRS in the given file and print the result.
+to the TRS or SRS in the given file and print the result; `n` must be a
+non-negative integer (zero prints only the initial pattern rules).
 Printing pattern unfoldings is not implemented for logic programs (`.pl`)
 - `-prove`: run a (non)termination proof of the program in the given file
 **(THIS IS THE DEFAULT ACTION)**
@@ -112,8 +113,11 @@ Printing pattern unfoldings is not implemented for logic programs (`.pl`)
 `options` (optional) can be:
 - `-v`: verbose mode (for printing proof details in the final output)
 - `-vv`: very verbose mode (also print work retained from every prover thread)
-- `-cti=path`: set the path to cTI (for proving termination of logic programs)
-If no path to cTI is set, then only nontermination proofs are run for logic programs
+- `-cti=path`: set the path to cTI (for proving termination of logic programs).
+If no path to cTI is set, NTI still runs its internal binary and pattern
+unfolding analyses for logic programs. Besides searching for nontermination,
+binary unfolding can also prove termination when an unfolding iteration
+generates no rules.
 
 To bound the complete execution time, run NTI under an external process
 supervisor. For example, with GNU coreutils:

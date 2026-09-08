@@ -76,6 +76,60 @@ class OptionsParserTest {
 	}
 
 	@Test
+	void preserveEqualsSignsInCtiPath() {
+		String path = "/tmp/tools=custom/cti==";
+		Options options = Options.parse(new String[] { "-cti=" + path });
+
+		assertEquals(path, options.getPathToCti());
+	}
+
+	@Test
+	void preserveEqualsSignsInInputFileName() {
+		String fileName = "examples/program=custom.pl";
+		Options options = Options.parse(new String[] { fileName, "-print" });
+
+		assertEquals(fileName, options.getFileName());
+		assertEquals(NtiAction.PRINT_PROG, options.getAction());
+	}
+
+	@Test
+	void rejectUnknownArguments() {
+		for (String argument : new String[] {
+				"-prnit", "--unknown", "-unknown=input.pl", "unexpected.txt", "=", "" }) {
+			IllegalStateException failure = assertThrows(
+					IllegalStateException.class,
+					() -> Options.parse(new String[] { "input.trs", argument }),
+					argument);
+
+			assertTrue(failure.getMessage().contains("unrecognized argument"));
+		}
+	}
+
+	@Test
+	void rejectInvalidIterationCounts() {
+		for (String argument : new String[] {
+				"-patunf=-1", "-patunf=-2147483648", "-patunf", "-patunf=",
+				"-patunf=abc", "-patunf=2147483648" }) {
+			IllegalStateException failure = assertThrows(
+					IllegalStateException.class,
+					() -> Options.parse(new String[] { argument }),
+					argument);
+
+			assertTrue(failure.getMessage().contains("non-negative integer"));
+		}
+	}
+
+	@Test
+	void acceptZeroAndPositiveIterationCounts() {
+		for (int count : new int[] { 0, 1, 10 }) {
+			Options options = Options.parse(new String[] { "-patunf=" + count });
+
+			assertEquals(count, options.getNbIte());
+			assertEquals(NtiAction.PATUNF, options.getAction());
+		}
+	}
+
+	@Test
 	@DisplayName("reject the former mixed-case cTI option")
 	void rejectFormerMixedCaseCtiOption() {
 		IllegalStateException failure = assertThrows(

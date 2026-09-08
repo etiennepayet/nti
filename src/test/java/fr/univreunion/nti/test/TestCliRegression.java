@@ -92,6 +92,28 @@ public class TestCliRegression {
     }
 
     @Test
+    void unknownActionFailsBeforeAnalyzingInput() throws Exception {
+        Path program = writeTermRewriteSystem();
+
+        CliResult result = runCli(program.toString(), "-prnit");
+
+        assertNotEquals(0, result.exitCode());
+        assertTrue(result.stderr().contains("unrecognized argument: -prnit"));
+        assertEquals("", result.stdout());
+    }
+
+    @Test
+    void negativeIterationCountFailsBeforeUnfolding() throws Exception {
+        Path program = writeTermRewriteSystem();
+
+        CliResult result = runCli(program.toString(), "-patunf=-1");
+
+        assertNotEquals(0, result.exitCode());
+        assertTrue(result.stderr().contains("non-negative integer"));
+        assertEquals("", result.stdout());
+    }
+
+    @Test
     void printLogicProgram() throws Exception {
         Path program = writeLogicProgram();
 
