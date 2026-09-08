@@ -3,8 +3,10 @@
 NTI is a **free software** distributed under the terms of the
 [GNU Lesser General Public License](https://www.gnu.org/licenses/lgpl-3.0.html), version 3
 or any later version. It is developed and maintained by [Étienne Payet](mailto:etienne.payet@univ-reunion.fr).
+The project license notice is provided in [LICENSE](LICENSE).
 The complete license texts are provided in [COPYING.LESSER.md](COPYING.LESSER.md)
-and [COPYING.md](COPYING.md).
+and [COPYING.md](COPYING.md). The GPL v3 text in `COPYING.md` is included because
+the LGPL v3 incorporates its terms with additional permissions.
 
 The executable jar includes SAT4J Core 2.3.6, used under the GNU Lesser
 General Public License version 2.1 or later. For this distribution, NTI
@@ -71,15 +73,30 @@ infinite using the approaches of [[Payet, TCS'08]](http://lim.univ-reunion.fr/st
 [[Payet, LOPSTR'25]](https://lim.univ-reunion.fr/staff/epayet/Research/Resources/lopstr25-1.pdf)
 and [[Payet, ICLP'25]](https://www.cambridge.org/core/journals/theory-and-practice-of-logic-programming/article/nontermination-of-logic-programs-using-patterns/55645892F7FEEA8A14B8033377A6A812) (adapted to TRSs).
 
-`file` has to conform to the TPDB syntax specification
+NTI supports a subset of the TPDB input formats
 (see [here](http://termination-portal.org/wiki/TPDB) and
 [here](https://termination-portal.org/wiki/Term_Rewriting)).
-It has one of the following suffixes:
+The input `file` must have one of the following suffixes:
 - `.pl`  for a  pure logic program
 - `.ari` for a  TRS or an SRS in the ARI format
 - `.xml` for a  TRS or an SRS in the old XML format
 - `.trs` for a  TRS in the old, human-readable, format
 - `.srs` for an SRS in the old, human-readable, format
+
+The following restrictions apply:
+
+- Rewriting analysis supports only standard, unrestricted rewriting (`FULL`).
+  Strategies such as `INNERMOST`, `OUTERMOST`, `LEFTMOST`, and `RIGHTMOST`
+  are not supported. Relative, conditional, context-sensitive, and equational
+  rewriting are not supported either.
+- ARI input must use `(format TRS)`, with `(fun name arity)` declarations
+  before `(rule lhs rhs)` rules. Left-hand sides must not be variables.
+  Rule costs and function theories are not supported. ARI files are always
+  analyzed using `FULL` rewriting; only use files intended for that strategy.
+  SRSs in ARI format are represented using unary function symbols.
+- Logic programs must start with exactly one `%query:` directive (apart from
+  comments and whitespace), followed by the program clauses and any supported
+  Prolog directives. Use separate files to analyze different query modes.
 
 `action` (optional) can be:
 - `-h|--help`: print this help
@@ -87,7 +104,8 @@ It has one of the following suffixes:
 - `-print`: print the program in the given file
 - `-stat`: print some statistics about the program in the given file
 - `-patunf=n`: apply the pattern unfolding operator `n` times
-to the program in the given file and print the result
+to the TRS or SRS in the given file and print the result.
+Printing pattern unfoldings is not implemented for logic programs (`.pl`)
 - `-prove`: run a (non)termination proof of the program in the given file
 **(THIS IS THE DEFAULT ACTION)**
 

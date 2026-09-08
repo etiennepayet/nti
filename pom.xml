@@ -47,6 +47,7 @@
                 <directory>${project.basedir}</directory>
                 <targetPath>META-INF/licenses</targetPath>
                 <includes>
+                    <include>LICENSE</include>
                     <include>COPYING.md</include>
                     <include>COPYING.LESSER.md</include>
                     <include>THIRD-PARTY-NOTICES.md</include>
