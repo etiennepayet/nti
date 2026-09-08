@@ -127,6 +127,41 @@ public class TestCliRegression {
     }
 
     @Test
+    void missingCtiPathFailsBeforeAnalyzingInput() throws Exception {
+        Path program = writeLogicProgram();
+        for (String option : new String[] { "-cti", "-cti=" }) {
+            CliResult result = runCli(program.toString(), option);
+
+            assertNotEquals(0, result.exitCode());
+            assertTrue(result.stderr().contains("-cti requires a non-blank path"));
+            assertEquals("", result.stdout());
+        }
+    }
+
+    @Test
+    void unexpectedFlagValueFailsBeforePerformingAction() throws Exception {
+        for (String option : new String[] { "--version=garbage", "--help=" }) {
+            CliResult result = runCli(option);
+
+            assertNotEquals(0, result.exitCode());
+            assertTrue(result.stderr().contains("does not accept a value"));
+            assertEquals("", result.stdout());
+        }
+    }
+
+    @Test
+    void multipleInputFilesFailBeforePrintingEitherProgram() throws Exception {
+        Path first = writeLogicProgram();
+        Path second = writeTermRewriteSystem();
+
+        CliResult result = runCli(first.toString(), second.toString(), "-print");
+
+        assertNotEquals(0, result.exitCode());
+        assertTrue(result.stderr().contains("only one input file is allowed"));
+        assertEquals("", result.stdout());
+    }
+
+    @Test
     void printLargeAriWithoutBuildingDependencyGraph() throws Exception {
         Path program = writeLargeAriProgram();
 

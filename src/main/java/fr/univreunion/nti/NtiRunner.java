@@ -148,6 +148,8 @@ final class NtiRunner {
 	 */
 	private void printHelp(Printer printer) {
 		printer.println("Usage: java -jar nti.jar <file> [action] [options]\n");
+		printer.println("Only one input file is allowed per invocation, even if the same path is repeated.");
+		printer.println("Help and version information can be requested without a file.\n");
 		//
 		printer.println("NTI tries to prove (non)termination of the program in the provided file.");
 		printer.println("- For logic programs, the implemented techniques are described in");
@@ -200,6 +202,10 @@ final class NtiRunner {
 		printer.println("    Without cTI, NTI still runs its internal binary and pattern unfolding analyses.");
 		printer.println("    Besides searching for nontermination, binary unfolding can also prove termination");
 		printer.println("    when an unfolding iteration generates no rules.");
+		printer.println("-cti=path requires a non-blank path; -cti and -cti= are errors.");
+		printer.println("Only -cti and -patunf accept an attached =value. Other actions and options");
+		printer.println("reject attached values, including empty ones (for example, --help= or -v=1).");
+		printer.println("Invalid arguments are rejected before any input file is read, with a nonzero exit code.");
 		printer.println("To bound the complete execution time, use an external process supervisor");
 		printer.println("such as GNU timeout.");
 	}

@@ -54,6 +54,10 @@ You can then run NTI as indicated below.
 
 Usage: `java -jar target/nti.jar <file> [action] [options]`
 
+Only one input file is allowed per invocation, including when using `-print`
+or `-stat`. Supplying more than one file is an error, even if the same path
+is repeated. Help and version information can be requested without a file.
+
 NTI tries to prove (non)termination of the program in the provided file.
 - For logic programs, the implemented techniques are described in
 [[Payet & Mesnard, TOPLAS'06]](http://lim.univ-reunion.fr/staff/epayet/Research/Resources/toplas06.pdf),
@@ -118,6 +122,12 @@ If no path to cTI is set, NTI still runs its internal binary and pattern
 unfolding analyses for logic programs. Besides searching for nontermination,
 binary unfolding can also prove termination when an unfolding iteration
 generates no rules.
+
+`-cti=path` requires a non-blank path; `-cti` and `-cti=` are errors.
+Only `-cti` and `-patunf` accept an attached `=value`. The other actions and
+options reject any attached value, including an empty one (for example,
+`--help=` or `-v=1`). Invalid arguments are rejected before any input file
+is read, with a nonzero exit code.
 
 To bound the complete execution time, run NTI under an external process
 supervisor. For example, with GNU coreutils:

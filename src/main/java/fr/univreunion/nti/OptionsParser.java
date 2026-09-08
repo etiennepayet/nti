@@ -109,22 +109,27 @@ final class OptionsParser {
 	 */
 	private boolean parseAction(String actionOption, String value) {
 		if ("-h".equals(actionOption) || "--help".equals(actionOption)) {
+			requireNoValue(actionOption, value);
 			this.action = NtiAction.PRINT_HELP;
 			return true;
 		}
 		if ("--version".equals(actionOption)) {
+			requireNoValue(actionOption, value);
 			this.action = NtiAction.PRINT_VERSION;
 			return true;
 		}
 		if ("-print".equals(actionOption)) {
+			requireNoValue(actionOption, value);
 			this.action = NtiAction.PRINT_PROG;
 			return true;
 		}
 		if ("-stat".equals(actionOption)) {
+			requireNoValue(actionOption, value);
 			this.action = NtiAction.PRINT_STAT;
 			return true;
 		}
 		if ("-prove".equals(actionOption)) {
+			requireNoValue(actionOption, value);
 			this.action = NtiAction.PROVE_TERM;
 			return true;
 		}
@@ -146,10 +151,12 @@ final class OptionsParser {
 	 */
 	private boolean parseOption(String actionOption, String value) {
 		if ("-vv".equals(actionOption)) {
+			requireNoValue(actionOption, value);
 			this.verbosity = Verbosity.VERY_VERBOSE;
 			return true;
 		}
 		if ("-v".equals(actionOption)) {
+			requireNoValue(actionOption, value);
 			if (this.verbosity == Verbosity.QUIET)
 				this.verbosity = Verbosity.VERBOSE;
 			return true;
@@ -161,11 +168,24 @@ final class OptionsParser {
 			throw new IllegalStateException(
 					"option -cTI has been renamed to -cti");
 		if ("-cti".equals(actionOption)) {
+			if (value == null || value.isBlank())
+				throw new IllegalStateException("option -cti requires a non-blank path: -cti=path");
 			this.pathToCti = value;
 			return true;
 		}
 
 		return false;
+	}
+
+	/**
+	 * Rejects an attached value for an action or option that takes none.
+	 *
+	 * @param actionOption the action or option identifier
+	 * @param value the attached value, or {@code null} if no '=' was supplied
+	 */
+	private static void requireNoValue(String actionOption, String value) {
+		if (value != null)
+			throw new IllegalStateException(actionOption + " does not accept a value");
 	}
 
 	/**
@@ -178,8 +198,12 @@ final class OptionsParser {
 				arg.endsWith(".ari") ||
 				arg.endsWith(".xml") ||
 				arg.endsWith(".trs") ||
-				arg.endsWith(".srs")))
+				arg.endsWith(".srs"))) {
+			if (this.fileName != null)
+				throw new IllegalStateException("only one input file is allowed: "
+						+ this.fileName + " and " + arg);
 			this.fileName = arg;
+		}
 		else
 			throw new IllegalStateException("unrecognized argument: " + arg);
 	}

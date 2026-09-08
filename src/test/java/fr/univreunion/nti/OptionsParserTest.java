@@ -84,6 +84,48 @@ class OptionsParserTest {
 	}
 
 	@Test
+	void rejectMissingOrBlankCtiPath() {
+		for (String argument : new String[] { "-cti", "-cti=", "-cti= \t" }) {
+			IllegalStateException failure = assertThrows(
+					IllegalStateException.class,
+					() -> Options.parse(new String[] { argument }), argument);
+
+			assertTrue(failure.getMessage().contains("-cti requires a non-blank path"));
+		}
+	}
+
+	@Test
+	void preserveSpacesInNonBlankCtiPath() {
+		String path = "/tmp/my tools/cti ";
+
+		assertEquals(path, Options.parse(new String[] { "-cti=" + path }).getPathToCti());
+	}
+
+	@Test
+	void rejectValuesForFlagsWithoutValues() {
+		for (String flag : new String[] { "-h", "--help", "--version", "-print", "-stat", "-prove", "-v", "-vv" }) {
+			for (String suffix : new String[] { "=", "=garbage" }) {
+				IllegalStateException failure = assertThrows(
+						IllegalStateException.class,
+						() -> Options.parse(new String[] { flag + suffix }), flag + suffix);
+
+				assertTrue(failure.getMessage().contains(flag + " does not accept a value"));
+			}
+		}
+	}
+
+	@Test
+	void rejectMultipleInputFiles() {
+		for (String second : new String[] { "second.pl", "first.trs" }) {
+			IllegalStateException failure = assertThrows(
+					IllegalStateException.class,
+					() -> Options.parse(new String[] { "first.trs", "-print", second }));
+
+			assertTrue(failure.getMessage().contains("only one input file is allowed"));
+		}
+	}
+
+	@Test
 	void preserveEqualsSignsInInputFileName() {
 		String fileName = "examples/program=custom.pl";
 		Options options = Options.parse(new String[] { fileName, "-print" });
