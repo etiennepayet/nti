@@ -63,7 +63,7 @@ public class TestCliRegression {
         CliResult result = runCli("--version");
 
         assertEquals(0, result.exitCode());
-        assertTrue(result.stdout().contains("NTI (May 2026)"));
+        assertTrue(result.stdout().contains("NTI (September 2026)"));
         assertNoCrash(result);
     }
 
