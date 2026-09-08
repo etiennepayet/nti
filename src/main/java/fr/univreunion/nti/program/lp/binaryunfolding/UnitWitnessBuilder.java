@@ -33,7 +33,10 @@ import fr.univreunion.nti.program.lp.SoP;
  * <a href="https://doi.org/10.1145/1119479.1119481">Non-Termination
  * Inference of Logic Programs</a>, ACM Transactions on Programming
  * Languages and Systems 28(2), 256--289, 2006.
+ *
+ * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
+
 final class UnitWitnessBuilder {
 
 	/**

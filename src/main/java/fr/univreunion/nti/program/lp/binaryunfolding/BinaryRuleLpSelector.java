@@ -27,7 +27,10 @@ import fr.univreunion.nti.program.lp.UnfoldedRuleLp;
 
 /**
  * Selects binary rules from unfolded logic-program rules.
+ *
+ * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
+
 final class BinaryRuleLpSelector {
 
 	/**

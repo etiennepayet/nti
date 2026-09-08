@@ -30,6 +30,7 @@ import fr.univreunion.nti.term.Term;
  *
  * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
+
 final class IdentityBinaryUnfolder {
 
 	/**

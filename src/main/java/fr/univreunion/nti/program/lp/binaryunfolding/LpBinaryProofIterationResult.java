@@ -27,7 +27,10 @@ import fr.univreunion.nti.program.lp.ResultLp;
  * @param result the proof result to return, or <code>null</code>
  * when <code>completed</code> is <code>false</code>
  * @param completed whether the iteration completed the proof
+ *
+ * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
+
 record LpBinaryProofIterationResult(
 		ResultLp result,
 		boolean completed) {

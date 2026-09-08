@@ -32,7 +32,10 @@ import fr.univreunion.nti.program.lp.NonTerminationWitness;
  * @param proof the proof being built
  * @param unfolder the binary unfolder
  * @param loopDictionary the loop dictionary constructed during the proof
+ *
+ * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
+
 record LpBinaryProofState(
 		AnalysisContext context,
 		Proof proof,

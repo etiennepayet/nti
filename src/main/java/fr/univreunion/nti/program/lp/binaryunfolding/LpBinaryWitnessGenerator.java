@@ -27,7 +27,10 @@ import fr.univreunion.nti.program.lp.UnfoldedRuleLp;
 
 /**
  * Generates nontermination witnesses from binary unfolded rules.
+ *
+ * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
+
 final class LpBinaryWitnessGenerator {
 
 	/**

@@ -29,7 +29,10 @@ import fr.univreunion.nti.term.Variable;
 
 /**
  * Formats recurrent pairs as logic-program nontermination witnesses.
+ *
+ * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
+
 final class RecurrentPairLpFormatter {
 
 	/**

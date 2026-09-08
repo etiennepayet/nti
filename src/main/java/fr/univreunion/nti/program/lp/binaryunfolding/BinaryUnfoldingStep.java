@@ -29,7 +29,10 @@ import fr.univreunion.nti.program.lp.UnfoldedRuleLp;
  * @param latestSourceIteration the latest iteration among the two
  * source rules used for this unfolding step
  * @param iteration the current iteration of the unfolding operator
+ *
+ * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
+
 record BinaryUnfoldingStep(
 		int bodyIndex,
 		int lastIndex,

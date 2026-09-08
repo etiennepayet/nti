@@ -27,7 +27,10 @@ import fr.univreunion.nti.program.lp.NonTerminationWitness;
 
 /**
  * The nontermination witnesses generated during one binary-unfolding step.
+ *
+ * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
+
 final class LpBinaryWitnessGeneration {
 
 	/**

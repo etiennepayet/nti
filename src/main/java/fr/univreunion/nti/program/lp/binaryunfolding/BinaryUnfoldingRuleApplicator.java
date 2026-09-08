@@ -31,6 +31,7 @@ import fr.univreunion.nti.term.Function;
  *
  * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
+
 final class BinaryUnfoldingRuleApplicator {
 
 	/**

@@ -28,6 +28,8 @@ import fr.univreunion.nti.program.lp.UnfoldedRuleLp;
  * @param step the unfolding step metadata
  * @param rule the copied rule computed so far during the unfolding
  * @param unfoldingRule the copied rule used for unfolding
+ *
+ * @author <A HREF="mailto:etienne.payet@univ-reunion.fr">Etienne Payet</A>
  */
 record BinaryUnfoldingMatch(
 		BinaryUnfoldingStep step,
