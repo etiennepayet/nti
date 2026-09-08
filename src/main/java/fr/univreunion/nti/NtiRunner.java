@@ -151,14 +151,14 @@ final class NtiRunner {
 		//
 		printer.println("NTI tries to prove (non)termination of the program in the provided file.");
 		printer.println("- For logic programs, the implemented techniques are described in");
-		printer.println("  [Payet & Mesnard, TOPLAS'06] and [Payet, ICLP'25].");
+		printer.println("  [Payet & Mesnard, TOPLAS'06], [Payet, LOPSTR'25] and [Payet, ICLP'25].");
 		printer.println("- For TRSs, NTI first tries direct nontermination techniques, including");
 		printer.println("  generalized rules, rewrite cycles, structural growth, and regular tree languages.");
 		printer.println("  If none succeeds, it uses the dependency pair (DP) framework: it decomposes");
 		printer.println("  the initial set of DP problems into subproblems using");
 		printer.println("  sound DP processors, then it tries to prove that the unsolved subproblems");
-		printer.println("  are infinite using the approaches of [Payet, TCS'08], [Payet, LOPSTR'18]");
-		printer.println("  and [Payet, JAR'24].\n");
+		printer.println("  are infinite using the approaches of [Payet, TCS'08], [Payet, LOPSTR'18],");
+		printer.println("  [Payet, LOPSTR'25] and [Payet, ICLP'25] (adapted to TRSs).\n");
 		//
 		printer.println("'file' has one of the following suffixes:");
 		printer.println("   .pl  for a  pure logic program");
