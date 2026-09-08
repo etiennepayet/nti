@@ -166,9 +166,20 @@ final class NtiRunner {
 		printer.println("   .xml for a  TRS or an SRS in the old XML format");
 		printer.println("   .trs for a  TRS in the old, human readable, format");
 		printer.println("   .srs for an SRS in the old, human readable, format");
-		printer.println("file has to conform to the TPDB syntax specification");
+		printer.println("NTI supports a subset of the TPDB input formats");
 		printer.println("(see https://termination-portal.org/wiki/TPDB and");
-		printer.println(" https://termination-portal.org/wiki/Term_Rewriting)\n");
+		printer.println(" https://termination-portal.org/wiki/Term_Rewriting)");
+		printer.println("Restrictions:");
+		printer.println("   Rewriting analysis supports only standard, unrestricted rewriting (FULL).");
+		printer.println("   INNERMOST, OUTERMOST, LEFTMOST and RIGHTMOST are not supported.");
+		printer.println("   Relative, conditional, context-sensitive and equational rewriting are not supported.");
+		printer.println("   ARI: (format TRS), then (fun name arity) declarations, then (rule lhs rhs) rules.");
+		printer.println("   Left-hand sides must not be variables; rule costs and function theories are not supported.");
+		printer.println("   ARI files are always analyzed using FULL rewriting; only use files intended for that strategy.");
+		printer.println("   ARI SRSs use unary function symbols.");
+		printer.println("   Logic programs must start with exactly one %query: directive (apart from comments");
+		printer.println("   and whitespace), followed by clauses and any supported Prolog directives.");
+		printer.println("   Use separate files to analyze different query modes.\n");
 		//
 		printer.println("'action' (optional) can be:");
 		printer.println("   -h|--help: print this help");
@@ -176,7 +187,8 @@ final class NtiRunner {
 		printer.println("   -print: print the program in the given file");
 		printer.println("   -stat: print some statistics about the program in the given file");
 		printer.println("   -patunf=n: apply the pattern unfolding operator n times");
-		printer.println("    to the program in the given file and print the result");
+		printer.println("    to the TRS or SRS in the given file and print the result");
+		printer.println("    Printing pattern unfoldings is not implemented for logic programs (.pl)");
 		printer.println("   -prove: run a (non)termination proof of the program in the given file");
 		printer.println("    THIS IS THE DEFAULT ACTION\n");
 		//
