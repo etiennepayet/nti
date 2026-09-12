@@ -32,7 +32,7 @@ public class Nti {
 	/**
 	 * The version of NTI.
 	 */
-	public static final String VERSION = "(September 2026)";
+	public static final String VERSION = "2026.09";
 
 	/**
 	 * The method where everything starts. It processes the user-provided
