@@ -20,6 +20,7 @@
 package fr.univreunion.nti.parse.ari;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -33,8 +34,40 @@ import fr.univreunion.nti.parse.SyntaxException;
 import fr.univreunion.nti.program.trs.RuleTrs;
 import fr.univreunion.nti.program.trs.Trs;
 import fr.univreunion.nti.term.Function;
+import fr.univreunion.nti.term.Variable;
 
 class ParserAriTest {
+
+	@Test
+	void previouslyDeclaredConstantsRemainVariablesInAnotherDocument() throws IOException {
+		Trs previous = parse("(format TRS) (fun ari_scope_x 0) "
+				+ "(rule ari_scope_x ari_scope_x)");
+		Trs current = parse("(format TRS) (fun ari_scope_f 1) "
+				+ "(rule (ari_scope_f ari_scope_x) ari_scope_x)");
+		RuleTrs rule = current.iterator().next();
+		assertInstanceOf(Variable.class, rule.getLeft().getChild(0));
+		assertSame(rule.getLeft().getChild(0), rule.getRight());
+
+		// Declaring the symbol in this document must still reuse its identity.
+		Trs redeclared = parse("(format TRS) (fun ari_scope_x 0) "
+				+ "(rule ari_scope_x ari_scope_x)");
+		assertSame(previous.iterator().next().getLeft().getRootSymbol(),
+				redeclared.iterator().next().getLeft().getRootSymbol());
+	}
+
+	@Test
+	void rejectsApplicationsDeclaredOnlyInAnotherDocument() throws IOException {
+		parse("(format TRS) (fun ari_scope_prior 1)");
+		assertThrows(SyntaxException.class, () -> parse(
+				"(format TRS) (rule (ari_scope_prior x) x)"));
+	}
+
+	@Test
+	void rejectsVariableLeftSideEvenWhenAConstantWasPreviouslyDeclared() throws IOException {
+		parse("(format TRS) (fun ari_scope_lhs 0)");
+		assertThrows(SyntaxException.class, () -> parse(
+				"(format TRS) (rule ari_scope_lhs ari_scope_lhs)"));
+	}
 
 	@Test
 	void parsesDeclarationsRulesQuotedIdentifiersAndSharedVariables() throws IOException {

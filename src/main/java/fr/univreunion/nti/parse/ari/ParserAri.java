@@ -70,6 +70,14 @@ public class ParserAri extends Parser {
 	 */
 	private final Map<String, Variable> variables = new HashMap<>();
 
+	/**
+	 * Declarations of this document. Global symbol interning preserves identity,
+	 * but declarations from an earlier parse must not affect this grammar.
+	 */
+	private final Map<Signature, FunctionSymbol> declaredSymbols = new HashMap<>();
+
+	private record Signature(String name, int arity) {}
+
     /**
 	 * Builds a parser for a TRS/SRS in ARI format.
 	 *
@@ -152,9 +160,8 @@ public class ParserAri extends Parser {
 		int arity = (int) this.lookahead.attribute();
 		this.match(Token.INT);
 
-		// We insert the function symbol that
-		// has been read in the symbol table:
-		FunctionSymbol.intern(lexeme, arity);
+		this.declaredSymbols.put(new Signature(lexeme, arity),
+				FunctionSymbol.intern(lexeme, arity));
 	}
 
 	/**
@@ -197,7 +204,7 @@ public class ParserAri extends Parser {
 		String lexeme = (String) this.lookahead.attribute();
 		this.match(Token.ID);
 
-		FunctionSymbol functionSymbol = FunctionSymbol.get(lexeme, 0);
+		FunctionSymbol functionSymbol = this.declaredSymbols.get(new Signature(lexeme, 0));
 		if (functionSymbol != null) {
 			return new Function(functionSymbol, List.of());
 		}
@@ -226,7 +233,7 @@ public class ParserAri extends Parser {
 		this.match(Token.CLOSE_PAR);
 
 		int arity = arguments.size();
-		FunctionSymbol functionSymbol = FunctionSymbol.get(lexeme, arity);
+		FunctionSymbol functionSymbol = this.declaredSymbols.get(new Signature(lexeme, arity));
 		if (functionSymbol == null) {
 			int lineNumber = this.scanner.getLineno();
 			throw new SyntaxException("error at line " + lineNumber
